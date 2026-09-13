@@ -11,7 +11,7 @@ const WM = ["wm-hand", "wm-serif", "wm-black", "wm-round", "wm-pixel", "wm-geo"]
 
 // Placeholder media until Locadit's own footage lands. One card, centred.
 const CARDS = [
-  { x: 800, video: "https://static.amo.co/website/videos/location/20250915.mp4#t=9", qr: "https://amo.co/qrcode-location.png", name: "Locadit", tag: "Group trips without the argument", href: "/about" },
+  { x: 800, video: "https://static.amo.co/website/videos/location/20250915.mp4#t=9", qr: "https://amo.co/qrcode-location.png", name: "Locadit", tag: "Group trips without the argument", href: "/start" },
 ];
 
 // Stagger index of each piece within its layer (drives pop-in delay).
