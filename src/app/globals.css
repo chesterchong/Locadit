@@ -177,7 +177,8 @@ input[type=range]{accent-color:#111}
 .swipe-photo .border-black\/10{border-color:rgba(255,255,255,.2)}
 
 /* Promo flyers: confined to the side gutters so they never cover the content column */
-.promos{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.promos{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+body:has(.landing) .promos{display:none}
 main{position:relative;z-index:1}
 .promo{position:absolute;pointer-events:none;animation:wander ease-in-out infinite alternate}
 .promo.lane-l{left:2vw;width:calc(50vw - 330px)}
@@ -197,7 +198,8 @@ main{position:relative;z-index:1}
 .swipe-photo .border-black\/10{border-color:rgba(255,255,255,.2)}
 
 /* Promo flyers */
-.promos{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.promos{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+body:has(.landing) .promos{display:none}
 main{position:relative;z-index:1}
 .promo{position:absolute;left:-80px;animation:fly linear infinite;pointer-events:none}
 .promo-pin{pointer-events:auto;font-size:28px;line-height:1;background:none;border:0;cursor:pointer;filter:drop-shadow(0 8px 14px rgba(0,0,0,.18));animation:bob 3.2s ease-in-out infinite;transition:transform .25s cubic-bezier(.2,1.4,.3,1)}

@@ -3,6 +3,7 @@ import { Aldrich, Caveat, Fredoka, Gochi_Hand, Inter, JetBrains_Mono, Playfair_D
 import "./globals.css";
 import "./overrides.css";
 import Soundtrack from "./soundtrack";
+import Promos from "./promos";
 
 // Self-hosted and preloaded, so the intro's wordmark faces are on hand before their beat.
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -26,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${inter.variable} ${mono.variable} ${caveat.variable} ${playfair.variable} ${fredoka.variable} ${pixel.variable} ${righteous.variable} ${marker.variable} ${caption.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col"><div className="top-blur" aria-hidden />{children}<Soundtrack /><div className="page-frame" aria-hidden /></body>
+      <body className="min-h-full flex flex-col"><div className="top-blur" aria-hidden /><Promos />{children}<Soundtrack /><div className="page-frame" aria-hidden /></body>
     </html>
   );
 }
