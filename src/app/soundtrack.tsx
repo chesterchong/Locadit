@@ -4,8 +4,8 @@ import { useEffect, useRef } from "react";
 const MAX_VOLUME = 0.7;
 const FADE_SECONDS = 4;
 
-// Site-wide soundtrack via Web Audio: the file is decoded once and looped seamlessly in memory
-// (no dependence on server range requests), with the volume ramping from silence to MAX_VOLUME.
+// Site-wide soundtrack via Web Audio: the file is decoded once and played through a single time,
+// with the volume ramping from silence to MAX_VOLUME.
 // Autoplay is attempted on load; if the browser blocks it, the first click, tap or key press starts it.
 // A fixed white frame around the page pulses with the track's bass energy and rests when the music is silent.
 export default function Soundtrack() {
@@ -73,7 +73,8 @@ export default function Soundtrack() {
         if (cancelled) return;
         source = ctx.createBufferSource();
         source.buffer = audio;
-        source.loop = true;
+        source.loop = false; // play once; the frame settles when the track ends
+        source.onended = () => { level = 0; setBeat(0); cancelAnimationFrame(raf); raf = 0; };
         source.connect(gain);
         source.connect(analyser); // pre-gain, so the beat reads cleanly even while the volume fades in
         source.start();

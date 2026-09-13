@@ -59,6 +59,7 @@ export default function Landing() {
 
   // After the wordmark parks at the top it keeps cycling through the drawn styles.
   const [loop, setLoop] = useState(0);
+  const [hot, setHot] = useState(false); // hovering the phone or its card grows both together
   useEffect(() => {
     if (step < 7 || reduced.current) return;
     const id = window.setInterval(() => setLoop((l) => l + 1), 1800);
@@ -84,7 +85,7 @@ export default function Landing() {
             {step >= 1 && <WordSvg key={`in-${changeStep}`} font={font} mode="draw" />}
           </h1>
           {CARDS.map((c, i) => (
-            <Link key={c.name} href={c.href} className={`phone-wrap ${step >= 8 ? "on" : ""}`} style={{ left: c.x, transitionDelay: `${i * 120}ms` }} onClick={stop} aria-label={`${c.name}: ${c.tag}`}>
+            <Link key={c.name} href={c.href} className={`phone-wrap ${step >= 8 ? "on" : ""} ${hot ? "hot" : ""}`} style={{ left: c.x, transitionDelay: `${i * 120}ms` }} onClick={stop} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)} aria-label={`${c.name}: ${c.tag}`}>
               {/* The clipped, rounded element must carry no transform of its own, or Chrome paints the video black. */}
               <div className="phone">
                 <video ref={(el) => { videos.current[i] = el; }} src={c.video} muted loop playsInline preload="auto" />
@@ -93,7 +94,7 @@ export default function Landing() {
             </Link>
           ))}
           {CARDS.map((c, i) => (
-            <Link key={`${c.name}-info`} href={c.href} className={`info ${step >= 9 ? "on" : ""}`} style={{ left: c.x, transitionDelay: `${i * 120}ms` }} onClick={stop}>
+            <Link key={`${c.name}-info`} href={c.href} className={`info ${step >= 9 ? "on" : ""} ${hot ? "hot" : ""}`} style={{ left: c.x, transitionDelay: `${i * 120}ms` }} onClick={stop} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)}>
               <img src={c.icon} alt="" />
               <span className="info-text"><b>{c.name}</b><small>{c.tag}</small></span>
               <span className="info-cta">Start a room</span>
