@@ -322,3 +322,10 @@ main{position:relative;z-index:1}
 .credit{position:absolute;left:0;right:0;bottom:30px;text-align:center;font-style:italic;font-size:15px;color:rgba(39,39,39,.55);opacity:0;transform:translateY(8px);transition:opacity .8s ease .4s,transform .8s ease .4s;pointer-events:none;z-index:70}
 .credit.on{opacity:1;transform:none}
 @media (max-width:640px){.credit{bottom:22px;font-size:13px}}
+
+/* Progressive blur along the top edge of app pages (hidden on the intro) */
+.top-blur{position:fixed;top:0;left:0;right:0;height:96px;z-index:45;pointer-events:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  -webkit-mask:linear-gradient(#000 0%,#000 30%,rgba(0,0,0,.6) 60%,transparent 100%);mask:linear-gradient(#000 0%,#000 30%,rgba(0,0,0,.6) 60%,transparent 100%);
+  background:linear-gradient(rgba(247,243,240,.85),rgba(247,243,240,0))}
+body:has(.landing) .top-blur{display:none}
+.home-link{z-index:60}
