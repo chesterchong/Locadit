@@ -48,7 +48,7 @@ export const PIECES: Piece[] = [
   { id: "book", wind: 2.5, hover: true, layer: 3, kind: "img", src: "/collage/book.png", content: "📙", x: 1350, y: 720, size: 230, rot: 14 },
   { id: "portrait", wind: 1.5, hover: true, layer: 3, kind: "img", src: "/collage/portrait.png", content: "🧑‍🎤", x: 150, y: 640, size: 230, rot: -5 },
   { id: "opera", wind: 0.8, hover: true, layer: 3, kind: "img", src: "/collage/opera.png", content: "🏛️", x: 1510, y: 660, size: 270 },
-  { id: "drink", layer: 3, kind: "text", content: "DRINK", x: 600, y: 520, size: 22, font: "serif", color: "#222" },
+  { id: "drink", layer: 3, kind: "text", content: "DEPART", x: 600, y: 520, size: 22, font: "serif", color: "#222" },
   { id: "fish", wind: 3, layer: 3, kind: "img", src: "/collage/fish.png", content: "🐠", x: 520, y: 580, size: 90, rot: -10 },
   { id: "cactus-l", wind: 2, layer: 3, kind: "img", src: "/collage/cactus-l.png", content: "🌵", x: 340, y: 820, size: 180, rot: -6 },
   { id: "cactus-r", wind: 6, layer: 3, kind: "img", src: "/collage/cactus-r.png", content: "🌵", x: 1190, y: 830, size: 170, rot: 8 },
@@ -67,15 +67,9 @@ export const PIECES: Piece[] = [
   { id: "ufo", wind: 5, layer: 5, kind: "img", src: "/collage/ufo.png", content: "🛸", x: 1300, y: 55, size: 100, rot: -10 },
   { id: "bfly-a", wind: 8, layer: 5, kind: "img", src: "/collage/bfly-a.png", content: "🦋", x: 640, y: 210, size: 60, rot: 15 },
   { id: "bfly-b", wind: 8, layer: 5, kind: "img", src: "/collage/bfly-b.png", content: "🦋", x: 1060, y: 150, size: 50, rot: -20 },
-  { id: "affaire", layer: 5, kind: "text", content: "FOR THE TWO
-OF YOU", cycle: ["FOR THE TWO
-OF YOU", "ONE PLAN FOR
-THE WHOLE FAMILY", "BEST FRIENDS,
-ZERO ARGUMENTS", "MARRIED, AND
-STILL EXPLORING", "TRIPS THAT KEEP
-THE GROUP TOGETHER"], x: 1165, y: 100, size: 24, font: "caption", color: "#fff", rot: -4 },
+  { id: "affaire", layer: 5, kind: "text", content: "FOR THE TWO\nOF YOU", cycle: ["FOR THE TWO\nOF YOU", "ONE PLAN FOR\nTHE WHOLE FAMILY", "BEST FRIENDS,\nZERO ARGUMENTS", "MARRIED, AND\nSTILL EXPLORING", "TRIPS THAT KEEP\nTHE GROUP TOGETHER"], x: 1165, y: 100, size: 24, font: "caption", color: "#fff", rot: -4 },
   { id: "lookup", layer: 5, kind: "text", content: "Look up!", x: 1400, y: 520, size: 44, font: "hand", color: "#111", rot: -12 },
-  { id: "friends", layer: 5, kind: "text", content: "FRIENDS!", x: 330, y: 600, size: 40, font: "hand", color: "#111", rot: -6, underline: true },
+  { id: "friends", layer: 5, kind: "text", content: "LET'S GO!", x: 330, y: 600, size: 40, font: "hand", color: "#111", rot: -6, underline: true },
   { id: "robot", wind: 1.2, hover: true, layer: 5, kind: "img", src: "/collage/robot.png", content: "🤖", x: 240, y: 190, size: 190, rot: -8 },
   { id: "disco", wind: 4, hover: true, layer: 5, kind: "img", src: "/collage/disco.png", content: "🪩", x: 90, y: 180, size: 130 },
   { id: "pol-a", wind: 3, hover: true, layer: 5, kind: "img", src: "/collage/pol-a.png", x: 380, y: 360, size: 90, h: 150, rot: 12, color: "linear-gradient(160deg,#5b7cfa,#1b2a7a)" },
