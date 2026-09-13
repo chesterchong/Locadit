@@ -1,26 +1,74 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ACTIVITIES } from "@/lib/store";
+import { ACTIVITIES, Pace } from "@/lib/store";
+
+type Trip = { code: string; name: string; destination: string; dateOptions: string[] };
+type Q = "name" | "budget" | "dates" | "pace" | "must" | "avoid";
+const FLOW: Q[] = ["name", "budget", "dates", "pace", "must", "avoid"];
 const EMOJI: Record<string, string> = { "Food & markets": "🍜", Nightlife: "🪩", "Nature & hikes": "🏔️", "Museums & culture": "🏛️", "Beach & rest": "🏝️", Shopping: "🛍️", "Adventure sports": "🪂", "Local neighbourhoods": "🚲" };
 const HUE: Record<string, string> = { "Food & markets": "#f97316", Nightlife: "#a855f7", "Nature & hikes": "#22c55e", "Museums & culture": "#eab308", "Beach & rest": "#06b6d4", Shopping: "#ec4899", "Adventure sports": "#ef4444", "Local neighbourhoods": "#3b82f6" };
+
 export default function Quiz() {
   const { code } = useParams<{ code: string }>();
   const r = useRouter();
-  const [trip, setTrip] = useState<{ name: string; destination: string; dateOptions: string[] } | null>(null);
-  const [step, setStep] = useState<0 | 1>(0);
+  const [trip, setTrip] = useState<Trip | null>(null);
+  const [host, setHost] = useState(false);
+
+  // Intake conversation
+  const [q, setQ] = useState(0);                       // index into FLOW; FLOW.length = swiping
+  const [log, setLog] = useState<{ from: "ai" | "me"; text: string }[]>([]);
+  const [typing, setTyping] = useState(false);
+  const [draft, setDraft] = useState("");
   const [name, setName] = useState("");
   const [budget, setBudget] = useState(800);
   const [dates, setDates] = useState<string[]>([]);
+  const [pace, setPace] = useState<Pace>("balanced");
+  const [mustHave, setMustHave] = useState("");
+  const [avoid, setAvoid] = useState("");
+  const endRef = useRef<HTMLDivElement>(null);
+
+  // Swiping
   const [i, setI] = useState(0);
   const [interests, setInterests] = useState<Record<string, number>>({});
   const [dx, setDx] = useState(0);
   const [drag, setDrag] = useState(false);
   const [fly, setFly] = useState<null | number>(null);
   const start = useRef(0);
-  useEffect(() => { fetch(`/api/trips/${code}`).then((r) => r.json()).then((d) => setTrip(d.trip)); }, [code]);
+
+  useEffect(() => {
+    setHost(new URLSearchParams(window.location.search).get("host") === "1");
+    fetch(`/api/trips/${code}`).then((r) => r.json()).then((d) => setTrip(d.trip));
+  }, [code]);
+
+  // Locadit asks the next question whenever the conversation advances.
+  useEffect(() => {
+    if (!trip || q >= FLOW.length) return;
+    const first = trip.dateOptions[0] ?? "";
+    const prompts: Record<Q, string> = {
+      name: `Hey! I'm Locadit. I'm helping plan ${trip.name}. What should I call you?`,
+      budget: `Nice to meet you, ${name}. What's the most you'd be happy spending on this trip, all in?`,
+      dates: `Got it. Which of these dates work for you? Pick every one that does${first ? `, even if ${first} is your favourite` : ""}.`,
+      pace: `How do you like to travel: slow mornings, a balanced mix, or every hour planned?`,
+      must: `One thing this ${trip.destination} trip must include for you?`,
+      avoid: `And one thing you'd rather avoid? (Skip if nothing comes to mind.)`,
+    };
+    setTyping(true);
+    const t = window.setTimeout(() => { setTyping(false); setLog((l) => [...l, { from: "ai", text: prompts[FLOW[q]] }]); }, 550);
+    return () => window.clearTimeout(t);
+  }, [trip, q, name]);
+
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, [log, typing]);
+
+  function answer(text: string) {
+    setLog((l) => [...l, { from: "me", text }]);
+    setDraft("");
+    setQ((n) => n + 1);
+  }
+
   async function submit(final: Record<string, number>) {
-    await fetch(`/api/trips/${code}/answers`, { method: "POST", body: JSON.stringify({ name, budget, dates, interests: final }) });
+    await fetch(`/api/trips/${code}/answers`, { method: "POST", body: JSON.stringify({ name, budget, dates, interests: final, pace, mustHave: mustHave || undefined, avoid: avoid || undefined }) });
     r.push(`/t/${code}/board`);
   }
   function vote(v: number) {
@@ -34,36 +82,75 @@ export default function Quiz() {
   const onDown = (e: React.PointerEvent) => { start.current = e.clientX; setDrag(true); (e.target as Element).setPointerCapture?.(e.pointerId); };
   const onMove = (e: React.PointerEvent) => { if (drag) setDx(e.clientX - start.current); };
   const onUp = () => { setDrag(false); if (dx > 110) vote(3); else if (dx < -110) vote(0); else setDx(0); };
+
   if (!trip) return <main className="p-6 muted">Loading…</main>;
+  const current = FLOW[q];
   const act = ACTIVITIES[i];
   const x = fly === null ? dx : fly * 600;
   const rot = x / 18;
   const love = Math.min(1, Math.max(0, x / 110)), pass = Math.min(1, Math.max(0, -x / 110));
+
   return (
     <main className="mx-auto max-w-md px-6 py-10 space-y-6">
+      {host && (
+        <div className="pill w-full justify-between">
+          <span><span className="dot" /> You started this room · code <b className="mono">{trip.code}</b></span>
+          <Link href={`/t/${trip.code}/board`} className="underline">Live board →</Link>
+        </div>
+      )}
       <header>
-        <p className="text-xs uppercase tracking-widest muted">{trip.destination} · private quiz</p>
+        <p className="text-xs uppercase tracking-widest muted">{trip.destination} · private</p>
         <h1 className="text-3xl font-extrabold tracking-tight">{trip.name}</h1>
       </header>
-      {step === 0 && (
-        <section className="glass p-5 space-y-5 pop">
-          <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
-          <div>
-            <div className="flex justify-between text-sm"><span className="muted">Max I&apos;m comfortable spending</span><span className="mono font-semibold">${budget}</span></div>
-            <input type="range" min={200} max={3000} step={50} value={budget} onChange={(e) => setBudget(+e.target.value)} className="mt-2 w-full" />
+
+      {q < FLOW.length && (
+        <section className="glass p-5 space-y-4 pop">
+          <div className="flex flex-col gap-2">
+            {log.map((m, k) => <div key={k} className={`bubble ${m.from}`}>{m.text}</div>)}
+            {typing && <div className="typing"><i /><i /><i /></div>}
+            <div ref={endRef} />
           </div>
-          <div className="space-y-2">
-            <p className="text-sm muted">Dates I can do</p>
-            <div className="grid gap-2">{trip.dateOptions.map((d) => (
-              <button key={d} onClick={() => setDates(dates.includes(d) ? dates.filter((x) => x !== d) : [...dates, d])} className={`chip text-left mono text-sm ${dates.includes(d) ? "on" : ""}`}>{d}</button>
-            ))}</div>
-          </div>
-          <button disabled={!name || !dates.length} onClick={() => setStep(1)} className="btn btn-primary w-full disabled:opacity-30">Start swiping →</button>
+          {!typing && current === "name" && (
+            <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (draft.trim()) { setName(draft.trim()); answer(draft.trim()); } }}>
+              <input autoFocus className="input" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Your name" />
+              <button className="btn btn-primary" disabled={!draft.trim()}>Next</button>
+            </form>
+          )}
+          {!typing && current === "budget" && (
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm"><span className="muted">All in, per person</span><span className="mono font-semibold">${budget}</span></div>
+              <input type="range" min={200} max={3000} step={50} value={budget} onChange={(e) => setBudget(+e.target.value)} className="w-full" />
+              <button className="btn btn-primary w-full" onClick={() => answer(`Up to $${budget}`)}>That&apos;s my max</button>
+            </div>
+          )}
+          {!typing && current === "dates" && (
+            <div className="space-y-3">
+              <div className="grid gap-2">{trip.dateOptions.map((d) => (
+                <button key={d} onClick={() => setDates(dates.includes(d) ? dates.filter((x) => x !== d) : [...dates, d])} className={`chip text-left mono text-sm ${dates.includes(d) ? "on" : ""}`}>{d}</button>
+              ))}</div>
+              <button className="btn btn-primary w-full" disabled={!dates.length} onClick={() => answer(dates.join(", "))}>These work</button>
+            </div>
+          )}
+          {!typing && current === "pace" && (
+            <div className="grid grid-cols-3 gap-2">
+              {([["chill", "Slow mornings"], ["balanced", "Balanced mix"], ["packed", "Every hour planned"]] as [Pace, string][]).map(([v, label]) => (
+                <button key={v} className="chip text-sm" onClick={() => { setPace(v); answer(label); }}>{label}</button>
+              ))}
+            </div>
+          )}
+          {!typing && (current === "must" || current === "avoid") && (
+            <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); const v = draft.trim(); if (current === "must") setMustHave(v); else setAvoid(v); answer(v || (current === "must" ? "Nothing specific" : "Nothing, I'm easy")); }}>
+              <input autoFocus className="input" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={current === "must" ? "e.g. one proper beach day" : "e.g. early mornings"} />
+              <button className="btn btn-primary" type="submit">{draft.trim() ? "Next" : "Skip"}</button>
+            </form>
+          )}
           <p className="text-xs muted text-center">Nobody sees your answers, only the merged result.</p>
         </section>
       )}
-      {step === 1 && (
-        <section className="space-y-5 select-none">
+
+      {q >= FLOW.length && (
+        <section className="space-y-5 select-none pop">
+          <div className="bubble ai">Last part, {name}: swipe right on what you&apos;d love in {trip.destination}, left to pass.</div>
           <div className="flex items-center justify-between text-xs muted"><span className="mono">{i + 1} / {ACTIVITIES.length}</span><span>← pass · love →</span></div>
           <div className="relative h-[460px]" style={{ perspective: 1000 }}>
             {ACTIVITIES[i + 1] && <div className="glass absolute inset-0 scale-[.95] translate-y-3 opacity-60" />}

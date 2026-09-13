@@ -10,7 +10,7 @@ export default function Home() {
   async function create() {
     const res = await fetch("/api/trips", { method: "POST", body: JSON.stringify({ name, destination: dest, dateOptions: dates.split(",").map((s) => s.trim()).filter(Boolean) }) });
     const t = await res.json();
-    r.push(`/t/${t.code}/board`);
+    r.push(`/t/${t.code}?host=1`);
   }
   return (
     <main className="mx-auto max-w-md px-6 py-14 space-y-8">

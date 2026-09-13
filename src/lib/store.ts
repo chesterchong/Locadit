@@ -1,4 +1,5 @@
-export type Answer = { name: string; budget: number; dates: string[]; interests: Record<string, number> };
+export type Pace = "chill" | "balanced" | "packed";
+export type Answer = { name: string; budget: number; dates: string[]; interests: Record<string, number>; pace?: Pace; mustHave?: string; avoid?: string };
 export type Expense = { id: string; title: string; amount: number; paidBy: string; splitAmong: string[] };
 export type Trip = { code: string; name: string; destination: string; dateOptions: string[]; answers: Answer[]; expenses: Expense[]; createdAt: number };
 export const ACTIVITIES = ["Food & markets", "Nightlife", "Nature & hikes", "Museums & culture", "Beach & rest", "Shopping", "Adventure sports", "Local neighbourhoods"];

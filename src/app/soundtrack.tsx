@@ -26,10 +26,10 @@ export default function Soundtrack() {
     let started = false;
     let cancelled = false;
     let raf = 0;
-    let avg = 0;      // running average of bass energy (adaptive threshold)
+    let peak = 0;     // slow-decaying peak of bass energy (normaliser)
     let level = 0;    // displayed beat level with fast attack, slow decay
     // Debug handle for verifying playback state from devtools.
-    (window as unknown as { __soundtrack?: unknown }).__soundtrack = { ctx, gain, get source() { return source; }, get started() { return started; }, get level() { return level; } };
+    (window as unknown as { __soundtrack?: unknown }).__soundtrack = { ctx, gain, get source() { return source; }, get started() { return started; }, get level() { return level; }, get peak() { return peak; } };
 
     const setBeat = (v: number) => frame.current?.style.setProperty("--beat", v.toFixed(3));
     const tick = () => {
@@ -39,9 +39,10 @@ export default function Soundtrack() {
       let sum = 0;
       for (let i = 1; i <= 8; i++) sum += bins[i]; // ~43–350 Hz: kick and bass
       const energy = sum / (8 * 255);
-      avg = avg ? avg * 0.96 + energy * 0.04 : energy;
-      const onset = Math.max(0, (energy - avg * 1.02) / Math.max(0.04, avg * 0.6));
-      level = Math.max(level * 0.86, Math.min(1, onset));
+      peak = Math.max(peak * 0.995, energy);
+      const n = energy / Math.max(0.05, peak);          // 0..1 relative to recent loudest bass
+      const target = Math.max(0, (n - 0.55) / 0.45);    // only the top of each hit registers
+      level = target > level ? target : level * 0.85;
       setBeat(level * Math.min(1, gain.gain.value / MAX_VOLUME));
       raf = requestAnimationFrame(tick);
     };

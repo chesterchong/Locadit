@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
-type Data = { trip: { code: string; name: string; destination: string; answers: { name: string }[]; expenses: { id: string; title: string; amount: number; paidBy: string }[] }; result: null | { budget: number; bestDate: { d: string; n: number }; dateVotes: { d: string; n: number }[]; scores: { act: string; score: number }[]; itinerary: { day: number; theme: string; why: string; budget: number; plan: string[] }[]; members: string[] }; balances: Record<string, number> };
+type Data = { trip: { code: string; name: string; destination: string; answers: { name: string }[]; expenses: { id: string; title: string; amount: number; paidBy: string }[] }; result: null | { budget: number; bestDate: { d: string; n: number }; dateVotes: { d: string; n: number }[]; scores: { act: string; score: number }[]; itinerary: { day: number; theme: string; why: string; budget: number; plan: string[] }[]; members: string[]; pace: string; notes: { name: string; mustHave?: string; avoid?: string }[] }; balances: Record<string, number> };
 export default function Board() {
   const { code } = useParams<{ code: string }>();
   const [d, setD] = useState<Data | null>(null);
@@ -23,6 +24,7 @@ export default function Board() {
         <h1 className="text-4xl font-extrabold tracking-tight">{trip.name}</h1>
         <p className="muted mt-1 text-sm">Share <span className="mono text-black/80">{link}</span></p>
         <p className="text-sm mt-1">{trip.answers.map((a) => a.name).join(" · ") || <span className="muted">waiting for the first swipe…</span>}</p>
+        <Link href={`/t/${trip.code}`} className="btn btn-primary inline-block mt-3">Add my answers</Link>
       </header>
       {!result ? <div className="glass p-8 muted text-center">Results appear here live as people finish swiping.</div> : (
         <>
@@ -36,8 +38,16 @@ export default function Board() {
               <div key={s.act} className="flex items-center gap-3 text-sm"><span className="w-44 truncate">{s.act}</span><div className="bar flex-1"><div style={{ width: `${pct}%` }} /></div><span className="mono w-10 text-right muted">{pct}%</span></div>
             ); })}
           </section>
+          {result.notes.length > 0 && (
+            <section className="glass p-5 space-y-2 pop">
+              <p className="text-xs uppercase tracking-widest muted">What people need</p>
+              {result.notes.map((n) => (
+                <p key={n.name} className="text-sm"><b>{n.name}</b>{n.mustHave && <span> · must have <span className="text-green-600">{n.mustHave}</span></span>}{n.avoid && <span> · avoid <span className="text-rose-500">{n.avoid}</span></span>}</p>
+              ))}
+            </section>
+          )}
           <section className="space-y-3">
-            <p className="text-xs uppercase tracking-widest muted">Itinerary</p>
+            <p className="text-xs uppercase tracking-widest muted">Itinerary · {result.pace === "chill" ? "slow pace" : result.pace === "packed" ? "packed days" : "balanced pace"}</p>
             {result.itinerary.map((day) => (
               <div key={day.day} className="glass p-5 pop">
                 <div className="flex items-baseline justify-between"><p className="font-semibold text-lg"><span className="mono muted mr-2">D{day.day}</span>{day.theme}</p><p className="mono text-sm muted">~${day.budget}/pp</p></div>
