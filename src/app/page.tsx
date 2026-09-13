@@ -123,9 +123,9 @@ function PieceEl({ p, step, delay }: { p: Piece; step: number; delay: number }) 
   } as CSSProperties;
   const cls = `piece ${p.kind} ${p.font ? "f-" + p.font : ""} ${p.underline ? "underline-blue" : ""} ${p.hover ? "hoverable" : ""} ${gone ? "off" : shown ? "on" : ""}`;
   if (p.kind === "img") return <img className={cls} style={style} src={p.src} alt="" />;
-  if (p.kind === "polaroid") return <div className={cls} style={style}><i style={{ background: p.color }} /></div>;
+  if (p.kind === "polaroid") return <div className={cls} style={style}><span className="in"><i style={{ background: p.color }} /></span></div>;
   if (p.kind === "checker" || p.kind === "cloud") return <div className={cls} style={style} />;
-  return <div className={cls} style={style} aria-hidden>{p.content}</div>;
+  return <div className={cls} style={style} aria-hidden><span className="in">{p.content}</span></div>;
 }
 
 function WordSvg({ font, mode }: { font: string; mode: "draw" | "erase" }) {
