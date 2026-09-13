@@ -75,7 +75,7 @@ export default function Landing() {
   return (
     <div className="landing">
       <section ref={heroRef} className="hero" aria-label="Locadit intro">
-        <div className="stage" style={{ "--s": fit?.s ?? 1, "--wm": fit?.wm ?? 1, visibility: fit ? "visible" : "hidden" } as CSSProperties}>
+        <div className={`stage ${step >= 6 ? "night" : ""}`} style={{ "--s": fit?.s ?? 1, "--wm": fit?.wm ?? 1, visibility: fit ? "visible" : "hidden" } as CSSProperties}>
           <div className="dots on" />
           <div className={`sky ${step >= 5 ? "on" : ""}`} />
           {PIECES.map((p, i) => <PieceEl key={p.id} p={p} step={step} delay={ORDER[i] * 70} seed={i} />)}
