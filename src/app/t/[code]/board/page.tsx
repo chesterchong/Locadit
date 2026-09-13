@@ -32,7 +32,7 @@ export default function Board() {
     setTitle(""); setAmount(""); load();
   }
   return (
-    <main className="mx-auto max-w-2xl px-6 py-10 space-y-6">
+    <main className="mx-auto max-w-2xl px-6 pt-16 pb-10 space-y-6">
       <ShareQr code={trip.code} />
       <Link href="/" className="home-link">Locadit</Link>
       <div className="pill"><span className="dot" />Live · <span className="mono">{trip.code}</span></div>

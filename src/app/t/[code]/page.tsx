@@ -143,7 +143,7 @@ export default function Quiz() {
   const fade = fly !== null ? 0 : 1 - Math.min(0.75, Math.abs(dx) / 320);
 
   return (
-    <main className={`mx-auto max-w-md px-6 py-10 flex flex-col gap-6 ${q < FLOW.length ? "h-[100svh] overflow-hidden" : "min-h-[100svh] justify-center"}`}>
+    <main className={`mx-auto max-w-md px-6 pt-16 pb-10 flex flex-col gap-6 ${q < FLOW.length ? "h-[100svh] overflow-hidden" : "min-h-[100svh] justify-center"}`}>
       <Link href="/" className="home-link">Locadit</Link>
       <Promos />
       {host && (

@@ -44,7 +44,7 @@ export default function Home() {
   const setWin = (i: number, patch: Partial<Win>) => setWins((ws) => ws.map((w, k) => (k === i ? { ...w, ...patch, ...(patch.from && w.to && w.to < patch.from ? { to: patch.from } : {}) } : w)));
 
   return (
-    <main className="mx-auto max-w-md px-6 py-14 space-y-8 enter">
+    <main className="mx-auto max-w-md px-6 pt-16 pb-14 space-y-8 enter">
       <Link href="/" className="home-link">Locadit</Link>
       <div className="pill"><span className="dot" />Live · no sign-up · 2 min per person</div>
       <div>
