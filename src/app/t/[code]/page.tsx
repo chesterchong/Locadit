@@ -191,7 +191,7 @@ export default function Quiz() {
           )}
           {!typing && (current === "must" || current === "avoid") && (
             <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); const v = draft.trim(); if (current === "must") setMustHave(v); else setAvoid(v); answer(v || (current === "must" ? "Nothing specific" : "Nothing, I'm easy")); }}>
-              <input autoFocus className="input" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={`e.g. ${SUGGEST[current]} · Tab to use`}
+              <input autoFocus className="input" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={`e.g. ${SUGGEST[current]}`}
                 onKeyDown={(e) => { if (e.key === "Tab" && !draft.trim()) { e.preventDefault(); setDraft(SUGGEST[current]); } }} />
               <button className="btn btn-primary" type="submit">{draft.trim() ? "Next" : "Skip"}</button>
             </form>
