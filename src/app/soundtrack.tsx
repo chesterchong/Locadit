@@ -3,8 +3,9 @@ import { useEffect, useRef, useState } from "react";
 
 const MAX_VOLUME = 0.55;
 const FADE_SECONDS = 4;
-// The disc's playlist (board page only). Loops.
-const PLAYLIST = ["/audio/melodic-minor.mp3", "/audio/nightcall.mp3", "/audio/broken-heart.mp3"];
+// The disc's playlist (board page only). Shuffled each pass, never the same song twice in a row.
+const PLAYLIST = ["/audio/nightcall.mp3", "/audio/broken-heart.mp3"];
+const shuffle = (a: string[]) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 const NOTES = ["🎵", "🎶", "♪", "♫"];
 
 // Site-wide soundtrack via Web Audio, controlled by the spinning disc in the top-right corner.
@@ -27,9 +28,16 @@ export default function Soundtrack() {
     }
     return buffers.current[url];
   };
+  const lastRef = useRef<string | null>(null);
   const nextUrl = () => {
-    if (!queueRef.current.length) queueRef.current = [...PLAYLIST]; // loop the disc playlist
-    return queueRef.current.shift()!;
+    if (!queueRef.current.length) {
+      let next = shuffle(PLAYLIST);
+      if (PLAYLIST.length > 1 && next[0] === lastRef.current) next = [...next.slice(1), next[0]];
+      queueRef.current = next;
+    }
+    const url = queueRef.current.shift()!;
+    lastRef.current = url;
+    return url;
   };
   const startSource = async (fadeSeconds = 1.5) => {
     const ctx = ctxRef.current, gain = gainRef.current;
@@ -68,7 +76,7 @@ export default function Soundtrack() {
     const tryStart = () => { if (startedRef.current) { unbind(); return; } play().then(() => { if (startedRef.current) unbind(); }); };
     const unbind = () => events.forEach((e) => window.removeEventListener(e, tryStart));
     events.forEach((e) => window.addEventListener(e, tryStart));
-    queueRef.current = [...PLAYLIST];
+    queueRef.current = shuffle(PLAYLIST);
     load(queueRef.current[0]).then(() => { if (cancelled) return; readyRef.current = true; tryStart(); }).catch(() => {});
     return () => { cancelled = true; unbind(); try { srcRef.current?.stop(); } catch {} ctx.close().catch(() => {}); };
   }, []); // eslint-disable-line
