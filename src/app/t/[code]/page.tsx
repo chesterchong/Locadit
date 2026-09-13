@@ -220,14 +220,18 @@ export default function Quiz() {
               style={{ transform: `translateX(${x}px) rotate(${rot}deg)`, opacity: fade, transition: drag ? "none" : "transform .26s ease-out, opacity .26s ease-out", background: photo ? `linear-gradient(to top, rgba(0,0,0,.78), rgba(0,0,0,.25) 50%, rgba(0,0,0,.05)), url(${photo}) center/cover` : `radial-gradient(80% 60% at 50% 0%, ${HUE[act]}33, #fff 70%)` }}>
               <div className="absolute left-5 top-5 rounded-lg border-2 border-green-600 px-3 py-1 text-lg font-extrabold text-green-600 -rotate-12" style={{ opacity: love }}>LOVE</div>
               <div className="absolute right-5 top-5 rounded-lg border-2 border-rose-500 px-3 py-1 text-lg font-extrabold text-rose-500 rotate-12" style={{ opacity: pass }}>PASS</div>
-              <div className={`flex h-full flex-col ${photo ? "items-start justify-end p-7 pb-16 text-left" : "items-center justify-center p-8 text-center"} gap-3`}>
-                <div className={photo ? "text-4xl" : "text-7xl drop-shadow-[0_10px_30px_rgba(0,0,0,.2)]"}>{EMOJI[act]}</div>
-                <h2 className="text-3xl font-extrabold tracking-tight">{act}</h2>
-                <p className="muted text-sm">in {trip.destination}</p>
+              <div className={`flex h-full flex-col justify-end p-4 gap-2 ${photo ? "" : "items-center justify-center"}`}>
+                {!photo && <div className="text-7xl drop-shadow-[0_10px_30px_rgba(0,0,0,.2)] mb-2">{EMOJI[act]}</div>}
+                <div className={`glass-pill ${photo ? "" : "glass-pill-dark"}`}>
+                  <div className="glass-pill-big">{act}</div>
+                  <div className="glass-pill-cap">{EMOJI[act]} {trip.destination}</div>
+                </div>
+                <div className="flex gap-2">
+                  <span className={`glass-chip ${photo ? "" : "glass-pill-dark"}`}>${budget.toLocaleString()} budget</span>
+                  {photo && <span className="glass-chip">Wikimedia Commons</span>}
+                </div>
               </div>
-              <div className="absolute inset-x-0 bottom-0 flex justify-between px-6 py-4 text-xs mono muted border-t border-black/10">
-                <span>BUDGET ${budget}</span><span>{photo ? "PHOTO · WIKIMEDIA COMMONS" : `${dates.length} DATE${dates.length > 1 ? "S" : ""}`}</span>
-              </div>
+            </div>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
