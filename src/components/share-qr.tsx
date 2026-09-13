@@ -33,23 +33,29 @@ export default function ShareQr({ code }: { code: string }) {
     context.fillRect(0, 0, size, size);
     context.fillStyle = "#171411";
 
+    // Wordmark badge snapped to whole modules (odd count, centred) so no module is cut in half.
+    // Covers ~9% of the modules, well inside level-H's 30% tolerance.
+    let badgeCells = Math.round(modules * 0.3); if (badgeCells % 2 !== modules % 2) badgeCells += 1;
+    const first = (modules - badgeCells) / 2, last = first + badgeCells - 1;
+    const inBadge = (r: number, c: number) => r >= first && r <= last && c >= first && c <= last;
     for (let row = 0; row < modules; row += 1) {
       for (let col = 0; col < modules; col += 1) {
-        if (qr.isDark(row, col)) {
+        if (qr.isDark(row, col) && !inBadge(row, col)) {
           context.fillRect((col + quietZone) * cell, (row + quietZone) * cell, cell, cell);
         }
       }
     }
-
-    // Locadit wordmark in the centre: covers under ~9% of the modules, well inside level-H's 30% tolerance.
-    const badge = Math.round(size * 0.24), r = 12, x = (size - badge) / 2, y = (size - badge) / 2;
+    const badge = badgeCells * cell, x = (first + quietZone) * cell, y = x, r = cell * 1.5;
     context.fillStyle = "#ffffff";
+    context.fillRect(x, y, badge, badge);
+    context.strokeStyle = "#171411";
+    context.lineWidth = 2;
     context.beginPath();
-    context.roundRect(x, y, badge, badge, r);
-    context.fill();
+    context.roundRect(x + cell * 0.5, y + cell * 0.5, badge - cell, badge - cell, r);
+    context.stroke();
     const face = getComputedStyle(document.documentElement).getPropertyValue("--font-caveat").trim() || "cursive";
     context.fillStyle = "#171411";
-    context.font = `700 ${Math.round(badge * 0.42)}px ${face}, cursive`;
+    context.font = `700 ${Math.round(badge * 0.36)}px ${face}, cursive`;
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillText("Locadit", size / 2, size / 2 + badge * 0.02);

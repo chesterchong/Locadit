@@ -68,7 +68,7 @@ export default function Home() {
               {wins.length > 1 && <button type="button" className="date-x" aria-label="Remove option" onClick={() => setWins((ws) => ws.filter((_, k) => k !== i))}>×</button>}
             </div>
           ))}
-          {wins.length < 3 && <button type="button" className="text-sm underline muted" onClick={() => setWins((ws) => [...ws, { from: "", to: "" }])}>+ another window</button>}
+          {wins.length < 4 && <button type="button" className="text-sm underline muted" onClick={() => setWins((ws) => [...ws, { from: "", to: "" }])}>+ another window</button>}
         </div>
         <button onClick={create} disabled={!canCreate} className="btn btn-primary w-full disabled:opacity-30">{creating ? "Creating…" : "Create room"}</button>
         {!canCreate && !creating && <p className="text-xs muted text-center">{!name.trim() ? "Give the trip a name to continue." : "Pick at least one date window."}</p>}
