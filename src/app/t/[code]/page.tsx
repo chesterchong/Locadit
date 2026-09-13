@@ -7,6 +7,7 @@ import { ACTIVITIES, Pace } from "@/lib/store";
 type Trip = { code: string; name: string; destination: string; dateOptions: string[] };
 type Q = "name" | "budget" | "dates" | "pace" | "must" | "avoid";
 const FLOW: Q[] = ["name", "budget", "dates", "pace", "must", "avoid"];
+const SUGGEST: Record<string, string> = { must: "one proper beach day", avoid: "early mornings" };
 const EMOJI: Record<string, string> = { "Food & markets": "🍜", Nightlife: "🪩", "Nature & hikes": "🏔️", "Museums & culture": "🏛️", "Beach & rest": "🏝️", Shopping: "🛍️", "Adventure sports": "🪂", "Local neighbourhoods": "🚲" };
 const HUE: Record<string, string> = { "Food & markets": "#f97316", Nightlife: "#a855f7", "Nature & hikes": "#22c55e", "Museums & culture": "#eab308", "Beach & rest": "#06b6d4", Shopping: "#ec4899", "Adventure sports": "#ef4444", "Local neighbourhoods": "#3b82f6" };
 
@@ -154,7 +155,8 @@ export default function Quiz() {
           )}
           {!typing && (current === "must" || current === "avoid") && (
             <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); const v = draft.trim(); if (current === "must") setMustHave(v); else setAvoid(v); answer(v || (current === "must" ? "Nothing specific" : "Nothing, I'm easy")); }}>
-              <input autoFocus className="input" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={current === "must" ? "e.g. one proper beach day" : "e.g. early mornings"} />
+              <input autoFocus className="input" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={`e.g. ${SUGGEST[current]} · Tab to use`}
+                onKeyDown={(e) => { if (e.key === "Tab" && !draft.trim()) { e.preventDefault(); setDraft(SUGGEST[current]); } }} />
               <button className="btn btn-primary" type="submit">{draft.trim() ? "Next" : "Skip"}</button>
             </form>
           )}
