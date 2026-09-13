@@ -117,7 +117,7 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
     const rate = fx.rate >= 100 ? Math.round(fx.rate).toLocaleString() : fx.rate.toFixed(fx.rate >= 10 ? 2 : 3);
     const dir = fx.change >= 0 ? "stronger" : "weaker";
     const homeName = NAMES[home] ?? home, destName = NAMES[dest] ?? dest;
-    signals.push({ id: "fx", title: "Exchange rate", level, message: `1 ${home} ≈ ${rate} ${dest} today. Your ${homeName} buy ${abs.toFixed(1)}% ${fx.change >= 0 ? "more" : "less"} ${destName} than a year ago; the rate has been ${fx.vol > 12 ? "volatile" : fx.vol > 7 ? "moving" : "steady"} (${fx.vol.toFixed(0)}% annualised).`, advice: level === "calm" ? undefined : fx.change >= 0 ? `Your ${homeName} is ${dir}; budget in ${home} and exchange in a couple of batches rather than all at once.` : `Your ${homeName} is ${dir}; lock in the big costs early and keep a 10% buffer.`, source: "European Central Bank via Frankfurter", asOf: fx.date });
+    signals.push({ id: "fx", title: "Exchange rate", level, message: `1 ${home} ≈ ${rate} ${dest} today. Your ${homeName} buys ${abs.toFixed(1)}% ${fx.change >= 0 ? "more" : "less"} ${destName} than a year ago; the rate has been ${fx.vol > 12 ? "volatile" : fx.vol > 7 ? "moving" : "steady"} (${fx.vol.toFixed(0)}% annualised).`, advice: level === "calm" ? undefined : fx.change >= 0 ? `Your ${homeName} is ${dir}; budget in ${home} and exchange in a couple of batches rather than all at once.` : `Your ${homeName} is ${dir}; lock in the big costs early and keep a 10% buffer.`, source: "European Central Bank via Frankfurter", asOf: fx.date });
   })());
   await Promise.all(tasks);
   const slug = place.country.toLowerCase().replace(/[^a-z0-9]+/g, "-");
