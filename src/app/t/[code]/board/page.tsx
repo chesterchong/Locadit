@@ -62,7 +62,7 @@ export default function Board() {
                 <div className="signal-head"><b>{s.title}{s.live && <span className="live-dot" />}</b><span className="lvl">{LEVEL[s.level]}</span></div>
                 <p className="signal-value">{s.message}</p>
                 {s.advice && <p className="signal-action">{s.advice}</p>}
-                {s.links && <footer>{s.links.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noreferrer">{l.label} ↗</a>)}</footer>}
+                {s.links?.[0] && <a className="signal-open" href={s.links[0].href} target="_blank" rel="noreferrer" aria-label={`Open ${s.links[0].label}`} title={s.links[0].label}><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5.2 12.8 12.8 5.2M6.6 5.2h6.2v6.2" /></svg></a>}
               </article>
             ))}
           </div>

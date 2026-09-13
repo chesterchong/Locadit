@@ -324,3 +324,9 @@ body:has(.landing) .top-blur{display:none}
 
 /* Board footer credit */
 .credit-static{text-align:center;font-style:italic;font-size:14px;color:rgba(39,39,39,.5);padding:2rem 0 1rem}
+
+/* Open-link icon button on radar cards */
+.signal{position:relative}
+.signal-open{position:absolute;right:12px;bottom:12px;width:32px;height:32px;display:grid;place-items:center;border-radius:999px;background:#f2eee9;color:#222;transition:background .15s,transform .2s cubic-bezier(.2,1.4,.3,1)}
+.signal-open svg{width:16px;height:16px}
+.signal-open:hover{background:#111;color:#fff;transform:translateY(-1px)}
