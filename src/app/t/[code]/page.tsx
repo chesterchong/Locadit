@@ -64,6 +64,8 @@ export default function Quiz() {
     fetch(`/api/trips/${code}`).then((r) => (r.status === 404 ? null : r.json())).then((d) => {
       if (!d) { setMissing(true); return; }
       setHost(isHost);
+      // Returning visitor: skip the name question.
+      try { const saved = localStorage.getItem("locadit:name"); if (saved) { setName(saved); setQ(1); } } catch {}
       setTrip(d.trip);
     }).catch(() => setMissing(true));
   }, [code]);
@@ -74,7 +76,7 @@ export default function Quiz() {
     const first = trip.dateOptions[0] ?? "";
     const prompts: Record<Q, string> = {
       name: `Hey! I'm Locadit. I'm helping plan ${trip.name}. What should I call you?`,
-      budget: `Nice to meet you, ${name}. What's the most you'd be happy spending on this trip, all in?`,
+      budget: `${log.length === 0 ? `Welcome back, ${name}.` : `Nice to meet you, ${name}.`} What's the most you'd be happy spending on this trip, all in?`,
       dates: `Got it. Which of these dates work for you? Pick every one that does${first ? `, even if ${first} is your favourite` : ""}.`,
       pace: `How do you like to travel: slow mornings, a balanced mix, or every hour planned?`,
       must: `One thing this ${trip.destination} trip must include for you?`,
