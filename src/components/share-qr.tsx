@@ -5,12 +5,13 @@ import qrcode from "qrcode-generator";
 
 export default function ShareQr({ code }: { code: string }) {
   const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (!open || !canvasRef.current) return;
 
-    const qr = qrcode(0, "M");
+    const qr = qrcode(0, "H"); // high error correction leaves room for the wordmark in the middle
     const inviteUrl = new URL(`/t/${encodeURIComponent(code)}`, window.location.origin).toString();
     qr.addData(inviteUrl, "Byte");
     qr.make();
@@ -39,7 +40,37 @@ export default function ShareQr({ code }: { code: string }) {
         }
       }
     }
+
+    // Locadit wordmark in the centre: covers under ~9% of the modules, well inside level-H's 30% tolerance.
+    const badge = Math.round(size * 0.24), r = 12, x = (size - badge) / 2, y = (size - badge) / 2;
+    context.fillStyle = "#ffffff";
+    context.beginPath();
+    context.roundRect(x, y, badge, badge, r);
+    context.fill();
+    const face = getComputedStyle(document.documentElement).getPropertyValue("--font-caveat").trim() || "cursive";
+    context.fillStyle = "#171411";
+    context.font = `700 ${Math.round(badge * 0.42)}px ${face}, cursive`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText("Locadit", size / 2, size / 2 + badge * 0.02);
   }, [code, open]);
+
+  async function copyImage() {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const blob: Blob | null = await new Promise((res) => canvas.toBlob(res, "image/png"));
+    if (!blob) return;
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `locadit-${code}.png`;
+      a.click();
+    }
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -55,11 +86,11 @@ export default function ShareQr({ code }: { code: string }) {
       {open ? (
         <div className="share-qr-panel">
           <div className="share-qr-heading">
-            <strong>Scan to join</strong>
+            <strong>Room <span className="mono">{code}</span></strong>
             <button type="button" className="share-qr-close" aria-label="Close QR code" onClick={() => setOpen(false)}>×</button>
           </div>
           <canvas ref={canvasRef} className="share-qr-code" role="img" aria-label={`Scannable invite QR for room ${code}`} />
-          <span className="share-qr-room">Room <b className="mono">{code}</b></span>
+          <button type="button" className="btn btn-primary w-full !py-2 text-sm" onClick={copyImage}>{copied ? "Copied" : "Copy QR image"}</button>
         </div>
       ) : (
         <button type="button" className="share-qr-trigger" aria-expanded="false" onClick={() => setOpen(true)}>

@@ -260,7 +260,3 @@ input[type=range]{accent-color:#111}
 .share-qr-room{display:block;text-align:center;font-size:12px;font-weight:700}
 @media (max-width:640px){.share-qr{right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom))}}
 
-.itinerary-cover{padding:0}
-.itinerary-cover-photo{min-height:300px;display:flex;align-items:flex-end;background-position:center;background-size:cover;color:#fff;padding:24px}
-.itinerary-cover-photo h2{font-size:1.65rem;font-weight:800;letter-spacing:-.025em;line-height:1.1;margin-top:6px}
-.itinerary-cover-photo p:last-child{max-width:34rem;margin-top:7px;font-size:.875rem;color:rgba(255,255,255,.82)}

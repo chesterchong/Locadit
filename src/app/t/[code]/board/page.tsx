@@ -14,8 +14,6 @@ export default function Board() {
   const [title, setTitle] = useState(""); const [amount, setAmount] = useState(""); const [paidBy, setPaidBy] = useState("");
   const [copied, setCopied] = useState(false);
   const [radar, setRadar] = useState<Radar | null>(null);
-  const [buildingItinerary, setBuildingItinerary] = useState(false);
-  const [itineraryError, setItineraryError] = useState("");
   useEffect(() => {
     const go = () => fetch(`/api/trips/${code}/risk`).then((r) => (r.ok ? r.json() : null)).then((j) => j && setRadar(j)).catch(() => {});
     go(); const t = setInterval(go, 600000); return () => clearInterval(t);
@@ -30,20 +28,6 @@ export default function Board() {
   async function addExpense() {
     await fetch(`/api/trips/${code}/expenses`, { method: "POST", body: JSON.stringify({ title, amount: +amount, paidBy, splitAmong: result?.members ?? [] }) });
     setTitle(""); setAmount(""); load();
-  }
-  async function buildRealItinerary() {
-    setBuildingItinerary(true);
-    setItineraryError("");
-    try {
-      const response = await fetch(`/api/trips/${code}/itinerary`, { method: "POST" });
-      const body = await response.json();
-      if (!response.ok) throw new Error(body.error || "Could not build the itinerary");
-      await load();
-    } catch (error) {
-      setItineraryError(error instanceof Error ? error.message : "Could not build the itinerary");
-    } finally {
-      setBuildingItinerary(false);
-    }
   }
   return (
     <main className="mx-auto max-w-2xl px-6 py-10 space-y-6">
@@ -105,19 +89,6 @@ export default function Board() {
           )}
           <section className="space-y-3">
             <p className="text-xs uppercase tracking-widest muted">Itinerary · {result.pace === "chill" ? "slow pace" : result.pace === "packed" ? "packed days" : "balanced pace"}</p>
-            {result.realItinerary ? (
-              <div className="itinerary-cover glass overflow-hidden pop">
-                <div className="itinerary-cover-photo" role="img" aria-label={`${result.itineraryTitle ?? trip.destination} itinerary`} style={{ backgroundImage: `linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,.04) 70%),url(${result.itineraryPhoto})` }}>
-                  <div><p className="text-xs uppercase tracking-widest">Real places · saved for this room</p><h2>{result.itineraryTitle}</h2><p>{result.itineraryIntro}</p></div>
-                </div>
-              </div>
-            ) : (
-              <div className="glass p-5 pop flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div><p className="font-semibold">Make it place-by-place</p><p className="text-sm muted mt-1">Real venues, sensible areas and one activity photo—saved for everyone.</p></div>
-                <button type="button" className="btn btn-primary shrink-0" onClick={buildRealItinerary} disabled={buildingItinerary}>{buildingItinerary ? "Building…" : "Build real itinerary"}</button>
-              </div>
-            )}
-            {itineraryError && <p className="text-sm text-rose-600">{itineraryError}</p>}
             {result.itinerary.map((day) => (
               <div key={day.day} className="glass p-5 pop">
                 <div className="flex items-baseline justify-between gap-3"><p className="font-semibold text-lg"><span className="mono muted mr-2">D{day.day}</span>{day.headline ?? day.theme}</p><p className="mono text-sm muted shrink-0">~${day.budget}/pp</p></div>

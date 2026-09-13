@@ -32,14 +32,7 @@ export function merge(trip: Trip) {
     const plan = perDayItems >= 4 ? [...full, "Sunset spot, then a late bite"] : full.slice(0, perDayItems);
     return { day: i + 1, theme: s.act, why, budget: perDay, plan };
   });
-  const itinerary = trip.realItinerary?.days.map((day) => ({
-    day: day.day,
-    theme: day.theme,
-    headline: day.headline,
-    why: day.why,
-    budget: day.budget,
-    plan: day.stops.map((stop) => `${stop.name} · ${stop.note}`),
-  })) ?? fallbackItinerary;
+  const itinerary = fallbackItinerary;
   return {
     budget,
     bestDate,
@@ -49,11 +42,6 @@ export function merge(trip: Trip) {
     members: a.map((x) => x.name),
     pace,
     notes,
-    realItinerary: Boolean(trip.realItinerary),
-    itineraryTitle: trip.realItinerary?.title,
-    itineraryIntro: trip.realItinerary?.intro,
-    itineraryPhoto: trip.realItinerary?.coverPhoto,
-    itineraryGeneratedAt: trip.realItinerary?.generatedAt,
   };
 }
 function planFor(act: string, dest: string) {
