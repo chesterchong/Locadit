@@ -330,3 +330,12 @@ body:has(.landing) .top-blur{display:none}
 .signal-open{position:absolute;right:14px;bottom:14px;width:24px;height:24px;display:grid;place-items:center;color:#222;opacity:.7;transition:opacity .15s,transform .2s cubic-bezier(.2,1.4,.3,1)}
 .signal-open svg{width:18px;height:18px}
 .signal-open:hover{opacity:1;transform:translate(1px,-1px)}
+
+/* Music disc, top-right */
+.disc{position:fixed;top:28px;right:34px;z-index:1200;width:44px;height:44px;border:0;padding:0;background:none;cursor:pointer;border-radius:999px}
+.disc-face{display:block;width:100%;height:100%;border-radius:999px;background:radial-gradient(circle at 50% 50%,#f5f1ea 0 14%,#111 15% 22%,#3a3a3a 23% 30%,#1b1b1b 31% 44%,#444 45% 52%,#161616 53% 100%);box-shadow:0 6px 18px rgba(0,0,0,.25),inset 0 0 0 1px rgba(255,255,255,.15)}
+.disc.spinning .disc-face{animation:spin 2.4s linear infinite}
+.disc:hover .disc-face{transform:scale(1.06)}
+.disc-note{position:absolute;left:50%;top:0;font-size:16px;translate:calc(-50% + var(--nx,0px)) 0;animation:noteUp 2.2s ease-out both;pointer-events:none}
+@keyframes noteUp{0%{opacity:0;transform:translateY(0) scale(.6)}20%{opacity:1;transform:translateY(-10px) scale(1)}100%{opacity:0;transform:translateY(-56px) scale(1.1) rotate(12deg)}}
+@media (max-width:640px){.disc{top:22px;right:24px;width:38px;height:38px}}
