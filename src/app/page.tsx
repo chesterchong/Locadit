@@ -56,6 +56,8 @@ export default function Landing() {
 
   const leaving = step >= 7;
   const font = leaving ? "wm-hand" : WM[Math.min(Math.max(step - 1, 0), 5)];
+  const changeStep = Math.min(step, 7); // the wordmark stops changing after it leaves
+  const prevFont = step >= 2 && step <= 7 ? (step <= 6 ? WM[step - 2] : WM[5]) : null;
   const stop = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
@@ -65,9 +67,10 @@ export default function Landing() {
           <div className="dots on" />
           <div className={`sky ${step >= 5 ? "on" : ""}`} />
           {PIECES.map((p, i) => <PieceEl key={p.id} p={p} step={step} delay={ORDER[i] * 70} />)}
-          <h1 className={`wm ${leaving ? "leave" : ""}`}>
-            {/* Mounted only from step 1 so the handwriting draw-in starts when the viewer can see it. */}
-            {step >= 1 && <span key={`${font}-${step < 2 ? "draw" : leaving ? "leave" : "blip"}`} className={`${font} ${step < 2 ? "wm-draw" : "wm-blip"}`}>Locadit</span>}
+          <h1 className={`wm ${leaving ? "leave" : ""}`} aria-label="Locadit">
+            {/* Each style change is drawn: the previous face is erased left to right while the new one traces in. */}
+            {prevFont && <WordSvg key={`out-${changeStep}`} font={prevFont} mode="erase" />}
+            {step >= 1 && <WordSvg key={`in-${changeStep}`} font={font} mode="draw" />}
           </h1>
           {CARDS.map((c, i) => (
             <Link key={c.name} href={c.href} className={`phone-wrap ${step >= 8 ? "on" : ""}`} style={{ left: c.x, transitionDelay: `${i * 120}ms` }} onClick={stop} aria-label={`${c.name}: ${c.tag}`}>
@@ -112,4 +115,12 @@ function PieceEl({ p, step, delay }: { p: Piece; step: number; delay: number }) 
   if (p.kind === "polaroid") return <div className={cls} style={style}><i style={{ background: p.color }} /></div>;
   if (p.kind === "checker" || p.kind === "cloud") return <div className={cls} style={style} />;
   return <div className={cls} style={style} aria-hidden>{p.content}</div>;
+}
+
+function WordSvg({ font, mode }: { font: string; mode: "draw" | "erase" }) {
+  return (
+    <svg className={`wm-svg ${mode}`} viewBox="0 0 1000 300" width="1000" height="300" aria-hidden>
+      <text x="500" y="150" textAnchor="middle" dominantBaseline="central" className={font}>Locadit</text>
+    </svg>
+  );
 }
