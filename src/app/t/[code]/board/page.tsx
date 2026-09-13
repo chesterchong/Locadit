@@ -106,18 +106,36 @@ export default function Board() {
               </div>
             ))}
           </section>
-          <section className="glass p-5 space-y-3 pop">
-            <p className="text-xs uppercase tracking-widest muted">Split costs</p>
-            <div className="flex gap-2">
-              <input className="input flex-1" placeholder="Villa deposit" value={title} onChange={(e) => setTitle(e.target.value)} />
-              <input className="input mono w-24" placeholder="$" value={amount} onChange={(e) => setAmount(e.target.value)} />
-              <select className="input w-32" value={paidBy} onChange={(e) => setPaidBy(e.target.value)}><option value="">Paid by</option>{result.members.map((m) => <option key={m}>{m}</option>)}</select>
-              <button onClick={addExpense} disabled={!title || !amount || !paidBy} className="btn btn-primary disabled:opacity-30">Add</button>
-            </div>
-            {trip.expenses.map((e) => <p key={e.id} className="text-sm flex justify-between"><span>{e.title} <span className="muted">· {e.paidBy}</span></span><span className="mono">${e.amount}</span></p>)}
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              {Object.entries(balances).map(([n, b]) => <div key={n} className="chip flex justify-between text-sm"><span>{n}</span><span className={`mono ${b >= 0 ? "text-green-600" : "text-rose-500"}`}>{b >= 0 ? "▲" : "▼"} ${Math.abs(b).toFixed(0)}</span></div>)}
-            </div>
+          <section className="glass p-5 space-y-4 pop">
+            <div className="flex items-baseline justify-between"><p className="text-xs uppercase tracking-widest muted">Split costs</p>{trip.expenses.length > 0 && <p className="text-xs muted">Total <span className="mono text-black/80">${trip.expenses.reduce((s, e) => s + e.amount, 0).toLocaleString()}</span> · {result.members.length} people</p>}</div>
+            <form className="money-form" onSubmit={(e) => { e.preventDefault(); if (title.trim() && +amount > 0 && paidBy) addExpense(); }}>
+              <input className="input" placeholder="What was it? Villa deposit, flights…" value={title} onChange={(e) => setTitle(e.target.value)} />
+              <label className="amount"><span>$</span><input className="input mono" inputMode="decimal" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))} /></label>
+              <select className="input" value={paidBy} onChange={(e) => setPaidBy(e.target.value)}><option value="">Who paid?</option>{result.members.map((m) => <option key={m}>{m}</option>)}</select>
+              <button type="submit" disabled={!title.trim() || !(+amount > 0) || !paidBy} className="btn btn-primary disabled:opacity-30">Add</button>
+            </form>
+            {trip.expenses.length === 0 ? (
+              <p className="text-sm muted">No expenses yet. Add the deposit, the flights or last night&apos;s dinner and Locadit splits it equally across everyone who answered.</p>
+            ) : (
+              <ul className="divide-y divide-black/5">
+                {trip.expenses.map((e) => (
+                  <li key={e.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+                    <div><p className="font-medium">{e.title}</p><p className="text-xs muted">paid by {e.paidBy} · split {result.members.length} ways · <span className="mono">${(e.amount / Math.max(1, result.members.length)).toFixed(0)}</span> each</p></div>
+                    <span className="mono">${e.amount.toLocaleString()}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {trip.expenses.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-widest muted">Settle up</p>
+                {result.members.length < 2 ? <p className="text-sm muted">Just you so far. Settling starts when a second person answers.</p> : settle(balances).length === 0 ? <p className="text-sm text-green-700">All square. Nobody owes anything.</p> : (
+                  <ul className="grid gap-2 sm:grid-cols-2">
+                    {settle(balances).map((s, k) => <li key={k} className="chip flex items-center justify-between text-sm"><span><b>{s.from}</b> pays <b>{s.to}</b></span><span className="mono">${s.amount.toFixed(0)}</span></li>)}
+                  </ul>
+                )}
+              </div>
+            )}
           </section>
         </>
       )}
@@ -140,4 +158,20 @@ function NotFound({ code }: { code: string }) {
       </div>
     </main>
   );
+}
+
+// Greedy settlement: turn per-person balances into the fewest "A pays B" transfers.
+function settle(balances: Record<string, number>) {
+  const debtors = Object.entries(balances).filter(([, v]) => v < -0.5).map(([n, v]) => ({ n, v: -v })).sort((a, b) => b.v - a.v);
+  const creditors = Object.entries(balances).filter(([, v]) => v > 0.5).map(([n, v]) => ({ n, v })).sort((a, b) => b.v - a.v);
+  const out: { from: string; to: string; amount: number }[] = [];
+  let i = 0, j = 0;
+  while (i < debtors.length && j < creditors.length) {
+    const amt = Math.min(debtors[i].v, creditors[j].v);
+    out.push({ from: debtors[i].n, to: creditors[j].n, amount: amt });
+    debtors[i].v -= amt; creditors[j].v -= amt;
+    if (debtors[i].v < 0.5) i++;
+    if (creditors[j].v < 0.5) j++;
+  }
+  return out;
 }
