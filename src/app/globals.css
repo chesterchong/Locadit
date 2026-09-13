@@ -333,9 +333,18 @@ body:has(.landing) .top-blur{display:none}
 
 /* Music disc, top-right */
 .disc{position:fixed;top:28px;right:34px;z-index:1200;width:44px;height:44px;border:0;padding:0;background:none;cursor:pointer;border-radius:999px}
-.disc-face{display:block;width:100%;height:100%;border-radius:999px;background:radial-gradient(circle at 50% 50%,#f5f1ea 0 14%,#111 15% 22%,#3a3a3a 23% 30%,#1b1b1b 31% 44%,#444 45% 52%,#161616 53% 100%);box-shadow:0 6px 18px rgba(0,0,0,.25),inset 0 0 0 1px rgba(255,255,255,.15)}
+.disc-face{display:block;width:100%;height:100%;border-radius:999px;position:relative;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(255,255,255,.92) 0 13%,rgba(255,255,255,0) 14%),
+    conic-gradient(from 0deg,rgba(255,255,255,.55),rgba(190,205,225,.35),rgba(255,255,255,.65),rgba(200,210,230,.3),rgba(255,255,255,.55)),
+    linear-gradient(135deg,rgba(255,255,255,.7),rgba(255,255,255,.25));
+  backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.75);
+  box-shadow:0 8px 24px rgba(30,40,60,.18),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(0,0,0,.05)}
+.disc-face::before{content:"";position:absolute;inset:26%;border-radius:999px;border:1px solid rgba(120,130,150,.25);background:radial-gradient(circle,rgba(255,255,255,.95) 0 40%,rgba(230,235,245,.8) 41% 100%)}
+.disc-face::after{content:"";position:absolute;inset:0;border-radius:999px;background:repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,0) 0 3px,rgba(120,130,150,.10) 3px 4px);mask:radial-gradient(circle,transparent 0 30%,#000 32% 92%,transparent 100%);-webkit-mask:radial-gradient(circle,transparent 0 30%,#000 32% 92%,transparent 100%)}
 .disc.spinning .disc-face{animation:spin 2.4s linear infinite}
 .disc:hover .disc-face{transform:scale(1.06)}
-.disc-note{position:absolute;left:50%;top:0;font-size:16px;translate:calc(-50% + var(--nx,0px)) 0;animation:noteUp 2.2s ease-out both;pointer-events:none}
+.disc-note{position:absolute;left:50%;top:0;font-size:16px;color:#3a4358;translate:calc(-50% + var(--nx,0px)) 0;animation:noteUp 2.2s ease-out both;pointer-events:none}
 @keyframes noteUp{0%{opacity:0;transform:translateY(0) scale(.6)}20%{opacity:1;transform:translateY(-10px) scale(1)}100%{opacity:0;transform:translateY(-56px) scale(1.1) rotate(12deg)}}
 @media (max-width:640px){.disc{top:22px;right:24px;width:38px;height:38px}}
