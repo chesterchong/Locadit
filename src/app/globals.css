@@ -367,3 +367,31 @@ body:has(.landing) .top-blur{display:none}
 .scene-photo{position:absolute;z-index:1;border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.28);object-fit:cover;aspect-ratio:3/4;transform:rotate(var(--r)) scale(.6);opacity:0;animation:scenePop .6s cubic-bezier(.2,1.4,.3,1) var(--d) both}
 @keyframes scenePop{to{opacity:1;transform:rotate(var(--r)) scale(1)}}
 @media (max-width:900px){.scene{display:none}}
+
+/* ---------- Mobile ---------- */
+.dest-tiles{grid-template-columns:repeat(5,minmax(0,1fr))}
+.dest-tile{min-width:0}
+.dest-tile span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+@media (max-width:640px){
+  .dest-tile{padding:.6rem .1rem;gap:.25rem}
+  .dest-tile .flag{font-size:22px}
+  .dest-tile span:last-child{font-size:10.5px;letter-spacing:0}
+  .home-link{font-size:24px;left:22px;top:18px}
+  .top-blur{height:72px}
+  .credit-static{padding:1.5rem 0 5.5rem}          /* clear the Share QR button */
+  .people{gap:.75rem}
+  .people .btn{width:100%;text-align:center}
+  .avatar{width:32px;height:32px;font-size:11px}
+  .signal-value{font-size:15px}
+  .pill{font-size:.8rem;padding:.35rem .75rem}
+  .share-qr-trigger{padding:10px 14px;font-size:14px}
+}
+/* Flex children default to min-width:auto, which lets one wide child push the page past the viewport on phones. */
+body > main{min-width:0;width:100%;max-width:100%}
+@media (max-width:640px){
+  .money-form{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .money-form .input,.money-form select{min-width:0}
+  .signal-head{gap:.5rem}
+  .signal-head b{min-width:0}
+  h1.text-4xl{font-size:2rem}
+}
