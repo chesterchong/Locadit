@@ -178,9 +178,10 @@ export default function Quiz() {
           )}
           {!typing && current === "budget" && (
             <div className="space-y-3">
-              <div className="flex justify-between text-sm"><span className="muted">All in, per person</span><span className="mono font-semibold">${budget}</span></div>
-              <input type="range" min={200} max={3000} step={50} value={budget} onChange={(e) => setBudget(+e.target.value)} className="w-full" />
-              <button className="btn btn-primary w-full" onClick={() => answer(`Up to $${budget}`)}>That&apos;s my max</button>
+              <div className="flex items-center justify-between text-sm"><span className="muted">All in, per person</span>
+                <label className="amount amount-inline"><span>$</span><input className="input mono" inputMode="numeric" value={budget} onChange={(e) => { const v = parseInt(e.target.value.replace(/[^0-9]/g, ""), 10); setBudget(isNaN(v) ? 0 : Math.min(v, 1000000)); }} onBlur={() => setBudget((b) => Math.max(50, b))} aria-label="Budget amount" /></label></div>
+              <input type="range" min={200} max={Math.max(3000, Math.ceil(budget / 1000) * 1000)} step={50} value={Math.min(budget, Math.max(3000, Math.ceil(budget / 1000) * 1000))} onChange={(e) => setBudget(+e.target.value)} className="w-full" aria-label="Budget slider" />
+              <button className="btn btn-primary w-full" disabled={budget < 50} onClick={() => answer(`Up to $${budget.toLocaleString()}`)}>That&apos;s my max</button>
             </div>
           )}
           {!typing && current === "dates" && (

@@ -307,3 +307,6 @@ main{position:relative;z-index:1}
 .avatar[data-name]{position:relative}
 .avatar[data-name]::after{content:attr(data-name);position:absolute;left:50%;bottom:calc(100% + 8px);translate:-50% 4px;background:#111;color:#fff;font-size:12px;font-weight:600;letter-spacing:0;padding:.3rem .6rem;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s,translate .15s}
 .avatar[data-name]:hover::after,.avatar[data-name]:focus-visible::after{opacity:1;translate:-50% 0}
+
+.amount-inline .input{width:120px;padding:.35rem .6rem .35rem 1.5rem;text-align:right;font-weight:600}
+.amount-inline>span{left:.6rem}
