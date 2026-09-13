@@ -133,6 +133,7 @@ export default function Board() {
           </section>
         </>
       )}
+      <p className="credit-static">Made by Team Odyssey for Codenection 2026 <span aria-hidden>❤️</span></p>
     </main>
   );
 }
@@ -150,7 +151,6 @@ function NotFound({ code }: { code: string }) {
           <Link href="/start" className="btn btn-ghost">Enter another code</Link>
         </div>
       </div>
-      <p className="credit-static">Made by Team Odyssey for Codenection 2026 <span aria-hidden>❤️</span></p>
     </main>
   );
 }
