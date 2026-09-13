@@ -22,6 +22,7 @@ export type Piece = {
   hideAtEnd?: boolean;
   hover?: boolean; // grows slightly on hover
   wind?: number;   // sway amplitude in degrees (default 2.5); light or tall things get more
+  cycle?: string[]; // text pieces only: lines to rotate through
 };
 
 export const PIECES: Piece[] = [
@@ -66,7 +67,13 @@ export const PIECES: Piece[] = [
   { id: "ufo", wind: 5, layer: 5, kind: "img", src: "/collage/ufo.png", content: "🛸", x: 1300, y: 55, size: 100, rot: -10 },
   { id: "bfly-a", wind: 8, layer: 5, kind: "img", src: "/collage/bfly-a.png", content: "🦋", x: 640, y: 210, size: 60, rot: 15 },
   { id: "bfly-b", wind: 8, layer: 5, kind: "img", src: "/collage/bfly-b.png", content: "🦋", x: 1060, y: 150, size: 50, rot: -20 },
-  { id: "affaire", layer: 5, kind: "text", content: "UNE AFFAIRE\nDE VOYAGE", x: 1165, y: 100, size: 24, font: "caption", color: "#fff", rot: -4 },
+  { id: "affaire", layer: 5, kind: "text", content: "FOR THE TWO
+OF YOU", cycle: ["FOR THE TWO
+OF YOU", "ONE PLAN FOR
+THE WHOLE FAMILY", "BEST FRIENDS,
+ZERO ARGUMENTS", "MARRIED, AND
+STILL EXPLORING", "TRIPS THAT KEEP
+THE GROUP TOGETHER"], x: 1165, y: 100, size: 24, font: "caption", color: "#fff", rot: -4 },
   { id: "lookup", layer: 5, kind: "text", content: "Look up!", x: 1400, y: 520, size: 44, font: "hand", color: "#111", rot: -12 },
   { id: "friends", layer: 5, kind: "text", content: "FRIENDS!", x: 330, y: 600, size: 40, font: "hand", color: "#111", rot: -6, underline: true },
   { id: "robot", wind: 1.2, hover: true, layer: 5, kind: "img", src: "/collage/robot.png", content: "🤖", x: 240, y: 190, size: 190, rot: -8 },

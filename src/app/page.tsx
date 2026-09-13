@@ -109,6 +109,14 @@ export default function Landing() {
 
 function PieceEl({ p, step, delay, seed }: { p: Piece; step: number; delay: number; seed: number }) {
   const shown = step >= p.layer + 1;
+  // Rotating caption lines (text pieces with `cycle`).
+  const [ci, setCi] = useState(0);
+  useEffect(() => {
+    if (!p.cycle || !shown) return;
+    const id = window.setInterval(() => setCi((c) => c + 1), 3600);
+    return () => window.clearInterval(id);
+  }, [p.cycle, shown]);
+  const content = p.cycle ? p.cycle[ci % p.cycle.length] : p.content;
   const settled = step >= 7 && p.to;
   const gone = p.hideAtEnd && step >= 8;
   const t = settled ? { ...p, ...p.to } : p;
@@ -126,7 +134,7 @@ function PieceEl({ p, step, delay, seed }: { p: Piece; step: number; delay: numb
   if (p.kind === "img") return <img className={cls} style={style} src={p.src} alt="" />;
   if (p.kind === "polaroid") return <div className={cls} style={style}><span className="in"><i style={{ background: p.color }} /></span></div>;
   if (p.kind === "checker" || p.kind === "cloud") return <div className={cls} style={style} />;
-  return <div className={cls} style={style} aria-hidden><span className="in">{p.content}</span></div>;
+  return <div className={cls} style={style} aria-hidden><span className="in"><span key={ci} className={p.cycle ? "fade-in" : undefined}>{content}</span></span></div>;
 }
 
 function WordSvg({ font, mode }: { font: string; mode: "draw" | "erase" }) {

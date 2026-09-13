@@ -220,3 +220,6 @@ input[type=range]{accent-color:#111}
 .temp.calm .lvl{background:#e6f6ec;color:#15803d}
 .temp.heads-up .lvl{background:#fff4d6;color:#a16207}
 .temp.caution .lvl{background:#fde8e8;color:#b91c1c}
+
+.fade-in{display:inline-block;animation:fadein .7s ease-out both}
+@keyframes fadein{from{opacity:0;translate:0 6px}to{opacity:1;translate:0 0}}
