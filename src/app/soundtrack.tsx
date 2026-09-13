@@ -15,17 +15,18 @@ export default function Soundtrack() {
   const [notes, setNotes] = useState<{ id: number; x: number; glyph: string }[]>([]);
   const ctxRef = useRef<AudioContext | null>(null);
   const gainRef = useRef<GainNode | null>(null);
-  const buffers = useRef<Record<string, AudioBuffer>>({});
+  const buffers = useRef<Record<string, Promise<AudioBuffer>>>({});
   const srcRef = useRef<AudioBufferSourceNode | null>(null);
   const startedRef = useRef(false);
   const queueRef = useRef<string[]>([]);   // tracks still to play in this pass
   const readyRef = useRef(false);
 
-  const load = async (url: string) => {
-    if (buffers.current[url]) return buffers.current[url];
-    const ctx = ctxRef.current!;
-    const b = await ctx.decodeAudioData(await (await fetch(url)).arrayBuffer());
-    buffers.current[url] = b; return b;
+  const load = (url: string) => {
+    if (!buffers.current[url]) {
+      const ctx = ctxRef.current!;
+      buffers.current[url] = fetch(url).then((r) => r.arrayBuffer()).then((b) => ctx.decodeAudioData(b)).catch((e) => { delete buffers.current[url]; throw e; });
+    }
+    return buffers.current[url];
   };
   const nextUrl = () => {
     if (!queueRef.current.length) queueRef.current = [...PLAYLIST]; // loop the disc playlist
