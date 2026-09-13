@@ -4,9 +4,9 @@ import { useState } from "react";
 // Floating promo flyers: a few UFOs, planes and balloons drift across the page. Tap one for the deal.
 // Offers are sample content for the prototype until a deals feed is connected.
 const PROMOS = [
-  { id: "flight", icon: "✈️", title: "Flights from $189", body: "Return fares to your destination in the autumn sale. Sample offer.", code: "FLY189", top: 18, dur: 58, delay: 0 },
-  { id: "hotel", icon: "🎈", title: "20% off villas", body: "Voucher for stays of 3+ nights at partner villas. Sample offer.", code: "STAY20", top: 62, dur: 74, delay: -25 },
-  { id: "transfer", icon: "🛸", title: "Free airport pickup", body: "Book 4+ nights and the transfer is on us. Sample offer.", code: "PICKUP", top: 38, dur: 66, delay: -48 },
+  { id: "flight", icon: "✈️", title: "Flights from $189", body: "Return fares to your destination in the autumn sale. Sample offer.", code: "FLY189", top: 18, dur: 26, delay: 0, lane: "l" },
+  { id: "hotel", icon: "🎈", title: "20% off villas", body: "Voucher for stays of 3+ nights at partner villas. Sample offer.", code: "STAY20", top: 50, dur: 34, delay: -9, lane: "r" },
+  { id: "transfer", icon: "🛸", title: "Free airport pickup", body: "Book 4+ nights and the transfer is on us. Sample offer.", code: "PICKUP", top: 30, dur: 30, delay: -17, lane: "r" },
 ];
 
 export default function Promos() {
@@ -15,7 +15,7 @@ export default function Promos() {
   return (
     <div className="promos" aria-label="Offers">
       {PROMOS.map((p) => (
-        <div key={p.id} className="promo" style={{ top: `${p.top}%`, animationDuration: `${p.dur}s`, animationDelay: `${p.delay}s` }}>
+        <div key={p.id} className={`promo lane-${p.lane}`} style={{ top: `${p.top}%`, animationDuration: `${p.dur}s`, animationDelay: `${p.delay}s` }}>
           <button type="button" className="promo-pin" onClick={() => setOpen(open === p.id ? null : p.id)} aria-expanded={open === p.id} aria-label={p.title}>{p.icon}</button>
           {open === p.id && (
             <div className="promo-card pop" role="dialog">

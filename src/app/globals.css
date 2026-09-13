@@ -58,7 +58,7 @@ input[type=range]{accent-color:#111}
 .piece.cloud::after{left:50%;top:-35%;width:34%;height:85%}
 .piece.polaroid .in{display:block;width:100%;height:100%;background:#fff;padding:7px 7px 22px;box-sizing:border-box;box-shadow:0 10px 30px rgba(0,0,0,.15)}
 .piece.polaroid i{display:block;width:100%;height:100%}
-.piece.img{object-fit:contain}
+.piece.img{object-fit:contain;height:auto}
 .wm{position:absolute;left:800px;top:380px;width:1000px;height:300px;z-index:55;margin:0;color:#111;transform:translate(-50%,-50%);transition:top .9s cubic-bezier(.6,0,.2,1),transform .9s cubic-bezier(.6,0,.2,1)}
 /* 450px - half the hero height in stage px = the visible top edge, whatever the aspect ratio. */
 .wm.leave{top:calc(450px - 50svh / var(--s,1) + 38px);transform:translate(-50%,-50%) scale(calc(.75 / var(--wm,1)))}
@@ -117,6 +117,39 @@ input[type=range]{accent-color:#111}
 .chat-list::-webkit-scrollbar{display:none}
 .bubble.ai{align-self:flex-start}
 .bubble.me{align-self:flex-end}
+
+/* Trip radar */
+.signal{border:1px solid var(--line);border-radius:16px;padding:.85rem 1rem;background:#fff}
+.signal .lvl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:.2rem .55rem;font-weight:600;white-space:nowrap}
+.signal.calm .lvl{background:#e6f6ec;color:#15803d}
+.signal.heads-up .lvl{background:#fff4d6;color:#a16207}
+.signal.heads-up{border-color:rgba(161,98,7,.35)}
+.signal.caution .lvl{background:#fde8e8;color:#b91c1c}
+.signal.caution{border-color:rgba(185,28,28,.35)}
+.signal.info .lvl{background:#eee;color:#555}
+/* World map behind the swipe deck, centred on the destination, parallax with the card */
+.worldmap{position:absolute;inset:-40px -140px;z-index:0;overflow:hidden;pointer-events:none;opacity:.16;filter:grayscale(1) contrast(1.1)}
+.worldmap img{position:absolute;width:2000px;height:1000px;max-width:none}
+.worldmap .pin{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px;border-radius:999px;background:#111}
+.worldmap .pin::after{content:"";position:absolute;inset:-12px;border-radius:999px;border:2px solid #111;animation:ping 1.8s ease-out infinite}
+@keyframes ping{from{transform:scale(.3);opacity:.9}to{transform:scale(1.5);opacity:0}}
+.swipe-photo{color:#fff}
+.swipe-photo .muted{color:rgba(255,255,255,.75)}
+.swipe-photo .border-black\/10{border-color:rgba(255,255,255,.2)}
+
+/* Promo flyers: confined to the side gutters so they never cover the content column */
+.promos{position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden}
+.promo{position:absolute;pointer-events:none;animation:wander ease-in-out infinite alternate}
+.promo.lane-l{left:2vw;width:calc(50vw - 300px)}
+.promo.lane-r{right:2vw;width:calc(50vw - 300px)}
+.promo-pin{pointer-events:auto;font-size:30px;line-height:1;background:none;border:0;cursor:pointer;filter:drop-shadow(0 8px 14px rgba(0,0,0,.18));display:inline-block;transition:transform .5s ease}
+.promo-card{pointer-events:auto;position:absolute;left:0;top:44px;width:240px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:.8rem .9rem;box-shadow:0 14px 40px rgba(0,0,0,.14);font-size:14px;z-index:2}
+.promo-card b{display:block;margin-bottom:.15rem}
+.promo-card p{color:var(--muted);font-size:13px;line-height:1.35;margin-bottom:.6rem}
+@keyframes wander{0%{translate:0 0}20%{translate:30% -22vh}45%{translate:70% 10vh}70%{translate:20% 28vh}100%{translate:85% -6vh}}
+.promo:has(.promo-card){animation-play-state:paused}
+@media (max-width:900px){.promos{display:none}}
+@media (prefers-reduced-motion:reduce){.promo{animation:none}}
 
 /* Trip radar */
 .signal{border:1px solid var(--line);border-radius:16px;padding:.85rem 1rem;background:#fff}
