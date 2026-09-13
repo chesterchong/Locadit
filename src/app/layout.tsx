@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Aldrich, Caveat, Fredoka, Gochi_Hand, Inter, JetBrains_Mono, Playfair_Display, Press_Start_2P, Righteous } from "next/font/google";
 import "./globals.css";
+import Soundtrack from "./soundtrack";
 
 // Self-hosted and preloaded, so the intro's wordmark faces are on hand before their beat.
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -24,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${inter.variable} ${mono.variable} ${caveat.variable} ${playfair.variable} ${fredoka.variable} ${pixel.variable} ${righteous.variable} ${marker.variable} ${caption.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">{children}<Soundtrack /></body>
     </html>
   );
 }

@@ -54,26 +54,13 @@ export default function Landing() {
     requestAnimationFrame(() => heroRef.current?.querySelector<HTMLElement>(".phone-wrap")?.focus({ preventScroll: true }));
   }, []);
 
-  // Keyboard skip while the intro runs: Escape, Enter or Space.
-  useEffect(() => {
-    if (step >= END) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
-        if (e.key === " ") e.preventDefault();
-        skip();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [step, skip]);
-
   const leaving = step >= 7;
   const font = leaving ? "wm-hand" : WM[Math.min(Math.max(step - 1, 0), 5)];
   const stop = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
     <div className="landing">
-      <section ref={heroRef} className="hero" onClick={() => { if (step < END) skip(); }} aria-label="Locadit intro">
+      <section ref={heroRef} className="hero" aria-label="Locadit intro">
         <div className="stage" style={{ "--s": fit?.s ?? 1, "--wm": fit?.wm ?? 1, visibility: fit ? "visible" : "hidden" } as CSSProperties}>
           <div className="dots on" />
           <div className={`sky ${step >= 5 ? "on" : ""}`} />
@@ -99,7 +86,7 @@ export default function Landing() {
             </Link>
           ))}
         </div>
-        {step < END && <button type="button" className="skip" onClick={(e) => { stop(e); skip(); }}>Skip intro</button>}
+        {step < END && <button type="button" className="skip" onClick={skip}>Skip intro</button>}
       </section>
 
     </div>
