@@ -104,6 +104,7 @@ export default function Quiz() {
   }
 
   async function submit(final: Record<string, number>) {
+    try { localStorage.setItem("locadit:name", name); } catch {}
     await fetch(`/api/trips/${code}/answers`, { method: "POST", body: JSON.stringify({ name, budget, dates, interests: final, pace, mustHave: mustHave || undefined, avoid: avoid || undefined }) });
     r.push(`/t/${code}/board`);
   }

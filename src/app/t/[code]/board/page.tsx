@@ -13,6 +13,8 @@ export default function Board() {
   const [d, setD] = useState<Data | null>(null);
   const [title, setTitle] = useState(""); const [amount, setAmount] = useState(""); const [paidBy, setPaidBy] = useState("");
   const [copied, setCopied] = useState(false);
+  const [me, setMe] = useState<string | null>(null);
+  useEffect(() => { try { setMe(localStorage.getItem("locadit:name")); } catch {} }, []);
   const [radar, setRadar] = useState<Radar | null>(null);
   useEffect(() => {
     const go = () => fetch(`/api/trips/${code}/risk`).then((r) => (r.ok ? r.json() : null)).then((j) => j && setRadar(j)).catch(() => {});
@@ -33,7 +35,7 @@ export default function Board() {
     <main className="mx-auto max-w-2xl px-6 py-10 space-y-6">
       <ShareQr code={trip.code} />
       <Link href="/" className="home-link">Locadit</Link>
-      <div className="pill"><span className="dot" />Room is live · <span className="mono">{trip.code}</span> · {trip.answers.length} joined · {trip.expenses.length} expenses</div>
+      <div className="pill"><span className="dot" />Live · <span className="mono">{trip.code}</span></div>
       <header>
         <p className="text-xs uppercase tracking-widest muted">{trip.destination}</p>
         <h1 className="text-4xl font-extrabold tracking-tight">{trip.name}</h1>
@@ -43,9 +45,9 @@ export default function Board() {
               {trip.answers.map((a) => <span key={a.name} className="avatar" style={{ background: tone(a.name) }} title={a.name}>{initials(a.name)}</span>)}
               <button type="button" className="avatar add" title={copied ? "Copied" : "Copy invite link"} onClick={() => { navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); }); }}>{copied ? "✓" : "+"}</button>
             </div>
-            <p className="text-sm muted">{trip.answers.length === 0 ? "Nobody has answered yet" : trip.answers.length === 1 ? `${trip.answers[0].name} has answered` : `${trip.answers.length} travellers have answered`}</p>
+            <p className="text-sm muted">{trip.answers.length === 0 ? "No answers yet" : `${trip.answers.length} answered`}</p>
           </div>
-          <Link href={`/t/${trip.code}`} className="btn btn-primary">Add my answers</Link>
+          <Link href={`/t/${trip.code}`} className="btn btn-primary !rounded-full !py-2 !px-4 text-sm">{me && trip.answers.some((a) => a.name === me) ? "Edit my answers" : "Join and answer →"}</Link>
         </div>
       </header>
       <section className="glass p-5 space-y-3 pop">
