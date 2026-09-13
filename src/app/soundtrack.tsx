@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from "react";
 
 const MAX_VOLUME = 0.7;
 const FADE_SECONDS = 4;
+// The disc's playlist. The landing intro plays its own track once first, then hands over to this list, which loops.
+const PLAYLIST = ["/audio/melodic-minor.mp3", "/audio/nightcall.mp3"];
+const INTRO = "/audio/intro.mp3";
 const NOTES = ["🎵", "🎶", "♪", "♫"];
 
 // Site-wide soundtrack via Web Audio, controlled by the spinning disc in the top-right corner.
@@ -12,27 +15,43 @@ export default function Soundtrack() {
   const [notes, setNotes] = useState<{ id: number; x: number; glyph: string }[]>([]);
   const ctxRef = useRef<AudioContext | null>(null);
   const gainRef = useRef<GainNode | null>(null);
-  const bufRef = useRef<AudioBuffer | null>(null);
+  const buffers = useRef<Record<string, AudioBuffer>>({});
   const srcRef = useRef<AudioBufferSourceNode | null>(null);
   const startedRef = useRef(false);
+  const queueRef = useRef<string[]>([]);   // tracks still to play in this pass
+  const readyRef = useRef(false);
 
-  const startSource = () => {
-    const ctx = ctxRef.current, gain = gainRef.current, buf = bufRef.current;
-    if (!ctx || !gain || !buf) return;
+  const load = async (url: string) => {
+    if (buffers.current[url]) return buffers.current[url];
+    const ctx = ctxRef.current!;
+    const b = await ctx.decodeAudioData(await (await fetch(url)).arrayBuffer());
+    buffers.current[url] = b; return b;
+  };
+  const nextUrl = () => {
+    if (!queueRef.current.length) queueRef.current = [...PLAYLIST]; // loop the disc playlist
+    return queueRef.current.shift()!;
+  };
+  const startSource = async (fadeSeconds = 1.5) => {
+    const ctx = ctxRef.current, gain = gainRef.current;
+    if (!ctx || !gain) return;
+    const url = nextUrl();
+    const buf = await load(url).catch(() => null);
+    if (!buf) return;
     try { srcRef.current?.stop(); } catch {}
     const src = ctx.createBufferSource();
     src.buffer = buf; src.loop = false; src.connect(gain);
-    src.onended = () => { if (srcRef.current === src) { srcRef.current = null; setPlaying(false); } };
+    src.onended = () => { if (srcRef.current === src) { srcRef.current = null; startSource(1.5); } }; // auto-advance
     src.start(); srcRef.current = src;
     const now = ctx.currentTime;
-    gain.gain.cancelScheduledValues(now); gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(MAX_VOLUME, now + FADE_SECONDS);
+    gain.gain.cancelScheduledValues(now); gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(MAX_VOLUME, now + fadeSeconds);
+    void load(queueRef.current[0] ?? PLAYLIST[0]); // prefetch what comes next
   };
 
   const play = async () => {
-    const ctx = ctxRef.current; if (!ctx || !bufRef.current) return;
+    const ctx = ctxRef.current; if (!ctx || !readyRef.current) return;
     await ctx.resume().catch(() => {});
     if (ctx.state !== "running") return;
-    if (!srcRef.current) startSource();
+    if (!srcRef.current) await startSource(startedRef.current ? 1.5 : FADE_SECONDS);
     startedRef.current = true; setPlaying(true);
   };
   const pause = async () => { await ctxRef.current?.suspend().catch(() => {}); setPlaying(false); };
@@ -49,7 +68,9 @@ export default function Soundtrack() {
     const tryStart = () => { if (startedRef.current) { unbind(); return; } play().then(() => { if (startedRef.current) unbind(); }); };
     const unbind = () => events.forEach((e) => window.removeEventListener(e, tryStart));
     events.forEach((e) => window.addEventListener(e, tryStart));
-    fetch("/audio/intro.mp3").then((r) => r.arrayBuffer()).then((b) => ctx.decodeAudioData(b)).then((audio) => { if (cancelled) return; bufRef.current = audio; tryStart(); }).catch(() => {});
+    // Landing plays the intro track once before the playlist; other pages go straight to the playlist.
+    queueRef.current = window.location.pathname === "/" ? [INTRO, ...PLAYLIST] : [...PLAYLIST];
+    load(queueRef.current[0]).then(() => { if (cancelled) return; readyRef.current = true; tryStart(); }).catch(() => {});
     return () => { cancelled = true; unbind(); try { srcRef.current?.stop(); } catch {} ctx.close().catch(() => {}); };
   }, []); // eslint-disable-line
 
