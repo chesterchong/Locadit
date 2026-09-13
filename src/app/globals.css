@@ -247,3 +247,23 @@ input[type=range]{accent-color:#111}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 .live-dot{display:inline-block;width:7px;height:7px;border-radius:999px;background:#22c55e;margin-left:.45rem;vertical-align:middle;box-shadow:0 0 0 3px rgba(34,197,94,.18)}
+
+/* Locadit's self-contained room QR: decorative tree closed, standard scannable code open. */
+.tree-qr{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:800}
+.tree-qr-toggle{display:block;border:0;padding:0;background:transparent;color:#26211c;cursor:pointer;border-radius:22px;font:inherit}
+.tree-qr-toggle:disabled{cursor:wait;opacity:.7}
+.tree-qr-toggle:focus-visible{outline:3px solid #111;outline-offset:5px}
+.tree-qr-closed{display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 10px 14px rgba(76,52,25,.16));transition:transform .25s cubic-bezier(.2,.9,.2,1)}
+.tree-qr-toggle:hover .tree-qr-closed{transform:translateY(-3px) scale(1.02)}
+.tree-qr-art{display:block;width:102px;height:auto;overflow:visible}
+.tree-qr-leaves{transform-origin:64px 80px;animation:tree-breathe 4s ease-in-out infinite alternate}
+.tree-qr-label{margin-top:-5px;border:1px solid rgba(87,65,40,.18);border-radius:999px;padding:6px 12px;background:rgba(255,251,244,.96);box-shadow:0 5px 18px rgba(55,40,25,.08);font-size:12px;font-weight:700;letter-spacing:.02em}
+.tree-qr-panel{display:flex;width:268px;flex-direction:column;align-items:center;border:1px solid rgba(87,65,40,.18);border-radius:22px;padding:16px;background:#fffaf2;box-shadow:0 20px 60px rgba(49,36,24,.2);animation:tree-qr-open .22s cubic-bezier(.2,.9,.2,1) both}
+.tree-qr-title{font-size:15px;font-weight:750;letter-spacing:-.01em}
+.tree-qr-code{display:block;width:224px;height:224px;margin:10px 0 8px;background:#fff;shape-rendering:crispEdges}
+.tree-qr-room{font-size:12px;color:#4f473e}
+.tree-qr-hint{margin-top:3px;font-size:10px;color:var(--muted)}
+@keyframes tree-breathe{from{transform:rotate(-1deg)}to{transform:rotate(1deg)}}
+@keyframes tree-qr-open{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+@media (max-width:640px){.tree-qr{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}.tree-qr-art{width:82px}.tree-qr-panel{width:min(254px,calc(100vw - 24px));padding:14px}.tree-qr-code{width:min(220px,calc(100vw - 52px));height:auto}}
+@media (prefers-reduced-motion:reduce){.tree-qr-leaves,.tree-qr-panel{animation:none}.tree-qr-closed{transition:none}}

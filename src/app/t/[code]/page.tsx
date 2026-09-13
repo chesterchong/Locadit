@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ACTIVITIES, Pace } from "@/lib/store";
 import Promos from "@/app/promos";
-import { treeQrUrl } from "@/lib/tree";
 
 type Trip = { code: string; name: string; destination: string; dateOptions: string[]; place?: { name: string; country: string; lat: number; lon: number } };
 // Search terms per activity for real photos (Wikimedia Commons via /api/photos).
@@ -149,7 +148,7 @@ export default function Quiz() {
       {host && (
         <div className="pill w-full justify-between shrink-0">
           <span><span className="dot" /> You started this room · code <b className="mono">{trip.code}</b></span>
-          <span className="flex gap-3"><a href={treeQrUrl(`${typeof window !== "undefined" ? window.location.origin : ""}/t/${trip.code}`)} target="_blank" rel="noreferrer" className="underline">🌳 Tree QR</a><Link href={`/t/${trip.code}/board`} className="underline">Live board →</Link></span>
+          <Link href={`/t/${trip.code}/board`} className="underline">Live board →</Link>
         </div>
       )}
       <header className="shrink-0">

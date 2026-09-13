@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import LoadingView from "@/app/loading-view";
 import { useParams } from "next/navigation";
+import TreeQr from "@/components/tree-qr";
 type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; live?: boolean; links?: { label: string; href: string }[] };
 type Radar = { place?: { name: string; country: string }; window?: { label: string }; signals: Signal[]; generatedAt: number; partial?: boolean };
 const LEVEL: Record<Signal["level"], string> = { calm: "Clear", "heads-up": "Check", caution: "Act", info: "Live" };
@@ -30,6 +31,7 @@ export default function Board() {
   }
   return (
     <main className="mx-auto max-w-2xl px-6 py-10 space-y-6">
+      <TreeQr code={trip.code} />
       <Link href="/" className="home-link">Locadit</Link>
       <div className="pill"><span className="dot" />Room is live · <span className="mono">{trip.code}</span> · {trip.answers.length} joined · {trip.expenses.length} expenses</div>
       <header>
