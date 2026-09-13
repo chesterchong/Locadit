@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import LoadingView from "@/app/loading-view";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ACTIVITIES, Pace } from "@/lib/store";
@@ -127,7 +128,7 @@ export default function Quiz() {
       </div>
     </main>
   );
-  if (!trip) return <main className="p-6 muted">Loading…</main>;
+  if (!trip) return <LoadingView label="Opening your room" />;
   const current = FLOW[q];
   const act = ACTIVITIES[i];
   const x = fly === null ? dx : fly * 600;

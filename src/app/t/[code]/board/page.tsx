@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import LoadingView from "@/app/loading-view";
 import { useParams } from "next/navigation";
 import { treeQrUrl } from "@/lib/tree";
 type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; links?: { label: string; href: string }[]; data?: { hi: number; lo: number; rain: number } };
@@ -33,7 +34,7 @@ export default function Board() {
   const load = () => fetch(`/api/trips/${code}`).then((r) => { if (r.status === 404) { setMissing(true); return null; } return r.json(); }).then((j) => { if (j) setD(j); }).catch(() => {});
   useEffect(() => { load(); const t = setInterval(() => { if (!missing) load(); }, 2500); return () => clearInterval(t); }, [code, missing]); // eslint-disable-line
   if (missing) return <NotFound code={code} />;
-  if (!d || !d.trip) return <main className="p-6 muted">Loading…</main>;
+  if (!d || !d.trip) return <LoadingView label="Opening the live board" />;
   const { trip, result, balances } = d;
   const link = typeof window !== "undefined" ? `${window.location.origin}/t/${trip.code}` : "";
   async function addExpense() {

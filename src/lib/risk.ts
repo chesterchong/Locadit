@@ -1,4 +1,5 @@
 import { Trip } from "./store";
+import { currencyFor, fxSnapshot, NAMES } from "./fx";
 
 export type Level = "calm" | "heads-up" | "caution" | "info";
 export type Signal = { id: string; title: string; level: Level; message: string; advice?: string; source: string; asOf?: string; links?: { label: string; href: string }[]; data?: { hi: number; lo: number; rain: number } };
@@ -47,15 +48,17 @@ function stormSeason(lat: number, lon: number, month: number): Signal {
   return { id: "storm", title: "Storm season", level: peak ? "caution" : "heads-up", message: `${basin} season is ${peak ? "at its peak" : "open"} for these dates.`, advice: "Book flexible fares, keep a spare day, and watch the forecast the week before.", source: "Seasonal climatology" };
 }
 
-export async function assessRisk(trip: Trip): Promise<Radar> {
-  const hit = cache.get(trip.code);
+export async function assessRisk(trip: Trip, homeCountry?: string | null): Promise<Radar> {
+  const home = currencyFor(homeCountry);
+  const cacheKey = `${trip.code}:${home ?? "-"}`;
+  const hit = cache.get(cacheKey);
   if (hit && Date.now() - hit.at < 3600000) return hit.radar;
   const place = trip.place;
   const signals: Signal[] = [];
   const win = parseWindow(trip.dateOptions[0] ?? "");
   if (!place) {
     const radar = { place, signals: [{ id: "place", title: "Location", level: "info" as Level, message: `Couldn't place "${trip.destination}" on the map, so the radar is off.`, source: "Open-Meteo geocoder" }], generatedAt: Date.now() };
-    cache.set(trip.code, { at: Date.now(), radar });
+    cache.set(cacheKey, { at: Date.now(), radar });
     return radar;
   }
   const tasks: Promise<void>[] = [];
@@ -105,6 +108,17 @@ export async function assessRisk(trip: Trip): Promise<Radar> {
     signals.push({ id: "economy", title: "Prices", level, message: `Inflation ${r.value.toFixed(1)}% (${r.year}).${level === "calm" ? " Prices should be stable while you plan." : ""}`, advice: level === "calm" ? undefined : "Budget with a buffer and pay by card where you can.", source: "World Bank", asOf: r.year });
   })());
 
+  const dest = currencyFor(place.countryCode);
+  if (home && dest && home !== dest) tasks.push((async () => {
+    const fx = await fxSnapshot(home, dest);
+    if (!fx) return;
+    const abs = Math.abs(fx.change);
+    const level: Level = abs > 12 || fx.vol > 12 ? "caution" : abs > 5 || fx.vol > 7 ? "heads-up" : "calm";
+    const rate = fx.rate >= 100 ? Math.round(fx.rate).toLocaleString() : fx.rate.toFixed(fx.rate >= 10 ? 2 : 3);
+    const dir = fx.change >= 0 ? "stronger" : "weaker";
+    const homeName = NAMES[home] ?? home, destName = NAMES[dest] ?? dest;
+    signals.push({ id: "fx", title: "Exchange rate", level, message: `1 ${home} ≈ ${rate} ${dest} today. Your ${homeName} buy ${abs.toFixed(1)}% ${fx.change >= 0 ? "more" : "less"} ${destName} than a year ago; the rate has been ${fx.vol > 12 ? "volatile" : fx.vol > 7 ? "moving" : "steady"} (${fx.vol.toFixed(0)}% annualised).`, advice: level === "calm" ? undefined : fx.change >= 0 ? `Your ${homeName} is ${dir}; budget in ${home} and exchange in a couple of batches rather than all at once.` : `Your ${homeName} is ${dir}; lock in the big costs early and keep a 10% buffer.`, source: "European Central Bank via Frankfurter", asOf: fx.date });
+  })());
   await Promise.all(tasks);
   const slug = place.country.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   signals.push({ id: "advisory", title: "Official travel advice", level: "info", message: `Government advisories for ${place.country} cover security, health and entry rules better than any score.`, source: "Official sources", links: [
@@ -115,6 +129,6 @@ export async function assessRisk(trip: Trip): Promise<Radar> {
   const order: Record<Level, number> = { caution: 0, "heads-up": 1, calm: 2, info: 3 };
   signals.sort((a, b) => order[a.level] - order[b.level]);
   const radar: Radar = { place, window: win ? { start: win.start, end: win.end, label: win.label } : undefined, signals, generatedAt: Date.now() };
-  cache.set(trip.code, { at: Date.now(), radar });
+  cache.set(cacheKey, { at: Date.now(), radar });
   return radar;
 }

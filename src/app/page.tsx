@@ -138,11 +138,11 @@ export default function Landing() {
 function TreeMark({ large = false }: { large?: boolean }) {
   return (
     <svg className={`tree-mark ${large ? "large" : ""}`} viewBox="0 0 96 92" aria-hidden>
-      <path className="tree-trunk" d="M48 84V43m0 18-15-14m15 4 17-17m-17 1-9-10m9 27 9-8" />
       <g className="tree-leaves">
         <circle cx="48" cy="23" r="18" /><circle cx="31" cy="33" r="15" /><circle cx="65" cy="34" r="17" />
         <circle cx="42" cy="42" r="17" /><circle cx="59" cy="18" r="13" /><circle cx="24" cy="22" r="11" />
       </g>
+      <path className="tree-trunk" d="M48 84V43m0 18-15-14m15 4 17-17m-17 1-9-10m9 27 9-8" />
       <path className="tree-ground" d="M29 85c10-5 29-5 39 0" />
     </svg>
   );
