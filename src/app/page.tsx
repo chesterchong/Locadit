@@ -131,7 +131,7 @@ function PieceEl({ p, step, delay, seed }: { p: Piece; step: number; delay: numb
     "--wa": `${p.wind ?? 2.5}deg`, "--wd": `${(2.1 + (seed % 5) * 0.35).toFixed(2)}s`, "--wdel": `${(-(seed % 7) * 0.4).toFixed(1)}s`,
   } as CSSProperties;
   const cls = `piece ${p.kind} ${p.font ? "f-" + p.font : ""} ${p.underline ? "underline-blue" : ""} ${p.hover ? "hoverable" : ""} ${gone ? "off" : shown ? "on" : ""}`;
-  if (p.kind === "img") return <img className={cls} style={style} src={p.src} alt="" />;
+  if (p.kind === "img") return <div className={cls} style={style}><span className="in"><img src={p.src} alt="" draggable={false} /></span></div>;
   if (p.kind === "polaroid") return <div className={cls} style={style}><span className="in"><i style={{ background: p.color }} /></span></div>;
   if (p.kind === "checker" || p.kind === "cloud") return <div className={cls} style={style} />;
   return <div className={cls} style={style} aria-hidden><span className="in"><span key={ci} className={p.cycle ? "fade-in" : undefined}>{content}</span></span></div>;

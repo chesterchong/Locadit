@@ -79,7 +79,8 @@ input[type=range]{accent-color:#111}
 .piece.cloud::after{left:50%;top:-35%;width:34%;height:85%}
 .piece.polaroid .in{display:block;transform-origin:50% 100%;width:100%;height:100%;background:#fff;padding:7px 7px 22px;box-sizing:border-box;box-shadow:0 10px 30px rgba(0,0,0,.15)}
 .piece.polaroid i{display:block;width:100%;height:100%}
-.piece.img{object-fit:contain;height:auto}
+.piece.img .in{display:block;width:100%}
+.piece.img img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
 .wm{position:absolute;left:800px;top:380px;width:1000px;height:300px;z-index:55;margin:0;color:#111;transform:translate(-50%,-50%);transition:top .9s cubic-bezier(.6,0,.2,1),transform .9s cubic-bezier(.6,0,.2,1)}
 /* 450px - half the hero height in stage px = the visible top edge, whatever the aspect ratio. */
 .wm.leave{top:calc(450px - 50svh / var(--s,1) + 38px);transform:translate(-50%,-50%) scale(calc(.75 / var(--wm,1)))}
