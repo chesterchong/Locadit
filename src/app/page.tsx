@@ -78,7 +78,7 @@ export default function Landing() {
         <div className="stage" style={{ "--s": fit?.s ?? 1, "--wm": fit?.wm ?? 1, visibility: fit ? "visible" : "hidden" } as CSSProperties}>
           <div className="dots on" />
           <div className={`sky ${step >= 5 ? "on" : ""}`} />
-          {PIECES.map((p, i) => <PieceEl key={p.id} p={p} step={step} delay={ORDER[i] * 70} />)}
+          {PIECES.map((p, i) => <PieceEl key={p.id} p={p} step={step} delay={ORDER[i] * 70} seed={i} />)}
           <h1 className={`wm ${leaving ? "leave" : ""}`} aria-label="Locadit">
             {/* Each style change is drawn: the previous face is erased left to right while the new one traces in. */}
             {prevFont && <WordSvg key={`out-${changeStep}`} font={prevFont} mode="erase" />}
@@ -107,7 +107,7 @@ export default function Landing() {
   );
 }
 
-function PieceEl({ p, step, delay }: { p: Piece; step: number; delay: number }) {
+function PieceEl({ p, step, delay, seed }: { p: Piece; step: number; delay: number; seed: number }) {
   const shown = step >= p.layer + 1;
   const settled = step >= 7 && p.to;
   const gone = p.hideAtEnd && step >= 8;
@@ -120,6 +120,7 @@ function PieceEl({ p, step, delay }: { p: Piece; step: number; delay: number }) 
     height: textual ? undefined : p.h,
     color: p.kind === "text" ? p.color : undefined,
     "--r": `${t.rot ?? 0}deg`, "--d": `${delay}ms`,
+    "--wa": `${p.wind ?? 2.5}deg`, "--wd": `${(2.1 + (seed % 5) * 0.35).toFixed(2)}s`, "--wdel": `${(-(seed % 7) * 0.4).toFixed(1)}s`,
   } as CSSProperties;
   const cls = `piece ${p.kind} ${p.font ? "f-" + p.font : ""} ${p.underline ? "underline-blue" : ""} ${p.hover ? "hoverable" : ""} ${gone ? "off" : shown ? "on" : ""}`;
   if (p.kind === "img") return <img className={cls} style={style} src={p.src} alt="" />;
