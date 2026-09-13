@@ -15,7 +15,7 @@ export type Piece = {
   h?: number;
   rot?: number;
   z?: number;
-  font?: "hand" | "serif" | "mono" | "pixel";
+  font?: "hand" | "serif" | "mono" | "pixel" | "caption";
   color?: string;
   underline?: boolean;
   to?: { x?: number; y?: number; size?: number; rot?: number };
@@ -64,7 +64,7 @@ export const PIECES: Piece[] = [
   { id: "ufo", layer: 5, kind: "emoji", content: "🛸", x: 1300, y: 55, size: 100, rot: -10 },
   { id: "bfly-a", layer: 5, kind: "emoji", content: "🦋", x: 640, y: 210, size: 60, rot: 15 },
   { id: "bfly-b", layer: 5, kind: "emoji", content: "🦋", x: 1060, y: 150, size: 50, rot: -20 },
-  { id: "affaire", layer: 5, kind: "text", content: "UNE AFFAIRE\nDE VOYAGE", x: 1165, y: 100, size: 22, font: "mono", color: "#fff", rot: -4 },
+  { id: "affaire", layer: 5, kind: "text", content: "UNE AFFAIRE\nDE VOYAGE", x: 1165, y: 100, size: 24, font: "caption", color: "#fff", rot: -4 },
   { id: "lookup", layer: 5, kind: "text", content: "Look up!", x: 1400, y: 520, size: 44, font: "hand", color: "#111", rot: -12 },
   { id: "friends", layer: 5, kind: "text", content: "FRIENDS!", x: 330, y: 600, size: 40, font: "hand", color: "#111", rot: -6, underline: true },
   { id: "robot", layer: 5, kind: "emoji", content: "🤖", x: 240, y: 190, size: 190, rot: -8 },

@@ -11,7 +11,7 @@ const WM = ["wm-hand", "wm-serif", "wm-black", "wm-round", "wm-pixel", "wm-geo"]
 
 // Placeholder media until Locadit's own footage lands. One card, centred.
 const CARDS = [
-  { x: 800, icon: "https://static.amo.co/shared/images/app-icons/location/20250123-167x167.png", video: "https://static.amo.co/website/videos/location/20250915.mp4#t=9", qr: "https://amo.co/qrcode-location.png", name: "Locadit", tag: "Group trips without the argument", href: "/start" },
+  { x: 800, icon: "https://static.amo.co/shared/images/app-icons/location/20250123-167x167.png", video: "https://static.amo.co/website/videos/location/20250915.mp4#t=9", qr: "https://amo.co/qrcode-location.png", name: "Locadit", tag: "Group trips without the argument", href: "/about" },
 ];
 
 // Stagger index of each piece within its layer (drives pop-in delay).
@@ -94,22 +94,14 @@ export default function Landing() {
           {CARDS.map((c, i) => (
             <Link key={`${c.name}-info`} href={c.href} className={`info ${step >= 9 ? "on" : ""}`} style={{ left: c.x, transitionDelay: `${i * 120}ms` }} onClick={stop}>
               <img src={c.icon} alt="" />
-              <span><b>{c.name}</b><small>{c.tag}</small></span>
+              <span className="info-text"><b>{c.name}</b><small>{c.tag}</small></span>
+              <span className="info-cta">Start a room</span>
             </Link>
           ))}
         </div>
         {step < END && <button type="button" className="skip" onClick={(e) => { stop(e); skip(); }}>Skip intro</button>}
       </section>
 
-      <section id="about" className="about mx-auto max-w-2xl px-6 py-32 text-center">
-        <h2>Planning a trip together<br />should feel like the trip.</h2>
-        <div className="mt-8 space-y-5 text-left text-[17px] leading-relaxed opacity-80">
-          <p>Locadit started with a group chat that never decided anything. Five friends, five budgets, three date ranges and a hundred links nobody opened. The trip didn&apos;t happen.</p>
-          <p>So we built the thing we wished existed. Everyone answers a private two-minute quiz: what they can spend, when they&apos;re free, what they actually want to do. No one sees anyone else&apos;s answers. Locadit merges them into one budget ceiling, one date window and a day-by-day itinerary that explains why each day is there.</p>
-          <p>Quiet voices get a day too. Costs split themselves. And when the plan meets reality, it bends instead of breaking.</p>
-        </div>
-        <Link href="/start" className="cta mt-12">Start a room</Link>
-      </section>
     </div>
   );
 }
