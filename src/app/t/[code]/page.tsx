@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ACTIVITIES, Pace } from "@/lib/store";
+import Promos from "@/app/promos";
 
 type Trip = { code: string; name: string; destination: string; dateOptions: string[]; place?: { name: string; country: string; lat: number; lon: number } };
 // Search terms per activity for real photos (Wikimedia Commons via /api/photos).
@@ -140,6 +141,7 @@ export default function Quiz() {
   return (
     <main className={`mx-auto max-w-md px-6 py-10 flex flex-col gap-6 ${q < FLOW.length ? "h-[100svh] overflow-hidden" : "min-h-[100svh] justify-center"}`}>
       <Link href="/" className="home-link">Locadit</Link>
+      <Promos />
       {host && (
         <div className="pill w-full justify-between shrink-0">
           <span><span className="dot" /> You started this room · code <b className="mono">{trip.code}</b></span>
