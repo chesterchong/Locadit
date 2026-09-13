@@ -38,9 +38,13 @@ input[type=range]{accent-color:#111}
   radial-gradient(90px 40px at 80% 86%,rgba(255,255,255,.85),transparent 70%),
   linear-gradient(#1651e6,#3b8cf6 70%,#7fb6ff)}
 .sky.on{transform:none}
+@property --hs{syntax:"<number>";inherits:false;initial-value:1}
 .piece{position:absolute;line-height:1;white-space:pre;opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(calc(var(--r) - 30deg));filter:drop-shadow(0 14px 18px rgba(0,0,0,.18));will-change:transform,opacity;
-  transition:transform .8s cubic-bezier(.2,1.5,.35,1) var(--d),opacity .3s var(--d),left .9s cubic-bezier(.4,0,.2,1),top .9s cubic-bezier(.4,0,.2,1),font-size .9s cubic-bezier(.4,0,.2,1)}
-.piece.on{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(var(--r))}
+  transition:transform .8s cubic-bezier(.2,1.5,.35,1) var(--d),opacity .3s var(--d),left .9s cubic-bezier(.4,0,.2,1),top .9s cubic-bezier(.4,0,.2,1),font-size .9s cubic-bezier(.4,0,.2,1),--hs .35s cubic-bezier(.2,1.4,.3,1) 0s}
+.piece.on{opacity:1;transform:translate(-50%,-50%) scale(var(--hs)) rotate(var(--r))}
+/* Hover grow on selected pieces and the phone card (--hs animates on its own, unaffected by the pop-in delay). */
+.piece.hoverable{cursor:pointer}
+.piece.hoverable.on:hover{--hs:1.14}
 .piece.off{opacity:0;transform:translate(-50%,-50%) scale(.5) rotate(var(--r));transition-delay:0s}
 .piece.text{font-weight:700;letter-spacing:.02em}
 .piece.f-hand{font-family:var(--font-marker),"Comic Sans MS",cursive;font-weight:400;letter-spacing:0}
@@ -77,8 +81,9 @@ input[type=range]{accent-color:#111}
 .wm-round{font-family:var(--font-fredoka),sans-serif;font-size:calc(120px * var(--wm,1));font-weight:700;letter-spacing:-.03em}
 .wm-pixel{font-family:var(--font-pixel),monospace;font-size:calc(68px * var(--wm,1));letter-spacing:-.04em}
 .wm-geo{font-family:var(--font-righteous),sans-serif;font-size:calc(115px * var(--wm,1));letter-spacing:-.01em}
-.phone-wrap{position:absolute;top:430px;width:204px;height:440px;margin:-220px 0 0 -102px;display:block;z-index:60;opacity:0;transform:translateY(720px) rotate(4deg);transition:transform 1.05s cubic-bezier(.2,1.05,.3,1),opacity .5s}
-.phone-wrap.on{opacity:1;transform:none}
+.phone-wrap{position:absolute;top:430px;width:204px;height:440px;margin:-220px 0 0 -102px;display:block;z-index:60;opacity:0;transform:translateY(720px) rotate(4deg);transition:transform 1.05s cubic-bezier(.2,1.05,.3,1),opacity .5s,--hs .35s cubic-bezier(.2,1.4,.3,1)}
+.phone-wrap.on{opacity:1;transform:scale(var(--hs))}
+.phone-wrap.on:hover{--hs:1.06}
 .phone{position:relative;width:100%;height:100%;border-radius:30px;overflow:hidden;background:#000;box-shadow:0 30px 70px rgba(0,0,0,.28)}
 .phone video{width:100%;height:100%;object-fit:cover;display:block}
 .phone .qr{position:absolute;right:16px;bottom:16px;width:68px;height:68px;border-radius:10px;background:#fff;padding:4px;box-sizing:border-box}

@@ -118,7 +118,7 @@ function PieceEl({ p, step, delay }: { p: Piece; step: number; delay: number }) 
     color: p.kind === "text" ? p.color : undefined,
     "--r": `${t.rot ?? 0}deg`, "--d": `${delay}ms`,
   } as CSSProperties;
-  const cls = `piece ${p.kind} ${p.font ? "f-" + p.font : ""} ${p.underline ? "underline-blue" : ""} ${gone ? "off" : shown ? "on" : ""}`;
+  const cls = `piece ${p.kind} ${p.font ? "f-" + p.font : ""} ${p.underline ? "underline-blue" : ""} ${p.hover ? "hoverable" : ""} ${gone ? "off" : shown ? "on" : ""}`;
   if (p.kind === "img") return <img className={cls} style={style} src={p.src} alt="" />;
   if (p.kind === "polaroid") return <div className={cls} style={style}><i style={{ background: p.color }} /></div>;
   if (p.kind === "checker" || p.kind === "cloud") return <div className={cls} style={style} />;
