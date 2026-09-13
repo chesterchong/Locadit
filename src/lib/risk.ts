@@ -3,7 +3,7 @@ import { currencyFor, fxSnapshot, NAMES } from "./fx";
 
 export type Level = "calm" | "heads-up" | "caution" | "info";
 export type Signal = { id: string; title: string; level: Level; message: string; advice?: string; source: string; asOf?: string; live?: boolean; links?: { label: string; href: string }[]; data?: { hi: number; lo: number; rain: number } };
-export type Radar = { place: Trip["place"]; stay?: Trip["stay"]; window?: { start: string; end: string; label: string }; signals: Signal[]; generatedAt: number };
+export type Radar = { place: Trip["place"]; stay?: Trip["stay"]; window?: { start: string; end: string; label: string }; signals: Signal[]; generatedAt: number; partial?: boolean };
 
 const cache = new Map<string, { at: number; radar: Radar }>();
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
@@ -23,13 +23,18 @@ function parseWindow(label: string, now = new Date()) {
   return { start: iso(new Date(Date.UTC(year - 1, month, day))), end: iso(new Date(Date.UTC(year - 1, month, day) + 4 * 86400000)), month, day, label };
 }
 
-async function json(url: string, revalidate = 3600, timeoutMs = 20000) {
-  const r = await fetch(url, { next: { revalidate }, signal: AbortSignal.timeout(timeoutMs), headers: { "User-Agent": "Locadit/0.1 (hackathon prototype)" } });
+function requestSignal(timeoutMs: number, deadline?: AbortSignal) {
+  const timeout = AbortSignal.timeout(timeoutMs);
+  return deadline ? AbortSignal.any([deadline, timeout]) : timeout;
+}
+
+async function json(url: string, revalidate = 3600, timeoutMs = 20000, deadline?: AbortSignal) {
+  const r = await fetch(url, { next: { revalidate }, signal: requestSignal(timeoutMs, deadline), headers: { "User-Agent": "Locadit/0.1 (hackathon prototype)" } });
   if (!r.ok) throw new Error(String(r.status));
   return r.json();
 }
-async function worldBank(country: string, indicator: string) {
-  const j = await json(`https://api.worldbank.org/v2/country/${country}/indicator/${indicator}?format=json&mrv=1`, 86400);
+async function worldBank(country: string, indicator: string, deadline: AbortSignal) {
+  const j = await json(`https://api.worldbank.org/v2/country/${country}/indicator/${indicator}?format=json&mrv=1`, 86400, 20000, deadline);
   const row = j?.[1]?.[0];
   return row && row.value != null ? { value: row.value as number, year: row.date as string } : null;
 }
@@ -51,7 +56,7 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
   const home = currencyFor(homeCountry);
   const cacheKey = `${trip.code}:${home ?? "-"}:${trip.stay?.name ?? "-"}`;
   const hit = cache.get(cacheKey);
-  if (hit && Date.now() - hit.at < 1800000) return hit.radar;
+  if (hit && !hit.radar.partial && Date.now() - hit.at < 1800000) return hit.radar;
   const place = trip.place;
   const point = trip.stay ?? place; // score around where the group actually sleeps when known
   const signals: Signal[] = [];
@@ -62,19 +67,23 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
     return radar;
   }
   const { lat, lon } = point;
+  // Every source is best-effort. Return completed checks within eight seconds instead of
+  // letting one slow upstream hold the whole serverless request open.
+  const deadline = AbortSignal.timeout(8000);
   const tasks: Promise<void>[] = [];
 
   // 1. Rain extremes for the dates: 10 years of daily totals, not last year's average.
   if (win) tasks.push((async () => {
     try {
       const y = new Date().getUTCFullYear();
-      const j = await json(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${y - 10}-01-01&end_date=${y - 1}-12-31&daily=precipitation_sum,temperature_2m_max,temperature_2m_min&timezone=auto`, 86400, 30000);
+      const j = await json(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${y - 10}-01-01&end_date=${y - 1}-12-31&daily=precipitation_sum,temperature_2m_max,temperature_2m_min&timezone=auto`, 86400, 30000, deadline);
       const t: string[] = j.daily.time, p: (number | null)[] = j.daily.precipitation_sum, hiA: (number | null)[] = j.daily.temperature_2m_max, loA: (number | null)[] = j.daily.temperature_2m_min;
       const mm = String(win.month + 1).padStart(2, "0");
-      const inWin = (d: string) => d.slice(5, 7) === mm && Math.abs(parseInt(d.slice(8, 10), 10) - win.day) <= 3;
+      const inWin = (d: string) => d.slice(5, 7) === mm && Math.abs(parseInt(d.slice(8, 10), 10) - win.day) <= 2;
       const rain = t.map((d, i) => (inWin(d) && p[i] != null ? (p[i] as number) : null)).filter((x): x is number => x != null);
       const his = t.map((d, i) => (inWin(d) ? hiA[i] : null)).filter((x): x is number => x != null);
       const los = t.map((d, i) => (inWin(d) ? loA[i] : null)).filter((x): x is number => x != null);
+      if (!rain.length || !his.length || !los.length) return;
       const monthly: Record<string, number[]> = {};
       t.forEach((d, i) => { if (p[i] != null) (monthly[d.slice(5, 7)] ??= []).push(p[i] as number); });
       const monthTotal = Object.fromEntries(Object.entries(monthly).map(([k, v]) => [k, v.reduce((a, b) => a + b, 0) / 10]));
@@ -90,8 +99,8 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
   tasks.push((async () => {
     try {
       const y = new Date();
-      const hist = await json(`https://flood-api.open-meteo.com/v1/flood?latitude=${lat}&longitude=${lon}&daily=river_discharge&start_date=${y.getUTCFullYear() - 5}-01-01&end_date=${y.toISOString().slice(0, 10)}`, 86400, 30000);
-      const fc = await json(`https://flood-api.open-meteo.com/v1/flood?latitude=${lat}&longitude=${lon}&daily=river_discharge&forecast_days=10`, 3600, 20000);
+      const hist = await json(`https://flood-api.open-meteo.com/v1/flood?latitude=${lat}&longitude=${lon}&daily=river_discharge&start_date=${y.getUTCFullYear() - 5}-01-01&end_date=${y.toISOString().slice(0, 10)}`, 86400, 30000, deadline);
+      const fc = await json(`https://flood-api.open-meteo.com/v1/flood?latitude=${lat}&longitude=${lon}&daily=river_discharge&forecast_days=10`, 3600, 20000, deadline);
       const h: number[] = (hist.daily.river_discharge as (number | null)[]).filter((x): x is number => x != null).sort((a, b) => a - b);
       const f: number[] = (fc.daily.river_discharge as (number | null)[]).filter((x): x is number => x != null);
       if (!h.length || !f.length) return;
@@ -106,7 +115,7 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
     try {
       const to = new Date(), from = new Date(to.getTime() - 30 * 86400000);
       const iso = (d: Date) => d.toISOString().slice(0, 10);
-      const j = await json(`https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?fromDate=${iso(from)}&toDate=${iso(to)}&alertlevel=Green;Orange;Red&eventlist=EQ,TC,FL,VO,DR,WF&country=${encodeURIComponent(place.country)}`, 1800, 25000);
+      const j = await json(`https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?fromDate=${iso(from)}&toDate=${iso(to)}&alertlevel=Green;Orange;Red&eventlist=EQ,TC,FL,VO,DR,WF&country=${encodeURIComponent(place.country)}`, 1800, 25000, deadline);
       type F = { properties: { eventtype: string; alertlevel: string; name: string; fromdate: string; url?: { report?: string } }; geometry: { coordinates: [number, number] } };
       const names: Record<string, string> = { EQ: "Earthquake", TC: "Tropical cyclone", FL: "Flood", VO: "Volcano", DR: "Drought", WF: "Wildfire" };
       const near = ((j.features ?? []) as F[]).map((x) => ({ ...x, d: km(lat, lon, x.geometry.coordinates[1], x.geometry.coordinates[0]) })).filter((x) => x.d <= 300).sort((a, b) => (a.properties.alertlevel === "Red" ? -1 : b.properties.alertlevel === "Red" ? 1 : a.properties.alertlevel === "Orange" ? -1 : b.properties.alertlevel === "Orange" ? 1 : a.d - b.d));
@@ -120,7 +129,7 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
   tasks.push((async () => {
     try {
       const d = 1; // ~100 km box
-      const j = await json(`https://webservices.volcano.si.edu/geoserver/GVP-VOTW/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=GVP-VOTW:Smithsonian_VOTW_Holocene_Volcanoes&outputFormat=json&bbox=${lon - d},${lat - d},${lon + d},${lat + d},EPSG:4326`, 86400, 25000);
+      const j = await json(`https://webservices.volcano.si.edu/geoserver/GVP-VOTW/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=GVP-VOTW:Smithsonian_VOTW_Holocene_Volcanoes&outputFormat=json&bbox=${lon - d},${lat - d},${lon + d},${lat + d},EPSG:4326`, 86400, 25000, deadline);
       type V = { properties: { Volcano_Name: string; Last_Eruption_Year: number | null }; geometry: { coordinates: [number, number] } };
       const vs = ((j.features ?? []) as V[]).map((v) => ({ name: v.properties.Volcano_Name, year: v.properties.Last_Eruption_Year, d: km(lat, lon, v.geometry.coordinates[1], v.geometry.coordinates[0]) })).filter((v) => v.d <= 100).sort((a, b) => a.d - b.d);
       if (!vs.length) { signals.push({ id: "volcano", title: "Volcanoes", level: "calm", message: "No Holocene volcanoes within 100 km.", source: "Smithsonian Global Volcanism Program" }); return; }
@@ -135,7 +144,7 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
   tasks.push((async () => {
     try {
       const since = new Date(Date.now() - 365 * 86400000).toISOString().slice(0, 10);
-      const j = await json(`https://earthquake.usgs.gov/fdsnws/event/1/count?format=geojson&latitude=${lat}&longitude=${lon}&maxradiuskm=300&starttime=${since}&minmagnitude=4.5`, 86400);
+      const j = await json(`https://earthquake.usgs.gov/fdsnws/event/1/count?format=geojson&latitude=${lat}&longitude=${lon}&maxradiuskm=300&starttime=${since}&minmagnitude=4.5`, 86400, 20000, deadline);
       const n = j.count as number;
       const level: Level = n >= 30 ? "caution" : n >= 8 ? "heads-up" : "calm";
       signals.push({ id: "seismic", title: "Seismic activity", level, message: n === 0 ? "No magnitude 4.5+ earthquakes within 300 km in the past year." : `${n} earthquakes of magnitude 4.5+ within 300 km in the past year.`, advice: level === "calm" ? undefined : "Active region. If you stay near the coast, learn the tsunami evacuation route on day one.", source: "USGS earthquake catalog", asOf: "past 12 months" });
@@ -148,9 +157,9 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
   tasks.push((async () => {
     const slug = place.country.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     let fcdo: { status: string[]; updated?: string } | null = null, us: string | null = null;
-    try { const j = await json(`https://www.gov.uk/api/content/foreign-travel-advice/${slug}`, 21600); fcdo = { status: j.details?.alert_status ?? [], updated: j.public_updated_at }; } catch { /* skip */ }
+    try { const j = await json(`https://www.gov.uk/api/content/foreign-travel-advice/${slug}`, 21600, 20000, deadline); fcdo = { status: j.details?.alert_status ?? [], updated: j.public_updated_at }; } catch { /* skip */ }
     try {
-      const r = await fetch("https://travel.state.gov/_res/rss/TAsTWs.xml", { next: { revalidate: 21600 }, signal: AbortSignal.timeout(15000) });
+      const r = await fetch("https://travel.state.gov/_res/rss/TAsTWs.xml", { next: { revalidate: 21600 }, signal: requestSignal(15000, deadline) });
       const x = await r.text();
       const m = new RegExp(`<title>\\s*${place.country.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[^<]*?Level (\\d)[^<]*</title>`, "i").exec(x);
       if (m) us = m[1];
@@ -158,7 +167,7 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
     const whole = fcdo?.status.some((s) => s.includes("whole_country")) ?? false, parts = fcdo?.status.some((s) => s.includes("parts")) ?? false;
     const level: Level = whole || us === "4" || us === "3" ? "caution" : parts || us === "2" ? "heads-up" : fcdo || us ? "calm" : "info";
     const bits: string[] = [];
-    if (fcdo) bits.push(whole ? "UK advises against travel to the whole country" : parts ? "UK advises against travel to some parts of the country" : "UK has no travel restrictions in place");
+    if (fcdo) bits.push(whole ? "UK advises against travel to the whole country" : parts ? "UK advises against travel to some parts of the country" : "UK is not advising against travel");
     if (us) bits.push(`US State Department Level ${us}${us === "1" ? " (exercise normal precautions)" : us === "2" ? " (exercise increased caution)" : us === "3" ? " (reconsider travel)" : " (do not travel)"}`);
     signals.push({ id: "advisory", title: "Government advice", level, live: true, message: bits.length ? `${bits.join(". ")}.` : `Check the official advisories for ${place.country}.`, advice: parts ? "Open the UK page to see which regions, and whether your route touches them." : undefined, source: "UK FCDO · US State Department", asOf: fcdo?.updated?.slice(0, 10), links: [
       { label: "UK FCDO", href: `https://www.gov.uk/foreign-travel-advice/${slug}` },
@@ -174,7 +183,7 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
       let j: { elements?: unknown[] } | null = null;
       for (const base of ["https://overpass.kumi.systems/api/interpreter", "https://overpass-api.de/api/interpreter"]) {
         try {
-          const r = await fetch(`${base}?data=${encodeURIComponent(q)}`, { next: { revalidate: 86400 }, signal: AbortSignal.timeout(20000), headers: { "User-Agent": "Locadit/0.1" } });
+          const r = await fetch(`${base}?data=${encodeURIComponent(q)}`, { next: { revalidate: 86400 }, signal: requestSignal(20000, deadline), headers: { "User-Agent": "Locadit/0.1" } });
           if (r.ok) { j = await r.json(); break; }
         } catch { /* try next mirror */ }
       }
@@ -184,7 +193,7 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
       else {
         // Nominatim fallback: hospitals inside a ~40 km box.
         const dd = 0.36;
-        const r = await fetch(`https://nominatim.openstreetmap.org/search?q=hospital&format=jsonv2&limit=8&bounded=1&viewbox=${lon - dd},${lat + dd},${lon + dd},${lat - dd}`, { next: { revalidate: 86400 }, signal: AbortSignal.timeout(15000), headers: { "User-Agent": "Locadit/0.1 (hackathon prototype)" } });
+        const r = await fetch(`https://nominatim.openstreetmap.org/search?q=hospital&format=jsonv2&limit=8&bounded=1&viewbox=${lon - dd},${lat + dd},${lon + dd},${lat - dd}`, { next: { revalidate: 86400 }, signal: requestSignal(15000, deadline), headers: { "User-Agent": "Locadit/0.1 (hackathon prototype)" } });
         if (!r.ok) throw new Error("nominatim");
         type N = { name?: string; display_name: string; lat: string; lon: string };
         hs = ((await r.json()) as N[]).map((n) => ({ name: n.name || n.display_name.split(",")[0], d: km(lat, lon, parseFloat(n.lat), parseFloat(n.lon)) }));
@@ -197,20 +206,20 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
   // 8. Money: crime, prices, exchange rate.
   const cc = place.countryCode;
   tasks.push((async () => {
-    const r = await worldBank(cc, "VC.IHR.PSRC.P5").catch(() => null);
+    const r = await worldBank(cc, "VC.IHR.PSRC.P5", deadline).catch(() => null);
     if (!r) return;
     const level: Level = r.value > 8 ? "caution" : r.value > 2 ? "heads-up" : "calm";
     signals.push({ id: "crime", title: "Violent crime", level, message: `${r.value.toFixed(1)} intentional homicides per 100,000 people (${r.year}).${r.value <= 2 ? " Among the lower rates worldwide." : ""}`, advice: level === "calm" ? undefined : "Usual city sense: licensed taxis at night, nothing valuable on display.", source: "World Bank / UNODC", asOf: r.year });
   })());
   tasks.push((async () => {
-    const r = await worldBank(cc, "FP.CPI.TOTL.ZG").catch(() => null);
+    const r = await worldBank(cc, "FP.CPI.TOTL.ZG", deadline).catch(() => null);
     if (!r) return;
     const level: Level = r.value > 15 ? "caution" : r.value > 6 ? "heads-up" : "calm";
     signals.push({ id: "economy", title: "Prices", level, message: `Inflation ${r.value.toFixed(1)}% (${r.year}).${level === "calm" ? " Prices should be stable while you plan." : ""}`, advice: level === "calm" ? undefined : "Budget with a buffer and pay by card where you can.", source: "World Bank", asOf: r.year });
   })());
   const dest = currencyFor(cc);
   if (home && dest && home !== dest) tasks.push((async () => {
-    const fx = await fxSnapshot(home, dest);
+    const fx = await fxSnapshot(home, dest, deadline);
     if (!fx) return;
     const abs = Math.abs(fx.change);
     const level: Level = abs > 12 || fx.vol > 12 ? "caution" : abs > 5 || fx.vol > 7 ? "heads-up" : "calm";
@@ -220,9 +229,13 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
   })());
 
   await Promise.all(tasks);
+  const partial = deadline.aborted;
+  if (partial) signals.push({ id: "sources", title: "Live source status", level: "info", message: "Some live sources did not answer within eight seconds. Showing the checks that completed; refresh to try them again.", source: "Locadit request budget" });
   const order: Record<Level, number> = { caution: 0, "heads-up": 1, calm: 2, info: 3 };
   signals.sort((a, b) => order[a.level] - order[b.level]);
-  const radar: Radar = { place, stay: trip.stay, window: win ? { start: win.start, end: win.end, label: win.label } : undefined, signals, generatedAt: Date.now() };
-  cache.set(cacheKey, { at: Date.now(), radar });
+  const radar: Radar = { place, stay: trip.stay, window: win ? { start: win.start, end: win.end, label: win.label } : undefined, signals, generatedAt: Date.now(), partial };
+  // Do not cache a partial response: an immediate refresh should genuinely retry the
+  // sources that missed the deadline.
+  if (!partial) cache.set(cacheKey, { at: Date.now(), radar });
   return radar;
 }

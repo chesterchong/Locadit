@@ -13,12 +13,12 @@ export const NAMES: Record<string, string> = { MYR: "ringgit", SGD: "Singapore d
 export type Fx = { home: string; dest: string; rate: number; change: number; vol: number; date: string };
 
 // Today's rate plus 12-month change and annualised volatility.
-export async function fxSnapshot(home: string, dest: string): Promise<Fx | null> {
+export async function fxSnapshot(home: string, dest: string, signal?: AbortSignal): Promise<Fx | null> {
   if (home === dest || !SUPPORTED.has(home) || !SUPPORTED.has(dest)) return null;
   const end = new Date(), start = new Date(end.getTime() - 365 * 86400000);
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   try {
-    const r = await fetch(`https://api.frankfurter.dev/v1/${iso(start)}..${iso(end)}?base=${home}&symbols=${dest}`, { next: { revalidate: 43200 } });
+    const r = await fetch(`https://api.frankfurter.dev/v1/${iso(start)}..${iso(end)}?base=${home}&symbols=${dest}`, { next: { revalidate: 43200 }, signal });
     if (!r.ok) return null;
     const j = await r.json();
     const days = Object.keys(j.rates).sort();

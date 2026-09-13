@@ -5,7 +5,7 @@ import LoadingView from "@/app/loading-view";
 import { useParams } from "next/navigation";
 import { treeQrUrl } from "@/lib/tree";
 type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; live?: boolean; links?: { label: string; href: string }[]; data?: { hi: number; lo: number; rain: number } };
-type Radar = { place?: { name: string; country: string }; stay?: { name: string }; window?: { label: string }; signals: Signal[] };
+type Radar = { place?: { name: string; country: string }; stay?: { name: string }; window?: { label: string }; signals: Signal[]; partial?: boolean };
 const LEVEL: Record<Signal["level"], string> = { calm: "Calm", "heads-up": "Heads-up", caution: "Caution", info: "Info" };
 const OUTDOOR = new Set(["Nature & hikes", "Beach & rest", "Adventure sports", "Local neighbourhoods", "Food & markets"]);
 // Temperature risk for a day, stricter when the theme keeps people outside.
@@ -69,7 +69,7 @@ export default function Board() {
       <section className="glass p-5 space-y-3 pop">
         <div className="flex items-baseline justify-between gap-3">
           <p className="text-xs uppercase tracking-widest muted">Trip radar{radar?.place ? ` · ${radar.place.name}, ${radar.place.country}` : ""}</p>
-          {radar && <p className="text-xs muted">{(() => { const n = radar.signals.filter((s) => s.level === "caution" || s.level === "heads-up").length; return n ? `${n} to keep in mind` : "all calm"; })()}{radar.window ? ` · ${radar.window.label}` : ""}</p>}
+          {radar && <p className="text-xs muted">{(() => { if (radar.partial) return "partial check"; const n = radar.signals.filter((s) => s.level === "caution" || s.level === "heads-up").length; return n ? `${n} to keep in mind` : "all calm"; })()}{radar.window ? ` · ${radar.window.label}` : ""}</p>}
         </div>
         <form className="flex flex-wrap items-center gap-2" onSubmit={async (e) => { e.preventDefault(); setStayBusy(true); setStayErr(""); const r = await fetch(`/api/trips/${code}/stay`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ stay }) }); setStayBusy(false); if (!r.ok) { setStayErr("Couldn't place that. Try a town or area name."); return; } setRadar(null); fetch(`/api/trips/${code}/risk`).then((r) => r.json()).then(setRadar).catch(() => {}); }}>
           <span className="text-sm muted">{radar?.stay ? `Scored around ${radar.stay.name}.` : "Scored around the destination centre."}</span>

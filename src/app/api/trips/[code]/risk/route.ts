@@ -7,7 +7,7 @@ async function visitorCountry(req: Request): Promise<string | null> {
   const h = req.headers.get("x-vercel-ip-country");
   if (h) return h;
   try {
-    const r = await fetch("https://ipwho.is/", { next: { revalidate: 3600 } });
+    const r = await fetch("https://ipwho.is/", { next: { revalidate: 3600 }, signal: AbortSignal.timeout(1200) });
     const j = await r.json();
     return j?.country_code ?? null;
   } catch {

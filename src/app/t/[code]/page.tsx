@@ -60,8 +60,12 @@ export default function Quiz() {
 
   const [missing, setMissing] = useState(false);
   useEffect(() => {
-    setHost(new URLSearchParams(window.location.search).get("host") === "1");
-    fetch(`/api/trips/${code}`).then((r) => (r.status === 404 ? null : r.json())).then((d) => (d ? setTrip(d.trip) : setMissing(true))).catch(() => setMissing(true));
+    const isHost = new URLSearchParams(window.location.search).get("host") === "1";
+    fetch(`/api/trips/${code}`).then((r) => (r.status === 404 ? null : r.json())).then((d) => {
+      if (!d) { setMissing(true); return; }
+      setHost(isHost);
+      setTrip(d.trip);
+    }).catch(() => setMissing(true));
   }, [code]);
 
   // Locadit asks the next question whenever the conversation advances.
@@ -76,9 +80,9 @@ export default function Quiz() {
       must: `One thing this ${trip.destination} trip must include for you?`,
       avoid: `And one thing you'd rather avoid? (Skip if nothing comes to mind.)`,
     };
-    setTyping(true);
-    const t = window.setTimeout(() => { setTyping(false); setLog((l) => [...l, { from: "ai", text: prompts[FLOW[q]] }]); }, 550);
-    return () => window.clearTimeout(t);
+    const start = window.setTimeout(() => setTyping(true), 0);
+    const finish = window.setTimeout(() => { setTyping(false); setLog((l) => [...l, { from: "ai", text: prompts[FLOW[q]] }]); }, 550);
+    return () => { window.clearTimeout(start); window.clearTimeout(finish); };
   }, [trip, q, name]);
 
   // Pin the newest question to the top of the panel: earlier messages scroll up out of view.
