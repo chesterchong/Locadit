@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 // The middle third stays clear so the itinerary reads.
 const DAY_TERMS: Record<string, string> = { "Food & markets": "market food", Nightlife: "city street", "Nature & hikes": "waterfall hike", "Museums & culture": "temple museum", "Beach & rest": "beach", Shopping: "shopping street", "Adventure sports": "surfing", "Local neighbourhoods": "old town street" };
 const NIGHT_TERMS: Record<string, string> = { "Food & markets": "night market", Nightlife: "night bar lights", "Nature & hikes": "sunset mountains", "Museums & culture": "temple night lights", "Beach & rest": "beach sunset", Shopping: "night shopping street", "Adventure sports": "bonfire beach night", "Local neighbourhoods": "street night lanterns" };
-const SLOTS = [{ x: 8, y: 16, r: -8, w: 150 }, { x: 22, y: 42, r: 6, w: 170 }, { x: 6, y: 66, r: -4, w: 140 }];
+// x is the offset from the inner edge (next to the itinerary column), in % of the panel width.
+const SLOTS = [{ x: 6, y: 14, r: -8, w: 160 }, { x: 26, y: 40, r: 6, w: 175 }, { x: 8, y: 64, r: -4, w: 150 }];
 
 export default function DayScene({ destination, theme, open, onClose }: { destination: string; theme: string | null; open: boolean; onClose: () => void }) {
   const [day, setDay] = useState<string[]>([]);
@@ -20,19 +21,22 @@ export default function DayScene({ destination, theme, open, onClose }: { destin
   useEffect(() => {
     if (!open) return;
     const esc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    // Any click that isn't on a day card closes the scene (cards toggle themselves).
+    const away = (e: MouseEvent) => { if (!(e.target as Element).closest?.(".day-card")) onClose(); };
     window.addEventListener("keydown", esc);
-    return () => window.removeEventListener("keydown", esc);
+    document.addEventListener("click", away);
+    return () => { window.removeEventListener("keydown", esc); document.removeEventListener("click", away); };
   }, [open, onClose]);
   return (
-    <div className={`scene ${open ? "on" : ""}`} aria-hidden onClick={onClose}>
+    <div className={`scene ${open ? "on" : ""}`} aria-hidden>
       <div className="scene-day">
         <span className="scene-sun" />
-        {day.map((u, i) => <img key={u} src={u} alt="" className="scene-photo" style={{ left: `${SLOTS[i].x}%`, top: `${SLOTS[i].y}%`, width: SLOTS[i].w, "--r": `${SLOTS[i].r}deg`, "--d": `${i * 120}ms` } as React.CSSProperties} />)}
+        {day.map((u, i) => <img key={u} src={u} alt="" className="scene-photo" style={{ right: `${SLOTS[i].x}%`, top: `${SLOTS[i].y}%`, width: SLOTS[i].w, "--r": `${SLOTS[i].r}deg`, "--d": `${i * 120}ms` } as React.CSSProperties} />)}
       </div>
       <div className="scene-mid" />
       <div className="scene-night">
         <span className="scene-moon" />
-        {night.map((u, i) => <img key={u} src={u} alt="" className="scene-photo" style={{ right: `${SLOTS[i].x}%`, top: `${SLOTS[i].y + 4}%`, width: SLOTS[i].w, "--r": `${-SLOTS[i].r}deg`, "--d": `${i * 120 + 60}ms` } as React.CSSProperties} />)}
+        {night.map((u, i) => <img key={u} src={u} alt="" className="scene-photo" style={{ left: `${SLOTS[i].x}%`, top: `${SLOTS[i].y + 4}%`, width: SLOTS[i].w, "--r": `${-SLOTS[i].r}deg`, "--d": `${i * 120 + 60}ms` } as React.CSSProperties} />)}
       </div>
     </div>
   );
