@@ -13,12 +13,12 @@ Open http://localhost:3000, create a room, share the `/t/CODE` link, open `/t/CO
 
 ## Landing intro
 
-The home page reproduces the amo.co intro choreography: a faint dot grid, a handwritten wordmark that draws itself in, six typographic styles cycling while a collage builds up layer by layer, a blue sky dropping in, the wordmark tucking into the top edge, then two phone cards rising into the cleared centre with their info cards and a bottom-right pill button.
+The home page opens with a staged intro: a faint dot grid, a handwritten wordmark that draws itself in, six typographic styles cycling while a collage builds up layer by layer, a blue sky dropping in, the wordmark tucking into the top edge, then a phone card rising into the cleared centre with its info card and a bottom-right pill button.
 
 - Timeline and stage: `src/app/page.tsx` (`STEPS` holds the beat timings in ms; the 1600×900 stage is scaled to cover the viewport without cropping the cards).
 - Collage slots: `src/lib/collage.ts`. Every piece is one entry with a centre position, size, rotation, the layer it appears with, and where it settles at the end. Swap a placeholder for real artwork by setting `kind: "img"` and `src: "/collage/your-file.png"`.
-- Styles: the block after `Landing: amo-style staged intro` in `src/app/globals.css`.
-- Placeholder media: the phone video, app icon and QR code are hot-linked from amo.co until Locadit's own footage lands. Replace the URLs in `CARDS` in `src/app/page.tsx`.
+- Styles: the block after `Landing: staged intro` in `src/app/globals.css`.
+- Placeholder media: the phone video, app icon and QR code are temporary stand-ins until Locadit's own footage lands. Replace the URLs in `CARDS` in `src/app/page.tsx`.
 
 ## Notes
 
