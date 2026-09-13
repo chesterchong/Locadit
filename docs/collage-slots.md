@@ -4,7 +4,7 @@
 
 Theme: Southeast and East Asia. Malaysia, Singapore, Japan and Korea, mixing famous landmarks with street-level details so the collage reads as a trip, not a postcard rack.
 
-Send transparent PNG cut-outs (background removed), roughly twice the listed size for sharp rendering. Name each file after the slot id and drop it in `public/collage/`. Polaroid slots take plain photos (the white frame is drawn by CSS). The phone video is one portrait clip (9:19.5), plus one square app icon and one QR image.
+Send transparent PNG cut-outs (background removed), roughly twice the listed size for sharp rendering. Name each file after the slot id and drop it in `public/collage/`. Polaroid slots take plain photos (the white frame is drawn by CSS). The phone video is one portrait clip (9:19.5), plus one QR image.
 
 | Beat | Slot id | Stand-in today | Suggested subject | Size on stage |
 |---|---|---|---|---|
@@ -46,4 +46,4 @@ Send transparent PNG cut-outs (background removed), roughly twice the listed siz
 
 Spare landmark ideas if a cut-out doesn't work: Batu Caves staircase (KL), Fushimi Inari torii gates (Kyoto), Mount Fuji, N Seoul Tower, Gamcheon Culture Village (Busan), Sultan Abdul Samad Building (KL), Kampong Glam shophouses (Singapore).
 
-Phone card: `video` (portrait mp4), `icon` (square png), `qr` (png) in `CARDS` in `src/app/page.tsx`.
+Phone card: `video` (portrait mp4) and `qr` (png) in `CARDS` in `src/app/page.tsx`.

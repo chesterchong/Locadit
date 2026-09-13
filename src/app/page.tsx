@@ -11,7 +11,7 @@ const WM = ["wm-hand", "wm-serif", "wm-black", "wm-round", "wm-pixel", "wm-geo"]
 
 // Placeholder media until Locadit's own footage lands. One card, centred.
 const CARDS = [
-  { x: 800, icon: "https://static.amo.co/shared/images/app-icons/location/20250123-167x167.png", video: "https://static.amo.co/website/videos/location/20250915.mp4#t=9", qr: "https://amo.co/qrcode-location.png", name: "Locadit", tag: "Group trips without the argument", href: "/about" },
+  { x: 800, video: "https://static.amo.co/website/videos/location/20250915.mp4#t=9", qr: "https://amo.co/qrcode-location.png", name: "Locadit", tag: "Group trips without the argument", href: "/about" },
 ];
 
 // Stagger index of each piece within its layer (drives pop-in delay).
@@ -95,7 +95,6 @@ export default function Landing() {
           ))}
           {CARDS.map((c, i) => (
             <Link key={`${c.name}-info`} href={c.href} className={`info ${step >= 9 ? "on" : ""} ${hot ? "hot" : ""}`} style={{ left: c.x, transitionDelay: `${i * 120}ms` }} onClick={stop} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)}>
-              <img src={c.icon} alt="" />
               <span className="info-text"><b>{c.name}</b><small>{c.tag}</small></span>
               <span className="info-cta">Start a room</span>
             </Link>
