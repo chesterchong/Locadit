@@ -1,17 +1,14 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { PIECES, Piece } from "@/lib/collage";
-import { treeQrUrl } from "@/lib/tree";
 
 // Intro timeline in ms. Step N+1 reveals collage layer N; the wordmark draws in at step 1, changes style at
 // steps 2–6, leaves at step 7, the phone rises at step 8 and its info card lands at step 9.
 const STEPS = [0, 500, 1500, 2200, 2900, 3600, 4300, 5400, 6000, 6600];
 const END = STEPS.length - 1;
 const WM = ["wm-hand", "wm-serif", "wm-black", "wm-round", "wm-pixel", "wm-geo"];
-const SHARE_URL = "https://locadit.vercel.app/start";
 
 // Placeholder media until Locadit's own footage lands. One card, centred.
 const CARDS = [
@@ -64,7 +61,6 @@ export default function Landing() {
   // After the wordmark parks at the top it keeps cycling through the drawn styles.
   const [loop, setLoop] = useState(0);
   const [hot, setHot] = useState(false); // hovering the phone or its card grows both together
-  const [shareOpen, setShareOpen] = useState(false);
   // Boarding transition: scatter the collage, zoom the phone, iris to cream, then route.
   const router = useRouter();
   const [exiting, setExiting] = useState(false);
@@ -85,7 +81,6 @@ export default function Landing() {
   const font = leaving ? WM[loop % WM.length] : WM[Math.min(Math.max(step - 1, 0), 5)];
   const prevFont = leaving ? WM[(loop + WM.length - 1) % WM.length] : step >= 2 ? WM[step - 2] : null;
   const changeStep = leaving ? `L${loop}` : String(step);
-  const stop = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
     <div className="landing">
@@ -100,24 +95,13 @@ export default function Landing() {
             {step >= 1 && <WordSvg key={`in-${changeStep}`} font={font} mode="draw" />}
           </h1>
           {CARDS.map((c, i) => (
-            <div key={c.name} className={`phone-wrap ${step >= 8 ? "on" : ""} ${hot ? "hot" : ""} ${shareOpen ? "sharing" : ""}`} style={{ left: c.x, transitionDelay: exiting ? "0ms" : `${i * 120}ms` }} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)}>
+            <div key={c.name} className={`phone-wrap ${step >= 8 ? "on" : ""} ${hot ? "hot" : ""}`} style={{ left: c.x, transitionDelay: exiting ? "0ms" : `${i * 120}ms` }} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)}>
               <Link href={c.href} className="phone-link" onClick={(e) => go(e, c.href)} aria-label={`${c.name}: ${c.tag}`}>
                 {/* The clipped, rounded element must carry no transform of its own, or Chrome paints the video black. */}
                 <div className="phone">
                   <video ref={(el) => { videos.current[i] = el; }} src={c.video} muted loop playsInline preload="auto" />
                 </div>
               </Link>
-              <div className={`tree-share ${shareOpen ? "open" : ""}`} onClick={stop}>
-                <button type="button" className="tree-share-toggle" aria-expanded={shareOpen} aria-controls="landing-tree-share" aria-label={shareOpen ? "Close share QR" : "Show share QR as a tree"} onClick={() => setShareOpen((open) => !open)}>
-                  <span className="tree-share-label"><TreeMark />Share QR</span>
-                  <span className="tree-share-close" aria-hidden>×</span>
-                </button>
-                <a id="landing-tree-share" className="tree-share-card" href={treeQrUrl(SHARE_URL)} target="_blank" rel="noreferrer" aria-label="Open the interactive Locadit tree QR in a new tab" aria-hidden={!shareOpen} tabIndex={shareOpen ? 0 : -1}>
-                  <TreeMark large />
-                  <span className="tree-qr-frame"><Image src="/tree-qr.svg" width={106} height={106} unoptimized alt="QR code to start a Locadit trip" /></span>
-                  <span className="tree-share-caption"><b>Scan to start</b><small>Tap for the full tree ↗</small></span>
-                </a>
-              </div>
             </div>
           ))}
           {CARDS.map((c, i) => (
@@ -132,19 +116,6 @@ export default function Landing() {
       </section>
 
     </div>
-  );
-}
-
-function TreeMark({ large = false }: { large?: boolean }) {
-  return (
-    <svg className={`tree-mark ${large ? "large" : ""}`} viewBox="0 0 96 92" aria-hidden>
-      <g className="tree-leaves">
-        <circle cx="48" cy="23" r="18" /><circle cx="31" cy="33" r="15" /><circle cx="65" cy="34" r="17" />
-        <circle cx="42" cy="42" r="17" /><circle cx="59" cy="18" r="13" /><circle cx="24" cy="22" r="11" />
-      </g>
-      <path className="tree-trunk" d="M48 84V43m0 18-15-14m15 4 17-17m-17 1-9-10m9 27 9-8" />
-      <path className="tree-ground" d="M29 85c10-5 29-5 39 0" />
-    </svg>
   );
 }
 
