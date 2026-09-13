@@ -9,7 +9,6 @@ import { treeQrUrl } from "@/lib/tree";
 type Trip = { code: string; name: string; destination: string; dateOptions: string[]; place?: { name: string; country: string; lat: number; lon: number } };
 // Search terms per activity for real photos (Wikimedia Commons via /api/photos).
 const TERMS: Record<string, string> = { "Food & markets": "street food market", Nightlife: "night lights bar", "Nature & hikes": "waterfall hike nature", "Museums & culture": "temple museum culture", "Beach & rest": "beach", Shopping: "shopping street market", "Adventure sports": "surfing diving adventure", "Local neighbourhoods": "street neighbourhood" };
-const MAP = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/World_location_map_%28equirectangular_180%29.svg/1920px-World_location_map_%28equirectangular_180%29.svg.png";
 type Q = "name" | "budget" | "dates" | "pace" | "must" | "avoid";
 const FLOW: Q[] = ["name", "budget", "dates", "pace", "must", "avoid"];
 const SUGGEST: Record<string, string> = { must: "one proper beach day", avoid: "early mornings" };
@@ -135,7 +134,6 @@ export default function Quiz() {
   const rot = x / 18;
   const love = Math.min(1, Math.max(0, x / 110)), pass = Math.min(1, Math.max(0, -x / 110));
   const photo = photos[act] || null;
-  const place = trip.place;
   // Fade the card as it travels: gradually while dragging, fully once it flies off.
   const fade = fly !== null ? 0 : 1 - Math.min(0.75, Math.abs(dx) / 320);
 
@@ -202,12 +200,6 @@ export default function Quiz() {
 
       {q >= FLOW.length && (
         <section className="space-y-4 select-none pop w-full">
-          {place && (
-            <div className="worldmap" aria-hidden style={{ transform: `translateX(${x * 0.3}px) scale(${Math.min(1.35, Math.max(0.8, 1 + x / 1500))})`, transition: drag ? "none" : "transform .5s cubic-bezier(.2,.8,.2,1)" }}>
-              <img src={MAP} alt="" style={{ left: `calc(50% - ${((place.lon + 180) / 360)} * var(--mw))`, top: `calc(50% - ${((90 - place.lat) / 180)} * var(--mw) / 2)` }} />
-              <span className="pin" />
-            </div>
-          )}
           <div className="flex items-center justify-end text-xs muted"><span className="mono">{i + 1} / {ACTIVITIES.length}</span></div>
           <div className="relative h-[460px]" style={{ perspective: 1000 }}>
             {ACTIVITIES[i + 1] && <div className="glass absolute inset-0 z-10 scale-[.95] translate-y-3 opacity-60" style={photos[ACTIVITIES[i + 1]] ? { backgroundImage: `linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)), url(${photos[ACTIVITIES[i + 1]]})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined} />}
