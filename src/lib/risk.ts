@@ -78,7 +78,7 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
       const severe = d.weather_code.some((code: number) => code >= 95);
       const level: Level = severe || hi >= 36 || rain >= 70 ? "caution" : hi >= 33 || rain >= 25 || chance >= 75 ? "heads-up" : "calm";
       const advice = severe ? "Keep plans flexible during storms." : hi >= 33 ? "Plan outdoor time before noon." : rain >= 25 ? "Keep one indoor backup." : undefined;
-      signals.push({ id: "weather", title: "Next 7 days", level, message: `Day ${hi}°C · Night ${lo}°C · ${chance}% rain · ${rain} mm`, advice, source: "Open-Meteo", asOf: d.time[0], live: true });
+      signals.push({ id: "weather", title: "Next 7 days", level, message: `Day ${hi}°C · Night ${lo}°C · ${chance}% rain · ${rain} mm`, advice, source: "Open-Meteo", asOf: d.time[0], live: true, links: [{ label: "7-day forecast", href: `https://www.windy.com/${lat.toFixed(3)}/${lon.toFixed(3)}?${lat.toFixed(3)},${lon.toFixed(3)},9` }] });
     } catch { /* shown as partial */ }
   })());
 
