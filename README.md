@@ -1,6 +1,30 @@
 # Locadit
 
-Group trips without the argument. Everyone answers a private 2-minute quiz (budget, dates, activity swipes); Locadit merges the answers into one budget ceiling, one date window and a day-by-day itinerary that explains its trade-offs, then splits costs.
+**Plan the trip together. Come home together.**
+
+Locadit is for groups who travel with the people they love and refuse to gamble on safety. The idea is borrowed from how Luma and Eventbrite make gathering people effortless, a link, a room, everyone in. But this is not an event. It is a trip, and the first priority is not the itinerary. It is knowing, before anyone books, whether the place and the dates carry a natural-disaster risk, and having somewhere the warning can reach the whole group if the world changes mid-trip.
+
+The 2026 Nepal flash floods, where hundreds of tourists on organised trips went missing after a glacier collapse, are the case Locadit is designed around. A weather average would not have flagged it. A live flood feed, rain extremes for the dates and a rescue-reality check might have changed a decision.
+
+## What it does
+
+1. **One link, no sign-up.** The organiser creates a room and shares a link or a tree-shaped QR code. Rooms persist in Supabase.
+2. **Private intake.** Locadit asks each traveller six short questions in a chat: name, budget ceiling, dates, pace, one must-have, one thing to avoid. Then a swipe deck of activities with real photos of the destination. Nobody sees anyone else's answers.
+3. **Merged plan.** The board turns everyone's answers into one budget ceiling, one date window and a day-by-day itinerary that explains why each day is there. Quiet voices get a day too. Costs split themselves with a settle-up list.
+4. **Trip radar.** Before and during the trip, every card is real data with its source and date, graded Calm, Heads-up or Caution:
+   - Rain extremes for your dates: ten years of daily totals, heaviest day, share of days over 50 mm, wet season flag (Open-Meteo archive).
+   - Flood outlook: river discharge forecast against five years of history at that point (Copernicus GloFAS via Open-Meteo). Live.
+   - Live alerts: GDACS disaster events within 300 km in the last 30 days. Live.
+   - Volcanoes within 100 km and which erupted in the last decade (Smithsonian Global Volcanism Program).
+   - Seismic activity: magnitude 4.5+ quakes within 300 km in the past year (USGS).
+   - Tropical storm season by basin and month.
+   - Government advice: UK FCDO status and US State Department level, fetched, not just linked. Live.
+   - Getting out: nearest hospitals to where you are staying (OpenStreetMap), plus the boring things that decide outcomes: embassy number saved, offline maps, a meeting point.
+   - Money: exchange rate and twelve-month volatility between the visitor's currency, inferred from location, and the destination's (ECB); inflation and homicide rate (World Bank).
+   - Per-day temperature risk on the itinerary, stricter for outdoor days.
+   Tell the radar where you are actually staying and it re-scores around that point: an Ubud villa and a Kuta beachfront are different trips.
+
+Nothing here predicts a disaster. The point is to put the warnings people usually find afterwards in front of the group before they book, in language they can act on.
 
 ## Run
 
@@ -9,21 +33,18 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000, create a room, share the `/t/CODE` link, open `/t/CODE/board` for the live dashboard.
+Open http://localhost:3000. Create a room at `/start`; the organiser is taken straight into the intake with the room code and live-board link. Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `.env.local` for persistence (a `locadit_trips` table with `code`, `data jsonb`, `updated_at`); without them rooms live in memory.
 
 ## Landing intro
 
-The home page opens with a staged intro: a faint dot grid, a handwritten wordmark that draws itself in, six typographic styles cycling while a collage builds up layer by layer, a blue sky dropping in, the wordmark tucking into the top edge, then a phone card rising into the cleared centre with its info card.
+The home page opens with a staged intro: a faint dot grid, a handwritten wordmark that draws itself in, six typographic styles cycling while a collage builds up layer by layer, a golden-hour sky that falls to night, the wordmark tucking into the top edge, then a phone card rising into the cleared centre with its card. The collage pieces are the team's own cut-outs, themed on Malaysia, Singapore, Japan and Korea.
 
-- Timeline and stage: `src/app/page.tsx` (`STEPS` holds the beat timings in ms; the 1600×900 stage is scaled to cover the viewport without cropping the cards).
-- Collage slots: `src/lib/collage.ts`. Every piece is one entry with a centre position, size, rotation, the layer it appears with, and where it settles at the end. Swap a placeholder for real artwork by setting `kind: "img"` and `src: "/collage/your-file.png"`.
-- Styles: the block after `Landing: staged intro` in `src/app/globals.css`.
-- Placeholder media: the phone video is a temporary stand-in until Locadit's own footage lands. Replace the URLs in `CARDS` in `src/app/page.tsx`.
+- Timeline and stage: `src/app/page.tsx`. Collage slots: `src/lib/collage.ts` and `docs/collage-slots.md`.
+- Radar engine: `src/lib/risk.ts`. Currency: `src/lib/fx.ts`. Merge engine: `src/lib/engine.ts`. Storage: `src/lib/store.ts`.
 
-## Notes
+## Stack
 
-- Storage is in-memory (single server process) for the prototype. Swap `src/lib/store.ts` for Supabase to persist across restarts or serverless instances.
-- Itinerary generation is deterministic in `src/lib/engine.ts`; wire Claude in there for richer plans.
+Next.js 16, React, Tailwind, Supabase, Web Audio for the soundtrack, no AI keys required. Every external source is keyless and cited on the card it feeds.
 
 ---
 

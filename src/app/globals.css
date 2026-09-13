@@ -280,3 +280,5 @@ input[type=range]{accent-color:#111}
 @keyframes shimmer{from{background-position:120% 0}to{background-position:-120% 0}}
 .spinner{width:14px;height:14px;border-radius:999px;border:2px solid rgba(0,0,0,.14);border-top-color:#111;animation:spin .8s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:999px;background:#22c55e;margin-left:.45rem;vertical-align:middle;box-shadow:0 0 0 3px rgba(34,197,94,.18)}

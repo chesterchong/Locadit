@@ -4,7 +4,7 @@ export type Pace = "chill" | "balanced" | "packed";
 export type Answer = { name: string; budget: number; dates: string[]; interests: Record<string, number>; pace?: Pace; mustHave?: string; avoid?: string };
 export type Expense = { id: string; title: string; amount: number; paidBy: string; splitAmong: string[] };
 export type Place = { name: string; country: string; countryCode: string; lat: number; lon: number };
-export type Trip = { code: string; name: string; destination: string; dateOptions: string[]; answers: Answer[]; expenses: Expense[]; createdAt: number; place?: Place };
+export type Trip = { code: string; name: string; destination: string; dateOptions: string[]; answers: Answer[]; expenses: Expense[]; createdAt: number; place?: Place; stay?: Place };
 export const ACTIVITIES = ["Food & markets", "Nightlife", "Nature & hikes", "Museums & culture", "Beach & rest", "Shopping", "Adventure sports", "Local neighbourhoods"];
 
 // Storage: Supabase when SUPABASE_URL + SUPABASE_ANON_KEY are set (one `locadit_trips` row per room, the trip as jsonb),

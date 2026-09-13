@@ -4,8 +4,8 @@ import Link from "next/link";
 import LoadingView from "@/app/loading-view";
 import { useParams } from "next/navigation";
 import { treeQrUrl } from "@/lib/tree";
-type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; links?: { label: string; href: string }[]; data?: { hi: number; lo: number; rain: number } };
-type Radar = { place?: { name: string; country: string }; window?: { label: string }; signals: Signal[] };
+type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; live?: boolean; links?: { label: string; href: string }[]; data?: { hi: number; lo: number; rain: number } };
+type Radar = { place?: { name: string; country: string }; stay?: { name: string }; window?: { label: string }; signals: Signal[] };
 const LEVEL: Record<Signal["level"], string> = { calm: "Calm", "heads-up": "Heads-up", caution: "Caution", info: "Info" };
 const OUTDOOR = new Set(["Nature & hikes", "Beach & rest", "Adventure sports", "Local neighbourhoods", "Food & markets"]);
 // Temperature risk for a day, stricter when the theme keeps people outside.
@@ -26,6 +26,9 @@ export default function Board() {
   const [title, setTitle] = useState(""); const [amount, setAmount] = useState(""); const [paidBy, setPaidBy] = useState("");
   const [copied, setCopied] = useState(false);
   const [radar, setRadar] = useState<Radar | null>(null);
+  const [stay, setStay] = useState("");
+  const [stayBusy, setStayBusy] = useState(false);
+  const [stayErr, setStayErr] = useState("");
   useEffect(() => {
     const go = () => fetch(`/api/trips/${code}/risk`).then((r) => (r.ok ? r.json() : null)).then((j) => j && setRadar(j)).catch(() => {});
     go(); const t = setInterval(go, 600000); return () => clearInterval(t);
@@ -49,7 +52,6 @@ export default function Board() {
         <p className="text-xs uppercase tracking-widest muted">{trip.destination}</p>
         <h1 className="text-4xl font-extrabold tracking-tight">{trip.name}</h1>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-          <span className="mono text-black/70 truncate max-w-full">{link}</span>
           <button className="btn btn-ghost !py-1.5 !px-3 text-sm" onClick={() => { navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); }); }}>{copied ? "Copied" : "Copy invite link"}</button>
           {link && <a className="btn btn-ghost !py-1.5 !px-3 text-sm" href={treeQrUrl(link)} target="_blank" rel="noreferrer" title="A QR code that grows as a tree; friends scan it to join">🌳 Share as a tree</a>}
         </div>
@@ -69,11 +71,17 @@ export default function Board() {
           <p className="text-xs uppercase tracking-widest muted">Trip radar{radar?.place ? ` · ${radar.place.name}, ${radar.place.country}` : ""}</p>
           {radar && <p className="text-xs muted">{(() => { const n = radar.signals.filter((s) => s.level === "caution" || s.level === "heads-up").length; return n ? `${n} to keep in mind` : "all calm"; })()}{radar.window ? ` · ${radar.window.label}` : ""}</p>}
         </div>
-        {!radar ? <p className="text-sm muted">Scanning weather history, storm seasons, seismic activity and country data…</p> : (
+        <form className="flex flex-wrap items-center gap-2" onSubmit={async (e) => { e.preventDefault(); setStayBusy(true); setStayErr(""); const r = await fetch(`/api/trips/${code}/stay`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ stay }) }); setStayBusy(false); if (!r.ok) { setStayErr("Couldn't place that. Try a town or area name."); return; } setRadar(null); fetch(`/api/trips/${code}/risk`).then((r) => r.json()).then(setRadar).catch(() => {}); }}>
+          <span className="text-sm muted">{radar?.stay ? `Scored around ${radar.stay.name}.` : "Scored around the destination centre."}</span>
+          <input className="input !w-56 !py-1.5 text-sm" placeholder={radar?.stay ? "Change where you're staying" : "Where are you staying? e.g. Ubud"} value={stay} onChange={(e) => setStay(e.target.value)} />
+          <button className="btn btn-ghost !py-1.5 !px-3 text-sm" disabled={stayBusy || !stay.trim()}>{stayBusy ? "Placing…" : "Re-score"}</button>
+          {stayErr && <span className="text-xs text-rose-500">{stayErr}</span>}
+        </form>
+        {!radar ? <p className="text-sm muted flex items-center gap-2"><span className="spinner" />Checking rain extremes, river levels, live alerts, volcanoes, seismic activity, advisories and money…</p> : (
           <div className="grid gap-2 sm:grid-cols-2">
             {radar.signals.map((s) => (
               <div key={s.id} className={`signal ${s.level}`}>
-                <div className="flex items-center justify-between gap-2"><b className="text-sm">{s.title}</b><span className="lvl">{LEVEL[s.level]}</span></div>
+                <div className="flex items-center justify-between gap-2"><b className="text-sm">{s.title}{s.live && <span className="live-dot" title="Live source, checked on every visit" />}</b><span className="lvl">{LEVEL[s.level]}</span></div>
                 <p className="text-sm mt-1 leading-snug">{s.message}</p>
                 {s.advice && <p className="text-xs mt-1 leading-snug">{s.advice}</p>}
                 {s.links && <p className="text-xs mt-2 flex gap-3">{s.links.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noreferrer" className="underline">{l.label}</a>)}</p>}
