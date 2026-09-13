@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
@@ -113,7 +114,7 @@ export default function Landing() {
                 </button>
                 <a id="landing-tree-share" className="tree-share-card" href={treeQrUrl(SHARE_URL)} target="_blank" rel="noreferrer" aria-label="Open the interactive Locadit tree QR in a new tab" tabIndex={shareOpen ? 0 : -1}>
                   <TreeMark large />
-                  <span className="tree-qr-frame"><img src="/tree-qr.svg" alt="QR code to start a Locadit trip" /></span>
+                  <span className="tree-qr-frame"><Image src="/tree-qr.svg" width={106} height={106} unoptimized alt="QR code to start a Locadit trip" /></span>
                   <span className="tree-share-caption"><b>Scan to start</b><small>Tap for the full tree ↗</small></span>
                 </a>
               </div>

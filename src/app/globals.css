@@ -266,3 +266,11 @@ input[type=range]{accent-color:#111}
 .amount>span{position:absolute;left:.9rem;top:50%;translate:0 -50%;color:var(--muted);font-family:var(--mono);pointer-events:none}
 .amount .input{padding-left:1.7rem}
 @media (max-width:640px){.money-form{grid-template-columns:1fr 1fr}.money-form .input:first-child{grid-column:1 / -1}}
+
+/* Participants */
+.people{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.avatars{display:flex;align-items:center}
+.avatar{width:36px;height:36px;border-radius:999px;border:2px solid #fff;margin-left:-9px;display:grid;place-items:center;font-size:12px;font-weight:600;letter-spacing:.02em;color:#333;box-shadow:0 1px 3px rgba(0,0,0,.10);transition:transform .2s cubic-bezier(.2,1.4,.3,1)}
+.avatar:first-child{margin-left:0}
+.avatar:hover{transform:translateY(-2px);z-index:1}
+.avatar.add{background:#fff;border:1.5px dashed rgba(0,0,0,.28);color:#555;cursor:pointer;font-size:16px;font-weight:500}

@@ -52,8 +52,16 @@ export default function Board() {
           <button className="btn btn-ghost !py-1.5 !px-3 text-sm" onClick={() => { navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); }); }}>{copied ? "Copied" : "Copy invite link"}</button>
           {link && <a className="btn btn-ghost !py-1.5 !px-3 text-sm" href={treeQrUrl(link)} target="_blank" rel="noreferrer" title="A QR code that grows as a tree; friends scan it to join">🌳 Share as a tree</a>}
         </div>
-        <p className="text-sm mt-1">{trip.answers.map((a) => a.name).join(" · ") || <span className="muted">waiting for the first swipe…</span>}</p>
-        <Link href={`/t/${trip.code}`} className="btn btn-primary inline-block mt-3">Add my answers</Link>
+        <div className="people mt-4">
+          <div className="flex items-center gap-3">
+            <div className="avatars">
+              {trip.answers.map((a) => <span key={a.name} className="avatar" style={{ background: tone(a.name) }} title={a.name}>{initials(a.name)}</span>)}
+              <button type="button" className="avatar add" title="Copy invite link" onClick={() => { navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); }); }}>+</button>
+            </div>
+            <p className="text-sm muted">{trip.answers.length === 0 ? "Nobody has answered yet" : trip.answers.length === 1 ? `${trip.answers[0].name} has answered` : `${trip.answers.length} travellers have answered`}</p>
+          </div>
+          <Link href={`/t/${trip.code}`} className="btn btn-primary">Add my answers</Link>
+        </div>
       </header>
       <section className="glass p-5 space-y-3 pop">
         <div className="flex items-baseline justify-between gap-3">
@@ -174,4 +182,15 @@ function settle(balances: Record<string, number>) {
     if (creditors[j].v < 0.5) j++;
   }
   return out;
+}
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  return ((parts[0]?.[0] ?? "?") + (parts[1]?.[0] ?? "")).toUpperCase();
+}
+// Stable pastel per name.
+function tone(name: string) {
+  let h = 0;
+  for (const ch of name.toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) % 360;
+  return `hsl(${h} 55% 86%)`;
 }
