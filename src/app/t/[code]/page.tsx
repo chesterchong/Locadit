@@ -232,7 +232,6 @@ export default function Quiz() {
                 </div>
               </div>
             </div>
-            </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <button onClick={() => vote(0)} disabled={saving} className="btn btn-ghost text-rose-500 disabled:opacity-30">✕ Pass</button>
