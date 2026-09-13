@@ -327,6 +327,6 @@ body:has(.landing) .top-blur{display:none}
 
 /* Open-link icon button on radar cards */
 .signal{position:relative}
-.signal-open{position:absolute;right:12px;bottom:12px;width:32px;height:32px;display:grid;place-items:center;border-radius:999px;background:#f2eee9;color:#222;transition:background .15s,transform .2s cubic-bezier(.2,1.4,.3,1)}
-.signal-open svg{width:16px;height:16px}
-.signal-open:hover{background:#111;color:#fff;transform:translateY(-1px)}
+.signal-open{position:absolute;right:14px;bottom:14px;width:24px;height:24px;display:grid;place-items:center;color:#222;opacity:.7;transition:opacity .15s,transform .2s cubic-bezier(.2,1.4,.3,1)}
+.signal-open svg{width:18px;height:18px}
+.signal-open:hover{opacity:1;transform:translate(1px,-1px)}
