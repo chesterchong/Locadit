@@ -116,3 +116,22 @@ input[type=range]{accent-color:#111}
 .chat-list{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
 .bubble.ai{align-self:flex-start}
 .bubble.me{align-self:flex-end}
+
+/* Trip radar */
+.signal{border:1px solid var(--line);border-radius:16px;padding:.85rem 1rem;background:#fff}
+.signal .lvl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:.2rem .55rem;font-weight:600;white-space:nowrap}
+.signal.calm .lvl{background:#e6f6ec;color:#15803d}
+.signal.heads-up .lvl{background:#fff4d6;color:#a16207}
+.signal.heads-up{border-color:rgba(161,98,7,.35)}
+.signal.caution .lvl{background:#fde8e8;color:#b91c1c}
+.signal.caution{border-color:rgba(185,28,28,.35)}
+.signal.info .lvl{background:#eee;color:#555}
+/* World map behind the swipe deck, centred on the destination, parallax with the card */
+.worldmap{position:absolute;inset:-40px -140px;z-index:0;overflow:hidden;pointer-events:none;opacity:.16;filter:grayscale(1) contrast(1.1)}
+.worldmap img{position:absolute;width:2000px;height:1000px;max-width:none}
+.worldmap .pin{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px;border-radius:999px;background:#111}
+.worldmap .pin::after{content:"";position:absolute;inset:-12px;border-radius:999px;border:2px solid #111;animation:ping 1.8s ease-out infinite}
+@keyframes ping{from{transform:scale(.3);opacity:.9}to{transform:scale(1.5);opacity:0}}
+.swipe-photo{color:#fff}
+.swipe-photo .muted{color:rgba(255,255,255,.75)}
+.swipe-photo .border-black\/10{border-color:rgba(255,255,255,.2)}

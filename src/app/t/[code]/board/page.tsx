@@ -2,12 +2,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; links?: { label: string; href: string }[] };
+type Radar = { place?: { name: string; country: string }; window?: { label: string }; signals: Signal[] };
+const LEVEL: Record<Signal["level"], string> = { calm: "Calm", "heads-up": "Heads-up", caution: "Caution", info: "Info" };
 type Data = { trip: { code: string; name: string; destination: string; answers: { name: string }[]; expenses: { id: string; title: string; amount: number; paidBy: string }[] }; result: null | { budget: number; bestDate: { d: string; n: number }; dateVotes: { d: string; n: number }[]; scores: { act: string; score: number }[]; itinerary: { day: number; theme: string; why: string; budget: number; plan: string[] }[]; members: string[]; pace: string; notes: { name: string; mustHave?: string; avoid?: string }[] }; balances: Record<string, number> };
 export default function Board() {
   const { code } = useParams<{ code: string }>();
   const [d, setD] = useState<Data | null>(null);
   const [title, setTitle] = useState(""); const [amount, setAmount] = useState(""); const [paidBy, setPaidBy] = useState("");
   const [copied, setCopied] = useState(false);
+  const [radar, setRadar] = useState<Radar | null>(null);
+  useEffect(() => {
+    const go = () => fetch(`/api/trips/${code}/risk`).then((r) => (r.ok ? r.json() : null)).then((j) => j && setRadar(j)).catch(() => {});
+    go(); const t = setInterval(go, 600000); return () => clearInterval(t);
+  }, [code]);
   const [missing, setMissing] = useState(false);
   const load = () => fetch(`/api/trips/${code}`).then((r) => { if (r.status === 404) { setMissing(true); return null; } return r.json(); }).then((j) => { if (j) setD(j); }).catch(() => {});
   useEffect(() => { load(); const t = setInterval(() => { if (!missing) load(); }, 2500); return () => clearInterval(t); }, [code, missing]); // eslint-disable-line
@@ -33,6 +41,25 @@ export default function Board() {
         <p className="text-sm mt-1">{trip.answers.map((a) => a.name).join(" · ") || <span className="muted">waiting for the first swipe…</span>}</p>
         <Link href={`/t/${trip.code}`} className="btn btn-primary inline-block mt-3">Add my answers</Link>
       </header>
+      <section className="glass p-5 space-y-3 pop">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="text-xs uppercase tracking-widest muted">Trip radar{radar?.place ? ` · ${radar.place.name}, ${radar.place.country}` : ""}</p>
+          {radar && <p className="text-xs muted">{(() => { const n = radar.signals.filter((s) => s.level === "caution" || s.level === "heads-up").length; return n ? `${n} to keep in mind` : "all calm"; })()}{radar.window ? ` · ${radar.window.label}` : ""}</p>}
+        </div>
+        {!radar ? <p className="text-sm muted">Scanning weather history, storm seasons, seismic activity and country data…</p> : (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {radar.signals.map((s) => (
+              <div key={s.id} className={`signal ${s.level}`}>
+                <div className="flex items-center justify-between gap-2"><b className="text-sm">{s.title}</b><span className="lvl">{LEVEL[s.level]}</span></div>
+                <p className="text-sm mt-1 leading-snug">{s.message}</p>
+                {s.advice && <p className="text-xs mt-1 leading-snug">{s.advice}</p>}
+                {s.links && <p className="text-xs mt-2 flex gap-3">{s.links.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noreferrer" className="underline">{l.label}</a>)}</p>}
+                <p className="text-[11px] muted mt-2">{s.source}{s.asOf ? ` · ${s.asOf}` : ""}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
       {!result ? <div className="glass p-8 muted text-center">Results appear here live as people finish swiping.</div> : (
         <>
           <section className="grid grid-cols-2 gap-3">

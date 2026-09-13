@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ACTIVITIES, Pace } from "@/lib/store";
 
-type Trip = { code: string; name: string; destination: string; dateOptions: string[] };
+type Trip = { code: string; name: string; destination: string; dateOptions: string[]; place?: { name: string; country: string; lat: number; lon: number } };
+// Search terms per activity for real photos (Wikimedia Commons via /api/photos).
+const TERMS: Record<string, string> = { "Food & markets": "street food market", Nightlife: "night lights bar", "Nature & hikes": "waterfall hike nature", "Museums & culture": "temple museum culture", "Beach & rest": "beach", Shopping: "shopping street market", "Adventure sports": "surfing diving adventure", "Local neighbourhoods": "street neighbourhood" };
+const MAP = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/World_location_map_%28equirectangular_180%29.svg/1920px-World_location_map_%28equirectangular_180%29.svg.png";
 type Q = "name" | "budget" | "dates" | "pace" | "must" | "avoid";
 const FLOW: Q[] = ["name", "budget", "dates", "pace", "must", "avoid"];
 const SUGGEST: Record<string, string> = { must: "one proper beach day", avoid: "early mornings" };
@@ -37,6 +40,21 @@ export default function Quiz() {
   const [drag, setDrag] = useState(false);
   const [fly, setFly] = useState<null | number>(null);
   const start = useRef(0);
+  const [photos, setPhotos] = useState<Record<string, string | null>>({});
+
+  // Fetch a real photo for the current and next card; preload so the swap is instant.
+  useEffect(() => {
+    if (!trip || q < FLOW.length) return;
+    [ACTIVITIES[i], ACTIVITIES[i + 1]].filter(Boolean).forEach((a) => {
+      if (photos[a] !== undefined) return;
+      setPhotos((ph) => ({ ...ph, [a]: null }));
+      fetch(`/api/photos?q=${encodeURIComponent(`${trip.destination} ${TERMS[a]}`)}`).then((r) => r.json()).then((j) => {
+        const url: string | null = j.photos?.[0]?.url ?? null;
+        if (url) { const im = new Image(); im.src = url; }
+        setPhotos((ph) => ({ ...ph, [a]: url }));
+      }).catch(() => {});
+    });
+  }, [trip, q, i]); // eslint-disable-line
 
   const [missing, setMissing] = useState(false);
   useEffect(() => {
@@ -104,11 +122,13 @@ export default function Quiz() {
   const x = fly === null ? dx : fly * 600;
   const rot = x / 18;
   const love = Math.min(1, Math.max(0, x / 110)), pass = Math.min(1, Math.max(0, -x / 110));
+  const photo = photos[act] || null;
+  const place = trip.place;
   // Fade the card as it travels: gradually while dragging, fully once it flies off.
   const fade = fly !== null ? 0 : 1 - Math.min(0.75, Math.abs(dx) / 320);
 
   return (
-    <main className={`mx-auto max-w-md px-6 py-10 flex flex-col gap-6 ${q < FLOW.length ? "h-[100svh] overflow-hidden" : ""}`}>
+    <main className={`mx-auto max-w-md px-6 py-10 flex flex-col gap-6 ${q < FLOW.length ? "h-[100svh] overflow-hidden" : "min-h-[100svh] justify-center"}`}>
       <Link href="/" className="home-link">Locadit</Link>
       {host && (
         <div className="pill w-full justify-between shrink-0">
@@ -167,23 +187,28 @@ export default function Quiz() {
       )}
 
       {q >= FLOW.length && (
-        <section className="space-y-5 select-none pop">
-          <div className="bubble ai">Last part, {name}: swipe right on what you&apos;d love in {trip.destination}, left to pass.</div>
-          <div className="flex items-center justify-between text-xs muted"><span className="mono">{i + 1} / {ACTIVITIES.length}</span><span>← pass · love →</span></div>
+        <section className="space-y-4 select-none pop w-full">
+          <div className="flex items-center justify-end text-xs muted"><span className="mono">{i + 1} / {ACTIVITIES.length}</span></div>
           <div className="relative h-[460px]" style={{ perspective: 1000 }}>
-            {ACTIVITIES[i + 1] && <div className="glass absolute inset-0 scale-[.95] translate-y-3 opacity-60" />}
+            {place && (
+              <div className="worldmap" aria-hidden>
+                <img src={MAP} alt="" style={{ left: `calc(50% - ${((place.lon + 180) / 360) * 2000}px)`, top: `calc(50% - ${((90 - place.lat) / 180) * 1000}px)`, transform: `translateX(${x * 0.25}px)`, transition: drag ? "none" : "transform .3s ease-out" }} />
+                <span className="pin" />
+              </div>
+            )}
+            {ACTIVITIES[i + 1] && <div className="glass absolute inset-0 z-10 scale-[.95] translate-y-3 opacity-60" style={photos[ACTIVITIES[i + 1]] ? { backgroundImage: `linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)), url(${photos[ACTIVITIES[i + 1]]})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined} />}
             <div onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
-              className="glass absolute inset-0 cursor-grab active:cursor-grabbing overflow-hidden touch-none"
-              style={{ transform: `translateX(${x}px) rotate(${rot}deg)`, opacity: fade, transition: drag ? "none" : "transform .26s ease-out, opacity .26s ease-out", background: `radial-gradient(80% 60% at 50% 0%, ${HUE[act]}33, #fff 70%)` }}>
+              className={`glass absolute inset-0 z-10 cursor-grab active:cursor-grabbing overflow-hidden touch-none ${photo ? "swipe-photo" : ""}`}
+              style={{ transform: `translateX(${x}px) rotate(${rot}deg)`, opacity: fade, transition: drag ? "none" : "transform .26s ease-out, opacity .26s ease-out", background: photo ? `linear-gradient(to top, rgba(0,0,0,.78), rgba(0,0,0,.25) 50%, rgba(0,0,0,.05)), url(${photo}) center/cover` : `radial-gradient(80% 60% at 50% 0%, ${HUE[act]}33, #fff 70%)` }}>
               <div className="absolute left-5 top-5 rounded-lg border-2 border-green-600 px-3 py-1 text-lg font-extrabold text-green-600 -rotate-12" style={{ opacity: love }}>LOVE</div>
               <div className="absolute right-5 top-5 rounded-lg border-2 border-rose-500 px-3 py-1 text-lg font-extrabold text-rose-500 rotate-12" style={{ opacity: pass }}>PASS</div>
-              <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
-                <div className="text-7xl drop-shadow-[0_10px_30px_rgba(0,0,0,.2)]">{EMOJI[act]}</div>
+              <div className={`flex h-full flex-col ${photo ? "items-start justify-end p-7 pb-16 text-left" : "items-center justify-center p-8 text-center"} gap-3`}>
+                <div className={photo ? "text-4xl" : "text-7xl drop-shadow-[0_10px_30px_rgba(0,0,0,.2)]"}>{EMOJI[act]}</div>
                 <h2 className="text-3xl font-extrabold tracking-tight">{act}</h2>
                 <p className="muted text-sm">in {trip.destination}</p>
               </div>
               <div className="absolute inset-x-0 bottom-0 flex justify-between px-6 py-4 text-xs mono muted border-t border-black/10">
-                <span>BUDGET ${budget}</span><span>{dates.length} DATE{dates.length > 1 ? "S" : ""}</span>
+                <span>BUDGET ${budget}</span><span>{photo ? "PHOTO · WIKIMEDIA COMMONS" : `${dates.length} DATE${dates.length > 1 ? "S" : ""}`}</span>
               </div>
             </div>
           </div>
