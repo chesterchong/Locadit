@@ -207,11 +207,6 @@ input[type=range]{accent-color:#111}
 .signal.caution{border-color:rgba(185,28,28,.35)}
 .signal.info .lvl{background:#eee;color:#555}
 /* World map behind the whole swipe screen, centred on the destination; pans and zooms with the card */
-.worldmap{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.42;filter:saturate(.7) contrast(1.15);transform-origin:50% 50%;--mw:max(2600px,170vw);overflow:hidden}
-.worldmap img{position:absolute;width:var(--mw);height:calc(var(--mw) / 2);max-width:none}
-.worldmap .pin{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px;border-radius:999px;background:#111}
-.worldmap .pin::after{content:"";position:absolute;inset:-12px;border-radius:999px;border:2px solid #111;animation:ping 1.8s ease-out infinite}
-@keyframes ping{from{transform:scale(.3);opacity:.9}to{transform:scale(1.5);opacity:0}}
 .swipe-photo{color:#fff}
 .swipe-photo .muted{color:rgba(255,255,255,.75)}
 .swipe-photo .border-black\/10{border-color:rgba(255,255,255,.2)}
