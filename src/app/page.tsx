@@ -99,7 +99,7 @@ export default function Landing() {
               <Link href={c.href} className="phone-link" onClick={(e) => go(e, c.href)} aria-label={`${c.name}: ${c.tag}`}>
                 {/* The clipped, rounded element must carry no transform of its own, or Chrome paints the video black. */}
                 <div className="phone">
-                  <video ref={(el) => { videos.current[i] = el; }} src={c.video} muted loop playsInline preload="auto" />
+                  <video ref={(el) => { videos.current[i] = el; }} src={c.video} muted loop playsInline preload="metadata" />
                 </div>
               </Link>
             </div>
@@ -144,7 +144,7 @@ function PieceEl({ p, step, delay, seed }: { p: Piece; step: number; delay: numb
     "--wa": `${p.wind ?? 2.5}deg`, "--wd": `${(2.1 + (seed % 5) * 0.35).toFixed(2)}s`, "--wdel": `${(-(seed % 7) * 0.4).toFixed(1)}s`,
   } as CSSProperties;
   const cls = `piece ${p.kind} ${p.font ? "f-" + p.font : ""} ${p.underline ? "underline-blue" : ""} ${p.hover ? "hoverable" : ""} ${gone ? "off" : shown ? "on" : ""}`;
-  if (p.kind === "img") return <div className={cls} style={style}><span className="in"><img src={p.src} alt="" draggable={false} /></span></div>;
+  if (p.kind === "img") return <div className={cls} style={style}><span className="in"><img src={p.src} alt="" draggable={false} decoding="async" /></span></div>;
   if (p.kind === "polaroid") return <div className={cls} style={style}><span className="in"><i style={{ background: p.color }} /></span></div>;
   if (p.kind === "checker" || p.kind === "cloud") return <div className={cls} style={style} />;
   return <div className={cls} style={style} aria-hidden><span className="in"><span key={ci} className={p.cycle ? "fade-in" : undefined}>{content}</span></span></div>;
