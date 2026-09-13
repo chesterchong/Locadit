@@ -8,7 +8,7 @@ const NIGHT_TERMS: Record<string, string> = { "Food & markets": "night market", 
 // x is the offset from the inner edge (next to the itinerary column), in % of the panel width.
 const SLOTS = [{ x: 6, y: 14, r: -8, w: 160 }, { x: 26, y: 40, r: 6, w: 175 }, { x: 8, y: 64, r: -4, w: 150 }];
 
-export default function DayScene({ destination, theme, open, onClose }: { destination: string; theme: string | null; open: boolean; onClose: () => void }) {
+export default function DayScene({ destination, theme, open }: { destination: string; theme: string | null; open: boolean }) {
   const [day, setDay] = useState<string[]>([]);
   const [night, setNight] = useState<string[]>([]);
   useEffect(() => {
@@ -18,15 +18,6 @@ export default function DayScene({ destination, theme, open, onClose }: { destin
     get(DAY_TERMS[theme] ?? theme).then(setDay);
     get(NIGHT_TERMS[theme] ?? `${theme} night`).then(setNight);
   }, [open, theme, destination]);
-  useEffect(() => {
-    if (!open) return;
-    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    // Any click that isn't on a day card closes the scene (cards toggle themselves).
-    const away = (e: MouseEvent) => { if (!(e.target as Element).closest?.(".day-card")) onClose(); };
-    window.addEventListener("keydown", esc);
-    document.addEventListener("click", away);
-    return () => { window.removeEventListener("keydown", esc); document.removeEventListener("click", away); };
-  }, [open, onClose]);
   return (
     <div className={`scene ${open ? "on" : ""}`} aria-hidden>
       <div className="scene-day">
