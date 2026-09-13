@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-const MAX_VOLUME = 0.7;
+const MAX_VOLUME = 0.55;
 const FADE_SECONDS = 4;
 // The disc's playlist. The landing intro plays its own track once first, then hands over to this list, which loops.
-const PLAYLIST = ["/audio/melodic-minor.mp3", "/audio/nightcall.mp3"];
+const PLAYLIST = ["/audio/melodic-minor.mp3", "/audio/nightcall.mp3", "/audio/broken-heart.mp3"];
 const INTRO = "/audio/intro.mp3";
 const NOTES = ["🎵", "🎶", "♪", "♫"];
 
