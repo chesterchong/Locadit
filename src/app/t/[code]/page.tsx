@@ -40,6 +40,7 @@ export default function Quiz() {
   const [dx, setDx] = useState(0);
   const [drag, setDrag] = useState(false);
   const [fly, setFly] = useState<null | number>(null);
+  const [saving, setSaving] = useState(false);
   const start = useRef(0);
   const [photos, setPhotos] = useState<Record<string, string | null>>({});
 
@@ -104,17 +105,20 @@ export default function Quiz() {
   }
 
   async function submit(final: Record<string, number>) {
+    setSaving(true);
     try { localStorage.setItem("locadit:name", name); } catch {}
-    await fetch(`/api/trips/${code}/answers`, { method: "POST", body: JSON.stringify({ name, budget, dates, interests: final, pace, mustHave: mustHave || undefined, avoid: avoid || undefined }) });
-    r.push(`/t/${code}/board`);
+    try {
+      await fetch(`/api/trips/${code}/answers`, { method: "POST", body: JSON.stringify({ name, budget, dates, interests: final, pace, mustHave: mustHave || undefined, avoid: avoid || undefined }) });
+      r.push(`/t/${code}/board`);
+    } catch { setSaving(false); setFly(null); }
   }
   function vote(v: number) {
-    if (fly !== null) return; // ignore taps while a card is still flying off
+    if (fly !== null || saving) return; // ignore taps while a card is flying off or answers are saving
     setFly(v === 0 ? -1 : v === 3 ? 1 : 0);
     setTimeout(() => {
       const next = { ...interests, [ACTIVITIES[i]]: v };
-      setInterests(next); setFly(null); setDx(0);
-      if (i + 1 < ACTIVITIES.length) setI(i + 1); else submit(next);
+      setInterests(next); setDx(0);
+      if (i + 1 < ACTIVITIES.length) { setFly(null); setI(i + 1); } else submit(next); // keep the last card gone while saving
     }, 260);
   }
   const onDown = (e: React.PointerEvent) => { start.current = e.clientX; setDrag(true); (e.target as Element).setPointerCapture?.(e.pointerId); };
@@ -224,9 +228,9 @@ export default function Quiz() {
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
-            <button onClick={() => vote(0)} className="btn btn-ghost text-rose-500">✕ Pass</button>
-            <button onClick={() => vote(1)} className="btn btn-ghost">~ Maybe</button>
-            <button onClick={() => vote(3)} className="btn btn-primary">♥ Love</button>
+            <button onClick={() => vote(0)} disabled={saving} className="btn btn-ghost text-rose-500 disabled:opacity-30">✕ Pass</button>
+            <button onClick={() => vote(1)} disabled={saving} className="btn btn-ghost disabled:opacity-30">~ Maybe</button>
+            <button onClick={() => vote(3)} disabled={saving} className="btn btn-primary disabled:opacity-30">{saving ? "Saving…" : "♥ Love"}</button>
           </div>
         </section>
       )}
