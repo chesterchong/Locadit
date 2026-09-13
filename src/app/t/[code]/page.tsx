@@ -27,7 +27,7 @@ export default function Quiz() {
   const [pace, setPace] = useState<Pace>("balanced");
   const [mustHave, setMustHave] = useState("");
   const [avoid, setAvoid] = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   // Swiping
   const [i, setI] = useState(0);
@@ -60,7 +60,8 @@ export default function Quiz() {
     return () => window.clearTimeout(t);
   }, [trip, q, name]);
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, [log, typing]);
+  // Keep the newest message in view by scrolling the chat panel itself, never the page.
+  useEffect(() => { const el = listRef.current; if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" }); }, [log, typing]);
 
   function answer(text: string) {
     setLog((l) => [...l, { from: "me", text }]);
@@ -104,25 +105,24 @@ export default function Quiz() {
   const love = Math.min(1, Math.max(0, x / 110)), pass = Math.min(1, Math.max(0, -x / 110));
 
   return (
-    <main className="mx-auto max-w-md px-6 py-10 space-y-6">
+    <main className={`mx-auto max-w-md px-6 py-10 flex flex-col gap-6 ${q < FLOW.length ? "h-[100svh] overflow-hidden" : ""}`}>
       <Link href="/" className="home-link">Locadit</Link>
       {host && (
-        <div className="pill w-full justify-between">
+        <div className="pill w-full justify-between shrink-0">
           <span><span className="dot" /> You started this room · code <b className="mono">{trip.code}</b></span>
           <Link href={`/t/${trip.code}/board`} className="underline">Live board →</Link>
         </div>
       )}
-      <header>
+      <header className="shrink-0">
         <p className="text-xs uppercase tracking-widest muted">{trip.destination} · private</p>
         <h1 className="text-3xl font-extrabold tracking-tight">{trip.name}</h1>
       </header>
 
       {q < FLOW.length && (
-        <section className="glass p-5 space-y-4 pop">
-          <div className="flex flex-col gap-2">
+        <section className="glass p-5 flex flex-col gap-4 flex-1 min-h-0 pop">
+          <div ref={listRef} className="chat-list flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto pr-1">
             {log.map((m, k) => <div key={k} className={`bubble ${m.from}`}>{m.text}</div>)}
-            {typing && <div className="typing"><i /><i /><i /></div>}
-            <div ref={endRef} />
+            {typing && <div className="typing self-start"><i /><i /><i /></div>}
           </div>
           {!typing && current === "name" && (
             <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (draft.trim()) { setName(draft.trim()); answer(draft.trim()); } }}>
@@ -158,7 +158,7 @@ export default function Quiz() {
               <button className="btn btn-primary" type="submit">{draft.trim() ? "Next" : "Skip"}</button>
             </form>
           )}
-          <p className="text-xs muted text-center">Nobody sees your answers, only the merged result.</p>
+          <p className="text-xs muted text-center shrink-0">Nobody sees your answers, only the merged result.</p>
         </section>
       )}
 

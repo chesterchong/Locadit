@@ -113,3 +113,6 @@ input[type=range]{accent-color:#111}
 /* Small home link on app pages */
 .home-link{position:fixed;left:20px;top:16px;z-index:50;font-family:var(--font-caveat),cursive;font-size:28px;font-weight:700;color:#111;text-decoration:none;opacity:.85}
 .home-link:hover{opacity:1}
+.chat-list{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
+.bubble.ai{align-self:flex-start}
+.bubble.me{align-self:flex-end}
