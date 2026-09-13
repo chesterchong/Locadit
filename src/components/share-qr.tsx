@@ -55,7 +55,9 @@ export default function ShareQr({ code }: { code: string }) {
     context.stroke();
     const face = getComputedStyle(document.documentElement).getPropertyValue("--font-caveat").trim() || "cursive";
     context.fillStyle = "#171411";
-    context.font = `700 ${Math.round(badge * 0.36)}px ${face}, cursive`;
+    let px = Math.round(badge * 0.36);
+    context.font = `700 ${px}px ${face}, cursive`;
+    while (px > 8 && context.measureText("Locadit").width > badge * 0.72) { px -= 1; context.font = `700 ${px}px ${face}, cursive`; }
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillText("Locadit", size / 2, size / 2 + badge * 0.02);
