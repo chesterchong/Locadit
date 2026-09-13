@@ -201,14 +201,14 @@ export default function Quiz() {
 
       {q >= FLOW.length && (
         <section className="space-y-4 select-none pop w-full">
+          {place && (
+            <div className="worldmap" aria-hidden style={{ transform: `translateX(${x * 0.3}px) scale(${Math.min(1.35, Math.max(0.8, 1 + x / 1500))})`, transition: drag ? "none" : "transform .5s cubic-bezier(.2,.8,.2,1)" }}>
+              <img src={MAP} alt="" style={{ left: `calc(50% - ${((place.lon + 180) / 360)} * var(--mw))`, top: `calc(50% - ${((90 - place.lat) / 180)} * var(--mw) / 2)` }} />
+              <span className="pin" />
+            </div>
+          )}
           <div className="flex items-center justify-end text-xs muted"><span className="mono">{i + 1} / {ACTIVITIES.length}</span></div>
           <div className="relative h-[460px]" style={{ perspective: 1000 }}>
-            {place && (
-              <div className="worldmap" aria-hidden>
-                <img src={MAP} alt="" style={{ left: `calc(50% - ${((place.lon + 180) / 360) * 2000}px)`, top: `calc(50% - ${((90 - place.lat) / 180) * 1000}px)`, transform: `translateX(${x * 0.25}px)`, transition: drag ? "none" : "transform .3s ease-out" }} />
-                <span className="pin" />
-              </div>
-            )}
             {ACTIVITIES[i + 1] && <div className="glass absolute inset-0 z-10 scale-[.95] translate-y-3 opacity-60" style={photos[ACTIVITIES[i + 1]] ? { backgroundImage: `linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.55)), url(${photos[ACTIVITIES[i + 1]]})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined} />}
             <div onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
               className={`glass absolute inset-0 z-10 cursor-grab active:cursor-grabbing overflow-hidden touch-none ${photo ? "swipe-photo" : ""}`}
