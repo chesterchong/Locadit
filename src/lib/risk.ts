@@ -171,9 +171,14 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
   tasks.push((async () => {
     try {
       const q = `[out:json][timeout:20];nwr[amenity=hospital][name](around:40000,${lat},${lon});out center 8;`;
-      const r = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`, { next: { revalidate: 86400 }, signal: AbortSignal.timeout(22000), headers: { "User-Agent": "Locadit/0.1" } });
-      if (!r.ok) throw new Error("overpass");
-      const j = await r.json();
+      let j: { elements?: unknown[] } | null = null;
+      for (const base of ["https://overpass.kumi.systems/api/interpreter", "https://overpass-api.de/api/interpreter"]) {
+        try {
+          const r = await fetch(`${base}?data=${encodeURIComponent(q)}`, { next: { revalidate: 86400 }, signal: AbortSignal.timeout(20000), headers: { "User-Agent": "Locadit/0.1" } });
+          if (r.ok) { j = await r.json(); break; }
+        } catch { /* try next mirror */ }
+      }
+      if (!j) throw new Error("overpass");
       type E = { tags: { name: string }; lat?: number; lon?: number; center?: { lat: number; lon: number } };
       const hs = ((j.elements ?? []) as E[]).map((e) => { const la = e.lat ?? e.center?.lat ?? lat, lo = e.lon ?? e.center?.lon ?? lon; return { name: e.tags.name, d: km(lat, lon, la, lo) }; }).sort((a, b) => a.d - b.d);
       signals.push({ id: "exit", title: "Getting out", level: hs.length && hs[0].d <= 15 ? "calm" : "heads-up", message: hs.length ? `Nearest hospitals to ${point.name}: ${hs.slice(0, 3).map((h) => `${h.name} (${Math.round(h.d)} km)`).join(", ")}.` : `No hospital mapped within 40 km of ${point.name}.`, advice: "Save the embassy number from the advisory page, download offline maps, and agree a meeting point and a check-in time each evening. Helicopters can't fly in heavy weather; a car and a known road matter more.", source: "OpenStreetMap" });
