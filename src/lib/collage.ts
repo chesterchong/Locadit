@@ -56,7 +56,7 @@ export const PIECES: Piece[] = [
 
   // Layer 4 · sky, clouds, devices (pixel wordmark)
   { id: "cloud-a", layer: 4, kind: "cloud", x: 560, y: 170, size: 170, h: 70, z: 3 },
-  { id: "cloud-b", layer: 4, kind: "cloud", x: 930, y: 100, size: 130, h: 55, z: 3 },
+  { id: "cloud-b", layer: 4, kind: "cloud", x: 400, y: 90, size: 130, h: 55, z: 3 },
   { id: "cloud-c", layer: 4, kind: "cloud", x: 1230, y: 220, size: 150, h: 60, z: 3 },
   { id: "balloon", wind: 6, hover: true, layer: 4, kind: "img", src: "/collage/balloon.png", content: "🎈", x: 1420, y: 300, size: 120, rot: 5 },
   { id: "tape", wind: 2, layer: 4, kind: "img", src: "/collage/tape.png", content: "📼", x: 720, y: 520, size: 170, rot: -12, hideAtEnd: true },
