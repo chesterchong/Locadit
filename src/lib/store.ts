@@ -4,7 +4,19 @@ export type Pace = "chill" | "balanced" | "packed";
 export type Answer = { name: string; budget: number; dates: string[]; interests: Record<string, number>; pace?: Pace; mustHave?: string; avoid?: string };
 export type Expense = { id: string; title: string; amount: number; paidBy: string; splitAmong: string[] };
 export type Place = { name: string; country: string; countryCode: string; lat: number; lon: number };
-export type Trip = { code: string; name: string; destination: string; dateOptions: string[]; answers: Answer[]; expenses: Expense[]; createdAt: number; place?: Place; stay?: Place };
+export type RealItineraryStop = { time: "AM" | "PM" | "EVE"; name: string; area: string; note: string };
+export type RealItineraryDay = { day: number; theme: string; headline: string; why: string; budget: number; stops: RealItineraryStop[] };
+export type RealItinerary = {
+  signature: string;
+  title: string;
+  intro: string;
+  generatedAt: number;
+  contentModel: "gpt-6-astra";
+  photoModel: "gpt-image-2.5-sunburst";
+  coverPhoto: string;
+  days: RealItineraryDay[];
+};
+export type Trip = { code: string; name: string; destination: string; dateOptions: string[]; answers: Answer[]; expenses: Expense[]; createdAt: number; place?: Place; stay?: Place; realItinerary?: RealItinerary };
 export const ACTIVITIES = ["Food & markets", "Nightlife", "Nature & hikes", "Museums & culture", "Beach & rest", "Shopping", "Adventure sports", "Local neighbourhoods"];
 
 // Storage: Supabase when SUPABASE_URL + SUPABASE_ANON_KEY are set (one `locadit_trips` row per room, the trip as jsonb),

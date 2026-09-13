@@ -24,7 +24,7 @@ export function merge(trip: Trip) {
   const pace = (Object.entries(paceVotes).sort((x, y) => y[1] - x[1])[0][0]) as "chill" | "balanced" | "packed";
   const perDayItems = pace === "chill" ? 2 : pace === "packed" ? 4 : 3;
   const notes = a.filter((m) => m.mustHave || m.avoid).map((m) => ({ name: m.name, mustHave: m.mustHave, avoid: m.avoid }));
-  const itinerary = Array.from({ length: days }, (_, i) => {
+  const fallbackItinerary = Array.from({ length: days }, (_, i) => {
     const s = ranked[i % ranked.length];
     const perDay = Math.round((budget * 0.6) / days);
     const why = s.fans.length === a.length ? "everyone wanted this" : s.fans.length > a.length / 2 ? `${s.fans.length} of ${a.length} rated it highly` : s.fans.length ? `${s.fans.join(" & ")}'s pick, kept for fairness` : "rounds out the mix; nobody objected";
@@ -32,7 +32,29 @@ export function merge(trip: Trip) {
     const plan = perDayItems >= 4 ? [...full, "Sunset spot, then a late bite"] : full.slice(0, perDayItems);
     return { day: i + 1, theme: s.act, why, budget: perDay, plan };
   });
-  return { budget, bestDate, dateVotes, scores, itinerary, members: a.map((x) => x.name), pace, notes };
+  const itinerary = trip.realItinerary?.days.map((day) => ({
+    day: day.day,
+    theme: day.theme,
+    headline: day.headline,
+    why: day.why,
+    budget: day.budget,
+    plan: day.stops.map((stop) => `${stop.name} · ${stop.note}`),
+  })) ?? fallbackItinerary;
+  return {
+    budget,
+    bestDate,
+    dateVotes,
+    scores,
+    itinerary,
+    members: a.map((x) => x.name),
+    pace,
+    notes,
+    realItinerary: Boolean(trip.realItinerary),
+    itineraryTitle: trip.realItinerary?.title,
+    itineraryIntro: trip.realItinerary?.intro,
+    itineraryPhoto: trip.realItinerary?.coverPhoto,
+    itineraryGeneratedAt: trip.realItinerary?.generatedAt,
+  };
 }
 function planFor(act: string, dest: string) {
   const p: Record<string, string[]> = {

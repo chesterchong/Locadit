@@ -3,17 +3,19 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import LoadingView from "@/app/loading-view";
 import { useParams } from "next/navigation";
-import TreeQr from "@/components/tree-qr";
+import ShareQr from "@/components/share-qr";
 type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; live?: boolean; links?: { label: string; href: string }[] };
 type Radar = { place?: { name: string; country: string }; window?: { label: string }; signals: Signal[]; generatedAt: number; partial?: boolean };
 const LEVEL: Record<Signal["level"], string> = { calm: "Clear", "heads-up": "Check", caution: "Act", info: "Live" };
-type Data = { trip: { code: string; name: string; destination: string; answers: { name: string }[]; expenses: { id: string; title: string; amount: number; paidBy: string }[] }; result: null | { budget: number; bestDate: { d: string; n: number }; dateVotes: { d: string; n: number }[]; scores: { act: string; score: number }[]; itinerary: { day: number; theme: string; why: string; budget: number; plan: string[] }[]; members: string[]; pace: string; notes: { name: string; mustHave?: string; avoid?: string }[] }; balances: Record<string, number> };
+type Data = { trip: { code: string; name: string; destination: string; answers: { name: string }[]; expenses: { id: string; title: string; amount: number; paidBy: string }[] }; result: null | { budget: number; bestDate: { d: string; n: number }; dateVotes: { d: string; n: number }[]; scores: { act: string; score: number }[]; itinerary: { day: number; theme: string; headline?: string; why: string; budget: number; plan: string[] }[]; members: string[]; pace: string; notes: { name: string; mustHave?: string; avoid?: string }[]; realItinerary: boolean; itineraryTitle?: string; itineraryIntro?: string; itineraryPhoto?: string; itineraryGeneratedAt?: number }; balances: Record<string, number> };
 export default function Board() {
   const { code } = useParams<{ code: string }>();
   const [d, setD] = useState<Data | null>(null);
   const [title, setTitle] = useState(""); const [amount, setAmount] = useState(""); const [paidBy, setPaidBy] = useState("");
   const [copied, setCopied] = useState(false);
   const [radar, setRadar] = useState<Radar | null>(null);
+  const [buildingItinerary, setBuildingItinerary] = useState(false);
+  const [itineraryError, setItineraryError] = useState("");
   useEffect(() => {
     const go = () => fetch(`/api/trips/${code}/risk`).then((r) => (r.ok ? r.json() : null)).then((j) => j && setRadar(j)).catch(() => {});
     go(); const t = setInterval(go, 600000); return () => clearInterval(t);
@@ -29,9 +31,23 @@ export default function Board() {
     await fetch(`/api/trips/${code}/expenses`, { method: "POST", body: JSON.stringify({ title, amount: +amount, paidBy, splitAmong: result?.members ?? [] }) });
     setTitle(""); setAmount(""); load();
   }
+  async function buildRealItinerary() {
+    setBuildingItinerary(true);
+    setItineraryError("");
+    try {
+      const response = await fetch(`/api/trips/${code}/itinerary`, { method: "POST" });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || "Could not build the itinerary");
+      await load();
+    } catch (error) {
+      setItineraryError(error instanceof Error ? error.message : "Could not build the itinerary");
+    } finally {
+      setBuildingItinerary(false);
+    }
+  }
   return (
     <main className="mx-auto max-w-2xl px-6 py-10 space-y-6">
-      <TreeQr code={trip.code} />
+      <ShareQr code={trip.code} />
       <Link href="/" className="home-link">Locadit</Link>
       <div className="pill"><span className="dot" />Room is live · <span className="mono">{trip.code}</span> · {trip.answers.length} joined · {trip.expenses.length} expenses</div>
       <header>
@@ -92,9 +108,23 @@ export default function Board() {
           )}
           <section className="space-y-3">
             <p className="text-xs uppercase tracking-widest muted">Itinerary · {result.pace === "chill" ? "slow pace" : result.pace === "packed" ? "packed days" : "balanced pace"}</p>
+            {result.realItinerary ? (
+              <div className="itinerary-cover glass overflow-hidden pop">
+                <div className="itinerary-cover-photo" role="img" aria-label={`${result.itineraryTitle ?? trip.destination} itinerary`} style={{ backgroundImage: `linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,.04) 70%),url(${result.itineraryPhoto})` }}>
+                  <div><p className="text-xs uppercase tracking-widest">Real places · saved for this room</p><h2>{result.itineraryTitle}</h2><p>{result.itineraryIntro}</p></div>
+                </div>
+              </div>
+            ) : (
+              <div className="glass p-5 pop flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div><p className="font-semibold">Make it place-by-place</p><p className="text-sm muted mt-1">Real venues, sensible areas and one activity photo—saved for everyone.</p></div>
+                <button type="button" className="btn btn-primary shrink-0" onClick={buildRealItinerary} disabled={buildingItinerary}>{buildingItinerary ? "Building…" : "Build real itinerary"}</button>
+              </div>
+            )}
+            {itineraryError && <p className="text-sm text-rose-600">{itineraryError}</p>}
             {result.itinerary.map((day) => (
               <div key={day.day} className="glass p-5 pop">
-                <div className="flex items-baseline justify-between"><p className="font-semibold text-lg"><span className="mono muted mr-2">D{day.day}</span>{day.theme}</p><p className="mono text-sm muted">~${day.budget}/pp</p></div>
+                <div className="flex items-baseline justify-between gap-3"><p className="font-semibold text-lg"><span className="mono muted mr-2">D{day.day}</span>{day.headline ?? day.theme}</p><p className="mono text-sm muted shrink-0">~${day.budget}/pp</p></div>
+                {day.headline && <p className="text-xs uppercase tracking-widest mt-1 muted">{day.theme}</p>}
                 <p className="text-sm muted mt-1">Why: {day.why}</p>
                 <ul className="mt-3 space-y-1 text-sm">{day.plan.map((p, k) => <li key={p} className="flex gap-3"><span className="mono muted">{["AM", "PM", "EVE"][k]}</span>{p}</li>)}</ul>
               </div>
