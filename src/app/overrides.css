@@ -1,0 +1,4 @@
+/* Layout overrides that must win over component styles. Keep tiny. */
+/* Floating Share QR: sit inside the paper frame with breathing room, not on its edge. */
+.share-qr{right:max(36px,calc(env(safe-area-inset-right) + 22px));bottom:max(34px,calc(env(safe-area-inset-bottom) + 20px))}
+@media (max-width:640px){.share-qr{right:max(24px,calc(env(safe-area-inset-right) + 12px));bottom:max(24px,calc(env(safe-area-inset-bottom) + 12px))}}

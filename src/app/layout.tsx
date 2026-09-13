@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Aldrich, Caveat, Fredoka, Gochi_Hand, Inter, JetBrains_Mono, Playfair_Display, Press_Start_2P, Righteous } from "next/font/google";
 import "./globals.css";
+import "./overrides.css";
 import Soundtrack from "./soundtrack";
 
 // Self-hosted and preloaded, so the intro's wordmark faces are on hand before their beat.
