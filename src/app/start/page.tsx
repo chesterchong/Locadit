@@ -14,7 +14,7 @@ export default function Home() {
     r.push(`/t/${t.code}?host=1`);
   }
   return (
-    <main className="mx-auto max-w-md px-6 py-14 space-y-8">
+    <main className="mx-auto max-w-md px-6 py-14 space-y-8 enter">
       <Link href="/" className="home-link">Locadit</Link>
       <div className="pill"><span className="dot" />Rooms are live · no sign‑up · 2 min per person</div>
       <div>

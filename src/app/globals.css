@@ -224,3 +224,17 @@ input[type=range]{accent-color:#111}
 
 .fade-in{display:inline-block;animation:fadein .7s ease-out both}
 @keyframes fadein{from{opacity:0;translate:0 6px}to{opacity:1;translate:0 0}}
+
+/* Boarding transition: landing -> room */
+.stage.exit .piece.on{opacity:0;transform:translate(calc(-50% + var(--fx)),calc(-50% + var(--fy))) scale(1.2) rotate(calc(var(--r) + 28deg));transition:transform .75s cubic-bezier(.3,0,.9,.4) var(--fd),opacity .45s ease calc(var(--fd) + .15s)}
+.stage.exit .sky{transform:translateY(-110%);transition:transform .75s cubic-bezier(.4,0,.8,.2) .05s}
+.stage.exit .wm{opacity:0;transform:translate(-50%,-50%) translateY(-220px) scale(.6);transition:transform .6s cubic-bezier(.4,0,.8,.2),opacity .4s}
+.stage.exit .phone-wrap.on{transform:scale(7.5);opacity:0;transition:transform .85s cubic-bezier(.6,0,.9,.15),opacity .35s ease .5s}
+.stage.exit .info.on{opacity:0;transform:translate(-50%,-50%) translateY(90px);transition:transform .5s cubic-bezier(.4,0,.8,.2),opacity .3s}
+.exit-wipe{position:fixed;inset:0;z-index:900;pointer-events:none;background:#f7f3f0 radial-gradient(rgba(0,0,0,.11) 1.2px,transparent 1.6px) 0 0/28px 28px;clip-path:circle(0 at 50% 50%);transition:clip-path .6s cubic-bezier(.65,0,.35,1) .28s}
+.exit-wipe.on{clip-path:circle(125% at 50% 50%);pointer-events:auto}
+/* Room page entrance: fields rise in, staggered */
+.enter > *{animation:rise .7s cubic-bezier(.2,.9,.2,1) both}
+.enter > *:nth-child(2){animation-delay:.07s}.enter > *:nth-child(3){animation-delay:.14s}.enter > *:nth-child(4){animation-delay:.22s}.enter > *:nth-child(5){animation-delay:.3s}
+@keyframes rise{from{opacity:0;translate:0 34px;scale:.97}to{opacity:1;translate:0 0;scale:1}}
+@media (prefers-reduced-motion:reduce){.enter > *{animation:none}.exit-wipe{transition:none}}

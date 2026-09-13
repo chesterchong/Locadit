@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { PIECES, Piece } from "@/lib/collage";
 
@@ -60,6 +61,16 @@ export default function Landing() {
   // After the wordmark parks at the top it keeps cycling through the drawn styles.
   const [loop, setLoop] = useState(0);
   const [hot, setHot] = useState(false); // hovering the phone or its card grows both together
+  // Boarding transition: scatter the collage, zoom the phone, iris to cream, then route.
+  const router = useRouter();
+  const [exiting, setExiting] = useState(false);
+  const go = (e: React.MouseEvent, href: string) => {
+    e.preventDefault(); e.stopPropagation();
+    if (exiting) return;
+    setExiting(true);
+    router.prefetch(href);
+    window.setTimeout(() => router.push(href), 760);
+  };
   useEffect(() => {
     if (step < 7 || reduced.current) return;
     const id = window.setInterval(() => setLoop((l) => l + 1), 1800);
@@ -75,7 +86,7 @@ export default function Landing() {
   return (
     <div className="landing">
       <section ref={heroRef} className="hero" aria-label="Locadit intro">
-        <div className={`stage ${step >= 6 ? "night" : ""}`} style={{ "--s": fit?.s ?? 1, "--wm": fit?.wm ?? 1, visibility: fit ? "visible" : "hidden" } as CSSProperties}>
+        <div className={`stage ${step >= 6 ? "night" : ""} ${exiting ? "exit" : ""}`} style={{ "--s": fit?.s ?? 1, "--wm": fit?.wm ?? 1, visibility: fit ? "visible" : "hidden" } as CSSProperties}>
           <div className="dots on" />
           <div className={`sky ${step >= 5 ? "on" : ""}`} />
           {PIECES.map((p, i) => <PieceEl key={p.id} p={p} step={step} delay={ORDER[i] * 70} seed={i} />)}
@@ -85,7 +96,7 @@ export default function Landing() {
             {step >= 1 && <WordSvg key={`in-${changeStep}`} font={font} mode="draw" />}
           </h1>
           {CARDS.map((c, i) => (
-            <Link key={c.name} href={c.href} className={`phone-wrap ${step >= 8 ? "on" : ""} ${hot ? "hot" : ""}`} style={{ left: c.x, transitionDelay: `${i * 120}ms` }} onClick={stop} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)} aria-label={`${c.name}: ${c.tag}`}>
+            <Link key={c.name} href={c.href} className={`phone-wrap ${step >= 8 ? "on" : ""} ${hot ? "hot" : ""}`} style={{ left: c.x, transitionDelay: exiting ? "0ms" : `${i * 120}ms` }} onClick={(e) => go(e, c.href)} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)} aria-label={`${c.name}: ${c.tag}`}>
               {/* The clipped, rounded element must carry no transform of its own, or Chrome paints the video black. */}
               <div className="phone">
                 <video ref={(el) => { videos.current[i] = el; }} src={c.video} muted loop playsInline preload="auto" />
@@ -93,13 +104,14 @@ export default function Landing() {
             </Link>
           ))}
           {CARDS.map((c, i) => (
-            <Link key={`${c.name}-info`} href={c.href} className={`info ${step >= 9 ? "on" : ""} ${hot ? "hot" : ""}`} style={{ left: c.x, transitionDelay: `${i * 120}ms` }} onClick={stop} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)}>
+            <Link key={`${c.name}-info`} href={c.href} className={`info ${step >= 9 ? "on" : ""} ${hot ? "hot" : ""}`} style={{ left: c.x, transitionDelay: exiting ? "0ms" : `${i * 120}ms` }} onClick={(e) => go(e, c.href)} onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)}>
               <span className="info-text"><b>{c.name}</b><small>{c.tag}</small></span>
               <span className="info-cta">Start a room</span>
             </Link>
           ))}
         </div>
         {step < END && <button type="button" className="skip" onClick={skip}>Skip intro</button>}
+        <div className={`exit-wipe ${exiting ? "on" : ""}`} aria-hidden />
       </section>
 
     </div>
@@ -127,6 +139,7 @@ function PieceEl({ p, step, delay, seed }: { p: Piece; step: number; delay: numb
     height: textual ? undefined : p.h,
     color: p.kind === "text" ? p.color : undefined,
     "--r": `${t.rot ?? 0}deg`, "--d": `${delay}ms`,
+    "--fx": `${Math.round((t.x - 800) * 1.7)}px`, "--fy": `${Math.round((t.y - 450) * 1.7)}px`, "--fd": `${Math.round(Math.min(220, Math.hypot(t.x - 800, t.y - 450) / 4))}ms`,
     "--wa": `${p.wind ?? 2.5}deg`, "--wd": `${(2.1 + (seed % 5) * 0.35).toFixed(2)}s`, "--wdel": `${(-(seed % 7) * 0.4).toFixed(1)}s`,
   } as CSSProperties;
   const cls = `piece ${p.kind} ${p.font ? "f-" + p.font : ""} ${p.underline ? "underline-blue" : ""} ${p.hover ? "hoverable" : ""} ${gone ? "off" : shown ? "on" : ""}`;
