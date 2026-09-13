@@ -353,7 +353,7 @@ body:has(.landing) .top-blur{display:none}
 .day-card{cursor:pointer;transition:transform .25s cubic-bezier(.2,1.4,.3,1),box-shadow .25s}
 .day-card:hover{transform:translateY(-2px)}
 .day-card.is-open{box-shadow:0 0 0 2px #111,0 12px 40px rgba(0,0,0,.12)}
-.scene{position:fixed;inset:0;z-index:0;display:grid;grid-template-columns:1fr minmax(0,44rem) 1fr;opacity:0;pointer-events:none;transition:opacity .7s ease}
+.scene{position:fixed;inset:0;z-index:-1;display:grid;grid-template-columns:1fr minmax(0,44rem) 1fr;opacity:0;pointer-events:none;transition:opacity .7s ease}
 .scene.on{opacity:1;pointer-events:auto}
 .scene-day,.scene-night{position:relative;overflow:hidden}
 .scene-day{background:linear-gradient(#5a4a8c 0%,#a85d84 30%,#ef8f6a 60%,#ffd4a0 88%,#fff0d6 100%)}
