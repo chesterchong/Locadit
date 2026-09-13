@@ -79,8 +79,18 @@ export default function Quiz() {
     return () => window.clearTimeout(t);
   }, [trip, q, name]);
 
-  // Keep the newest message in view by scrolling the chat panel itself, never the page.
-  useEffect(() => { const el = listRef.current; if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" }); }, [log, typing]);
+  // Pin the newest question to the top of the panel: earlier messages scroll up out of view.
+  // A spacer under the messages gives the list enough room to place the last question at the top.
+  const spacerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = listRef.current, sp = spacerRef.current;
+    if (!el || !sp) return;
+    const ai = el.querySelectorAll<HTMLElement>(".bubble.ai");
+    const last = ai[ai.length - 1];
+    if (!last) return;
+    sp.style.height = `${Math.max(0, el.clientHeight - last.offsetHeight - 12)}px`;
+    if (log[log.length - 1]?.from === "ai") el.scrollTo({ top: last.offsetTop, behavior: "smooth" });
+  }, [log, typing]);
 
   function answer(text: string) {
     setLog((l) => [...l, { from: "me", text }]);
@@ -143,9 +153,10 @@ export default function Quiz() {
 
       {q < FLOW.length && (
         <section className="glass p-5 flex flex-col gap-4 flex-1 min-h-0 pop">
-          <div ref={listRef} className="chat-list flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto pr-1">
+          <div ref={listRef} className="chat-list relative flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto">
             {log.map((m, k) => <div key={k} className={`bubble ${m.from}`}>{m.text}</div>)}
             {typing && <div className="typing self-start"><i /><i /><i /></div>}
+            <div ref={spacerRef} aria-hidden className="shrink-0" />
           </div>
           {!typing && current === "name" && (
             <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (draft.trim()) { setName(draft.trim()); answer(draft.trim()); } }}>
