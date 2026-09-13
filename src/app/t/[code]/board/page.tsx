@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { treeQrUrl } from "@/lib/tree";
 type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; links?: { label: string; href: string }[]; data?: { hi: number; lo: number; rain: number } };
 type Radar = { place?: { name: string; country: string }; window?: { label: string }; signals: Signal[] };
 const LEVEL: Record<Signal["level"], string> = { calm: "Calm", "heads-up": "Heads-up", caution: "Caution", info: "Info" };
@@ -49,6 +50,7 @@ export default function Board() {
         <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
           <span className="mono text-black/70 truncate max-w-full">{link}</span>
           <button className="btn btn-ghost !py-1.5 !px-3 text-sm" onClick={() => { navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); }); }}>{copied ? "Copied" : "Copy invite link"}</button>
+          {link && <a className="btn btn-ghost !py-1.5 !px-3 text-sm" href={treeQrUrl(link)} target="_blank" rel="noreferrer" title="A QR code that grows as a tree; friends scan it to join">🌳 Share as a tree</a>}
         </div>
         <p className="text-sm mt-1">{trip.answers.map((a) => a.name).join(" · ") || <span className="muted">waiting for the first swipe…</span>}</p>
         <Link href={`/t/${trip.code}`} className="btn btn-primary inline-block mt-3">Add my answers</Link>
