@@ -11,7 +11,7 @@ const WM = ["wm-hand", "wm-serif", "wm-black", "wm-round", "wm-pixel", "wm-geo"]
 
 // Placeholder media until Locadit's own footage lands. One card, centred.
 const CARDS = [
-  { x: 800, video: "/video/intro.mp4", qr: "https://amo.co/qrcode-location.png", name: "Locadit", tag: "Group trips without the argument", href: "/start" },
+  { x: 800, video: "/video/intro.mp4", name: "Locadit", tag: "Group trips without the argument", href: "/start" },
 ];
 
 // Stagger index of each piece within its layer (drives pop-in delay).
@@ -89,7 +89,6 @@ export default function Landing() {
               {/* The clipped, rounded element must carry no transform of its own, or Chrome paints the video black. */}
               <div className="phone">
                 <video ref={(el) => { videos.current[i] = el; }} src={c.video} muted loop playsInline preload="auto" />
-                <img className="qr" src={c.qr} alt="" />
               </div>
             </Link>
           ))}

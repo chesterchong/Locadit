@@ -106,7 +106,6 @@ input[type=range]{accent-color:#111}
 .phone-wrap.on.hot{width:218px;height:470px;margin:-241px 0 0 -109px}
 .phone{position:relative;width:100%;height:100%;border-radius:30px;overflow:hidden;background:#000;box-shadow:0 30px 70px rgba(0,0,0,.28)}
 .phone video{width:100%;height:100%;object-fit:cover;display:block}
-.phone .qr{position:absolute;right:16px;bottom:16px;width:68px;height:68px;border-radius:10px;background:#fff;padding:4px;box-sizing:border-box}
 .info{position:absolute;top:709px;width:300px;height:84px;box-sizing:border-box;padding:0 12px 0 20px;display:flex;align-items:center;gap:12px;background:#fff;border-radius:18px;box-shadow:0 14px 40px rgba(0,0,0,.12);color:#222;text-decoration:none;z-index:60;opacity:0;transform:translate(-50%,-50%) translateY(110px);transition:transform .8s cubic-bezier(.2,1.2,.3,1),opacity .4s,width .32s cubic-bezier(.2,1.4,.3,1),height .32s cubic-bezier(.2,1.4,.3,1)}
 .info.on{opacity:1;transform:translate(-50%,-50%)}
 .info.on.hot{width:320px;height:90px}

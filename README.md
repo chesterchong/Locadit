@@ -18,7 +18,7 @@ The home page opens with a staged intro: a faint dot grid, a handwritten wordmar
 - Timeline and stage: `src/app/page.tsx` (`STEPS` holds the beat timings in ms; the 1600×900 stage is scaled to cover the viewport without cropping the cards).
 - Collage slots: `src/lib/collage.ts`. Every piece is one entry with a centre position, size, rotation, the layer it appears with, and where it settles at the end. Swap a placeholder for real artwork by setting `kind: "img"` and `src: "/collage/your-file.png"`.
 - Styles: the block after `Landing: staged intro` in `src/app/globals.css`.
-- Placeholder media: the phone video and QR code are temporary stand-ins until Locadit's own footage lands. Replace the URLs in `CARDS` in `src/app/page.tsx`.
+- Placeholder media: the phone video is a temporary stand-in until Locadit's own footage lands. Replace the URLs in `CARDS` in `src/app/page.tsx`.
 
 ## Notes
 
