@@ -63,7 +63,7 @@ input[type=range]{accent-color:#111}
 .piece.img{object-fit:contain}
 .wm{position:absolute;left:800px;top:380px;width:1000px;height:300px;z-index:55;margin:0;color:#111;transform:translate(-50%,-50%);transition:top .9s cubic-bezier(.6,0,.2,1),transform .9s cubic-bezier(.6,0,.2,1)}
 /* 450px - half the hero height in stage px = the visible top edge, whatever the aspect ratio. */
-.wm.leave{top:calc(450px - 50svh / var(--s,1));transform:translate(-50%,-50%) scale(calc(.75 / var(--wm,1)))}
+.wm.leave{top:calc(450px - 50svh / var(--s,1) + 38px);transform:translate(-50%,-50%) scale(calc(.75 / var(--wm,1)))}
 .wm-svg{position:absolute;inset:0;overflow:visible}
 .wm-svg text{fill:#111;stroke:#111;stroke-width:2.5px;stroke-linejoin:round;stroke-linecap:round;paint-order:stroke fill}
 /* Draw: outlines trace in (dash offset) under a left-to-right wipe, then the fill settles in behind the pen. */
