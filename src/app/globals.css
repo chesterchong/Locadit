@@ -188,7 +188,7 @@ main{position:relative;z-index:1}
 .promo-card b{display:block;margin-bottom:.15rem}
 .promo-card p{color:var(--muted);font-size:13px;line-height:1.35;margin-bottom:.6rem}
 @keyframes wander{0%{translate:0 0}20%{translate:30% -22vh}45%{translate:70% 10vh}70%{translate:20% 28vh}100%{translate:85% -6vh}}
-.promo:has(.promo-card){animation-play-state:paused}
+.promo:has(.promo-card){animation-play-state:paused;z-index:5}
 @media (max-width:900px){.promos{display:none}}
 @media (prefers-reduced-motion:reduce){.promo{animation:none}}
 
@@ -209,7 +209,7 @@ main{position:relative;z-index:1}
 .promo-card p{color:var(--muted);font-size:13px;line-height:1.35;margin-bottom:.6rem}
 @keyframes fly{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 160px))}}
 @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -8px}}
-.promo:has(.promo-card){animation-play-state:paused}
+.promo:has(.promo-card){animation-play-state:paused;z-index:5}
 @media (prefers-reduced-motion:reduce){.promo{animation:none;left:auto;right:24px}.promo-pin{animation:none}}
 
 /* Washi paper frame around the whole site: warm handmade-paper tone with horizontal and vertical fibres (pure CSS) */
