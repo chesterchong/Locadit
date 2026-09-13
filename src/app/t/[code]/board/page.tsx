@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import LoadingView from "@/app/loading-view";
 import Soundtrack from "@/app/soundtrack";
+import DayScene from "@/components/day-scene";
 import { useParams } from "next/navigation";
 import ShareQr from "@/components/share-qr";
 type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; live?: boolean; links?: { label: string; href: string }[] };
@@ -14,6 +15,7 @@ export default function Board() {
   const [d, setD] = useState<Data | null>(null);
   const [title, setTitle] = useState(""); const [amount, setAmount] = useState(""); const [paidBy, setPaidBy] = useState("");
   const [copied, setCopied] = useState(false);
+  const [openDay, setOpenDay] = useState<number | null>(null);
   const [me, setMe] = useState<string | null>(null);
   useEffect(() => { try { setMe(localStorage.getItem("locadit:name")); } catch {} }, []);
   const [radar, setRadar] = useState<Radar | null>(null);
@@ -93,8 +95,9 @@ export default function Board() {
           )}
           <section className="space-y-3">
             <p className="text-xs uppercase tracking-widest muted">Itinerary · {result.pace === "chill" ? "slow pace" : result.pace === "packed" ? "packed days" : "balanced pace"}</p>
+            <DayScene destination={trip.destination} theme={result.itinerary.find((d) => d.day === openDay)?.theme ?? null} open={openDay !== null} onClose={() => setOpenDay(null)} />
             {result.itinerary.map((day) => (
-              <div key={day.day} className="glass p-5 pop">
+              <div key={day.day} role="button" tabIndex={0} aria-expanded={openDay === day.day} onClick={() => setOpenDay(openDay === day.day ? null : day.day)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpenDay(openDay === day.day ? null : day.day); } }} className={`glass p-5 pop day-card ${openDay === day.day ? "is-open" : ""}`}>
                 <div className="flex items-baseline justify-between gap-3"><p className="font-semibold text-lg"><span className="mono muted mr-2">D{day.day}</span>{day.headline ?? day.theme}</p><p className="mono text-sm muted shrink-0">~${day.budget}/pp</p></div>
                 {day.headline && <p className="text-xs uppercase tracking-widest mt-1 muted">{day.theme}</p>}
                 <p className="text-sm muted mt-1">Why: {day.why}</p>
