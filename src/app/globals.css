@@ -98,3 +98,9 @@ input[type=range]{accent-color:#111}
 .about h2{font-family:var(--font-playfair),"Iowan Old Style",Georgia,serif;font-weight:400;font-size:clamp(34px,5vw,54px);line-height:1.08;letter-spacing:-0.02em}
 .phone-wrap:focus{outline:none}
 .phone-wrap:focus-visible{outline:2px solid #111;outline-offset:4px;border-radius:34px}
+
+/* White page frame that pulses with the soundtrack (--beat is 0..1, set per frame by the Soundtrack component). */
+.beat-frame{position:fixed;inset:0;z-index:1000;pointer-events:none;--beat:0;
+  box-shadow:inset 0 0 0 calc(10px + 16px * var(--beat)) #fff,inset 0 0 calc(70px * var(--beat)) calc(6px * var(--beat)) rgba(255,255,255,var(--beat));
+  transition:box-shadow .05s linear}
+@media (prefers-reduced-motion:reduce){.beat-frame{box-shadow:inset 0 0 0 10px #fff}}

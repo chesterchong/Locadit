@@ -54,10 +54,18 @@ export default function Landing() {
     requestAnimationFrame(() => heroRef.current?.querySelector<HTMLElement>(".phone-wrap")?.focus({ preventScroll: true }));
   }, []);
 
+  // After the wordmark parks at the top it keeps cycling through the drawn styles.
+  const [loop, setLoop] = useState(0);
+  useEffect(() => {
+    if (step < 7 || reduced.current) return;
+    const id = window.setInterval(() => setLoop((l) => l + 1), 1800);
+    return () => window.clearInterval(id);
+  }, [step]);
+
   const leaving = step >= 7;
-  const font = leaving ? "wm-hand" : WM[Math.min(Math.max(step - 1, 0), 5)];
-  const changeStep = Math.min(step, 7); // the wordmark stops changing after it leaves
-  const prevFont = step >= 2 && step <= 7 ? (step <= 6 ? WM[step - 2] : WM[5]) : null;
+  const font = leaving ? WM[loop % WM.length] : WM[Math.min(Math.max(step - 1, 0), 5)];
+  const prevFont = leaving ? WM[(loop + WM.length - 1) % WM.length] : step >= 2 ? WM[step - 2] : null;
+  const changeStep = leaving ? `L${loop}` : String(step);
   const stop = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
