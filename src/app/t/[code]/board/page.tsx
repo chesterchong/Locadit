@@ -53,14 +53,11 @@ export default function Board() {
       <header>
         <p className="text-xs uppercase tracking-widest muted">{trip.destination}</p>
         <h1 className="text-4xl font-extrabold tracking-tight">{trip.name}</h1>
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-          <button className="btn btn-ghost !py-1.5 !px-3 text-sm" onClick={() => { navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); }); }}>{copied ? "Copied" : "Copy invite link"}</button>
-        </div>
         <div className="people mt-4">
           <div className="flex items-center gap-3">
             <div className="avatars">
               {trip.answers.map((a) => <span key={a.name} className="avatar" style={{ background: tone(a.name) }} title={a.name}>{initials(a.name)}</span>)}
-              <button type="button" className="avatar add" title="Copy invite link" onClick={() => { navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); }); }}>+</button>
+              <button type="button" className="avatar add" title={copied ? "Copied" : "Copy invite link"} onClick={() => { navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); }); }}>{copied ? "✓" : "+"}</button>
             </div>
             <p className="text-sm muted">{trip.answers.length === 0 ? "Nobody has answered yet" : trip.answers.length === 1 ? `${trip.answers[0].name} has answered` : `${trip.answers.length} travellers have answered`}</p>
           </div>
