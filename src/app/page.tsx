@@ -9,7 +9,7 @@ const STEPS = [0, 500, 1500, 2200, 2900, 3600, 4300, 5400, 6000, 6600];
 const END = STEPS.length - 1;
 const WM = ["wm-hand", "wm-serif", "wm-black", "wm-round", "wm-pixel", "wm-geo"];
 
-// Placeholder media borrowed from amo.co until Locadit's own footage lands. One card, centred.
+// Placeholder media until Locadit's own footage lands. One card, centred.
 const CARDS = [
   { x: 800, icon: "https://static.amo.co/shared/images/app-icons/location/20250123-167x167.png", video: "https://static.amo.co/website/videos/location/20250915.mp4#t=9", qr: "https://amo.co/qrcode-location.png", name: "Locadit", tag: "Group trips without the argument", href: "/start" },
 ];
