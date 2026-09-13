@@ -21,14 +21,14 @@ export default function Board() {
       <header>
         <p className="text-xs uppercase tracking-widest muted">{trip.destination}</p>
         <h1 className="text-4xl font-extrabold tracking-tight">{trip.name}</h1>
-        <p className="muted mt-1 text-sm">Share <span className="mono text-white/80">{link}</span></p>
+        <p className="muted mt-1 text-sm">Share <span className="mono text-black/80">{link}</span></p>
         <p className="text-sm mt-1">{trip.answers.map((a) => a.name).join(" · ") || <span className="muted">waiting for the first swipe…</span>}</p>
       </header>
       {!result ? <div className="glass p-8 muted text-center">Results appear here live as people finish swiping.</div> : (
         <>
           <section className="grid grid-cols-2 gap-3">
             <div className="glass p-5 pop"><p className="text-xs uppercase tracking-widest muted">Budget ceiling</p><p className="mono text-4xl font-semibold mt-1">${result.budget.toLocaleString()}</p><p className="text-xs muted mt-1">lowest comfortable max · per person</p></div>
-            <div className="glass glass-hi p-5 pop"><p className="text-xs uppercase tracking-widest muted">Best dates</p><p className="mono text-3xl font-semibold mt-1">{result.bestDate.d}</p><p className="text-xs muted mt-1"><span className="text-green-400">▲ {result.bestDate.n}/{result.members.length}</span> can make it</p></div>
+            <div className="glass glass-hi p-5 pop"><p className="text-xs uppercase tracking-widest muted">Best dates</p><p className="mono text-3xl font-semibold mt-1">{result.bestDate.d}</p><p className="text-xs muted mt-1"><span className="text-green-600">▲ {result.bestDate.n}/{result.members.length}</span> can make it</p></div>
           </section>
           <section className="glass p-5 space-y-3 pop">
             <p className="text-xs uppercase tracking-widest muted">What the group wants</p>
@@ -56,7 +56,7 @@ export default function Board() {
             </div>
             {trip.expenses.map((e) => <p key={e.id} className="text-sm flex justify-between"><span>{e.title} <span className="muted">· {e.paidBy}</span></span><span className="mono">${e.amount}</span></p>)}
             <div className="grid grid-cols-2 gap-2 pt-2">
-              {Object.entries(balances).map(([n, b]) => <div key={n} className="chip flex justify-between text-sm"><span>{n}</span><span className={`mono ${b >= 0 ? "text-green-400" : "text-rose-400"}`}>{b >= 0 ? "▲" : "▼"} ${Math.abs(b).toFixed(0)}</span></div>)}
+              {Object.entries(balances).map(([n, b]) => <div key={n} className="chip flex justify-between text-sm"><span>{n}</span><span className={`mono ${b >= 0 ? "text-green-600" : "text-rose-500"}`}>{b >= 0 ? "▲" : "▼"} ${Math.abs(b).toFixed(0)}</span></div>)}
             </div>
           </section>
         </>

@@ -69,21 +69,21 @@ export default function Quiz() {
             {ACTIVITIES[i + 1] && <div className="glass absolute inset-0 scale-[.95] translate-y-3 opacity-60" />}
             <div onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
               className="glass absolute inset-0 cursor-grab active:cursor-grabbing overflow-hidden touch-none"
-              style={{ transform: `translateX(${x}px) rotate(${rot}deg)`, transition: drag ? "none" : "transform .26s ease-out", background: `radial-gradient(80% 60% at 50% 0%, ${HUE[act]}33, rgba(255,255,255,0.03) 70%)` }}>
-              <div className="absolute left-5 top-5 rounded-lg border-2 border-green-400 px-3 py-1 text-lg font-extrabold text-green-400 -rotate-12" style={{ opacity: love }}>LOVE</div>
-              <div className="absolute right-5 top-5 rounded-lg border-2 border-rose-400 px-3 py-1 text-lg font-extrabold text-rose-400 rotate-12" style={{ opacity: pass }}>PASS</div>
+              style={{ transform: `translateX(${x}px) rotate(${rot}deg)`, transition: drag ? "none" : "transform .26s ease-out", background: `radial-gradient(80% 60% at 50% 0%, ${HUE[act]}33, #fff 70%)` }}>
+              <div className="absolute left-5 top-5 rounded-lg border-2 border-green-600 px-3 py-1 text-lg font-extrabold text-green-600 -rotate-12" style={{ opacity: love }}>LOVE</div>
+              <div className="absolute right-5 top-5 rounded-lg border-2 border-rose-500 px-3 py-1 text-lg font-extrabold text-rose-500 rotate-12" style={{ opacity: pass }}>PASS</div>
               <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
-                <div className="text-7xl drop-shadow-[0_10px_30px_rgba(0,0,0,.5)]">{EMOJI[act]}</div>
+                <div className="text-7xl drop-shadow-[0_10px_30px_rgba(0,0,0,.2)]">{EMOJI[act]}</div>
                 <h2 className="text-3xl font-extrabold tracking-tight">{act}</h2>
                 <p className="muted text-sm">in {trip.destination}</p>
               </div>
-              <div className="absolute inset-x-0 bottom-0 flex justify-between px-6 py-4 text-xs mono muted border-t border-white/10">
+              <div className="absolute inset-x-0 bottom-0 flex justify-between px-6 py-4 text-xs mono muted border-t border-black/10">
                 <span>BUDGET ${budget}</span><span>{dates.length} DATE{dates.length > 1 ? "S" : ""}</span>
               </div>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
-            <button onClick={() => vote(0)} className="btn btn-ghost text-rose-300">✕ Pass</button>
+            <button onClick={() => vote(0)} className="btn btn-ghost text-rose-500">✕ Pass</button>
             <button onClick={() => vote(1)} className="btn btn-ghost">~ Maybe</button>
             <button onClick={() => vote(3)} className="btn btn-primary">♥ Love</button>
           </div>
