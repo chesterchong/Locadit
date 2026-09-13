@@ -7,8 +7,11 @@ export default function Board() {
   const { code } = useParams<{ code: string }>();
   const [d, setD] = useState<Data | null>(null);
   const [title, setTitle] = useState(""); const [amount, setAmount] = useState(""); const [paidBy, setPaidBy] = useState("");
-  const load = () => fetch(`/api/trips/${code}`).then((r) => r.json()).then(setD);
-  useEffect(() => { load(); const t = setInterval(load, 2500); return () => clearInterval(t); }, [code]); // eslint-disable-line
+  const [copied, setCopied] = useState(false);
+  const [missing, setMissing] = useState(false);
+  const load = () => fetch(`/api/trips/${code}`).then((r) => { if (r.status === 404) { setMissing(true); return null; } return r.json(); }).then((j) => { if (j) setD(j); }).catch(() => {});
+  useEffect(() => { load(); const t = setInterval(() => { if (!missing) load(); }, 2500); return () => clearInterval(t); }, [code, missing]); // eslint-disable-line
+  if (missing) return <NotFound code={code} />;
   if (!d || !d.trip) return <main className="p-6 muted">Loading…</main>;
   const { trip, result, balances } = d;
   const link = typeof window !== "undefined" ? `${window.location.origin}/t/${trip.code}` : "";
@@ -18,11 +21,15 @@ export default function Board() {
   }
   return (
     <main className="mx-auto max-w-2xl px-6 py-10 space-y-6">
+      <Link href="/" className="home-link">Locadit</Link>
       <div className="pill"><span className="dot" />Room is live · <span className="mono">{trip.code}</span> · {trip.answers.length} joined · {trip.expenses.length} expenses</div>
       <header>
         <p className="text-xs uppercase tracking-widest muted">{trip.destination}</p>
         <h1 className="text-4xl font-extrabold tracking-tight">{trip.name}</h1>
-        <p className="muted mt-1 text-sm">Share <span className="mono text-black/80">{link}</span></p>
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+          <span className="mono text-black/70 truncate max-w-full">{link}</span>
+          <button className="btn btn-ghost !py-1.5 !px-3 text-sm" onClick={() => { navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); }); }}>{copied ? "Copied" : "Copy invite link"}</button>
+        </div>
         <p className="text-sm mt-1">{trip.answers.map((a) => a.name).join(" · ") || <span className="muted">waiting for the first swipe…</span>}</p>
         <Link href={`/t/${trip.code}`} className="btn btn-primary inline-block mt-3">Add my answers</Link>
       </header>
@@ -30,7 +37,8 @@ export default function Board() {
         <>
           <section className="grid grid-cols-2 gap-3">
             <div className="glass p-5 pop"><p className="text-xs uppercase tracking-widest muted">Budget ceiling</p><p className="mono text-4xl font-semibold mt-1">${result.budget.toLocaleString()}</p><p className="text-xs muted mt-1">lowest comfortable max · per person</p></div>
-            <div className="glass glass-hi p-5 pop"><p className="text-xs uppercase tracking-widest muted">Best dates</p><p className="mono text-3xl font-semibold mt-1">{result.bestDate.d}</p><p className="text-xs muted mt-1"><span className="text-green-600">▲ {result.bestDate.n}/{result.members.length}</span> can make it</p></div>
+            <div className="glass glass-hi p-5 pop"><p className="text-xs uppercase tracking-widest muted">Best dates</p><p className="mono text-3xl font-semibold mt-1">{result.bestDate.d}</p><p className="text-xs muted mt-1"><span className="text-green-600">▲ {result.bestDate.n}/{result.members.length}</span> can make it</p>
+              <div className="mt-3 space-y-1">{result.dateVotes.filter((d) => d.d !== result.bestDate.d).map((d) => <p key={d.d} className="flex justify-between text-xs muted"><span className="mono">{d.d}</span><span>{d.n}/{result.members.length}</span></p>)}</div></div>
           </section>
           <section className="glass p-5 space-y-3 pop">
             <p className="text-xs uppercase tracking-widest muted">What the group wants</p>
@@ -71,6 +79,23 @@ export default function Board() {
           </section>
         </>
       )}
+    </main>
+  );
+}
+
+function NotFound({ code }: { code: string }) {
+  return (
+    <main className="mx-auto max-w-md px-6 py-16 space-y-6">
+      <Link href="/" className="home-link">Locadit</Link>
+      <div className="glass p-6 space-y-3 pop">
+        <p className="text-xs uppercase tracking-widest muted">Room not found</p>
+        <h1 className="text-2xl font-extrabold tracking-tight">No room with code <span className="mono">{code}</span></h1>
+        <p className="muted text-sm">Check the code with whoever shared it. Rooms in this prototype live in memory and can expire after a while of inactivity.</p>
+        <div className="flex gap-2 pt-1">
+          <Link href="/start" className="btn btn-primary">Start a new room</Link>
+          <Link href="/start" className="btn btn-ghost">Enter another code</Link>
+        </div>
+      </div>
     </main>
   );
 }

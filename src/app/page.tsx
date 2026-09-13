@@ -45,7 +45,10 @@ export default function Landing() {
 
   // Chrome pauses muted video that starts off-screen, so start playback when the phone rises.
   useEffect(() => {
-    if (step >= 8 && !reduced.current) videos.current.forEach((v) => v && v.play().catch(() => {}));
+    const play = () => { if (step >= 8 && !reduced.current && !document.hidden) videos.current.forEach((v) => v && v.play().catch(() => {})); };
+    play();
+    document.addEventListener("visibilitychange", play);
+    return () => document.removeEventListener("visibilitychange", play);
   }, [step]);
 
   const skip = useCallback(() => {

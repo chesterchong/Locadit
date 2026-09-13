@@ -37,9 +37,10 @@ export default function Quiz() {
   const [fly, setFly] = useState<null | number>(null);
   const start = useRef(0);
 
+  const [missing, setMissing] = useState(false);
   useEffect(() => {
     setHost(new URLSearchParams(window.location.search).get("host") === "1");
-    fetch(`/api/trips/${code}`).then((r) => r.json()).then((d) => setTrip(d.trip));
+    fetch(`/api/trips/${code}`).then((r) => (r.status === 404 ? null : r.json())).then((d) => (d ? setTrip(d.trip) : setMissing(true))).catch(() => setMissing(true));
   }, [code]);
 
   // Locadit asks the next question whenever the conversation advances.
@@ -72,6 +73,7 @@ export default function Quiz() {
     r.push(`/t/${code}/board`);
   }
   function vote(v: number) {
+    if (fly !== null) return; // ignore taps while a card is still flying off
     setFly(v === 0 ? -1 : v === 3 ? 1 : 0);
     setTimeout(() => {
       const next = { ...interests, [ACTIVITIES[i]]: v };
@@ -83,6 +85,17 @@ export default function Quiz() {
   const onMove = (e: React.PointerEvent) => { if (drag) setDx(e.clientX - start.current); };
   const onUp = () => { setDrag(false); if (dx > 110) vote(3); else if (dx < -110) vote(0); else setDx(0); };
 
+  if (missing) return (
+    <main className="mx-auto max-w-md px-6 py-16 space-y-6">
+      <Link href="/" className="home-link">Locadit</Link>
+      <div className="glass p-6 space-y-3 pop">
+        <p className="text-xs uppercase tracking-widest muted">Room not found</p>
+        <h1 className="text-2xl font-extrabold tracking-tight">No room with code <span className="mono">{code}</span></h1>
+        <p className="muted text-sm">Check the code with whoever shared it. Rooms in this prototype live in memory and can expire after a while of inactivity.</p>
+        <div className="flex gap-2 pt-1"><Link href="/start" className="btn btn-primary">Start a new room</Link><Link href="/start" className="btn btn-ghost">Enter another code</Link></div>
+      </div>
+    </main>
+  );
   if (!trip) return <main className="p-6 muted">Loading…</main>;
   const current = FLOW[q];
   const act = ACTIVITIES[i];
@@ -92,6 +105,7 @@ export default function Quiz() {
 
   return (
     <main className="mx-auto max-w-md px-6 py-10 space-y-6">
+      <Link href="/" className="home-link">Locadit</Link>
       {host && (
         <div className="pill w-full justify-between">
           <span><span className="dot" /> You started this room · code <b className="mono">{trip.code}</b></span>

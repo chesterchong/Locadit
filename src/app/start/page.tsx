@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 export default function Home() {
   const r = useRouter();
@@ -14,6 +15,7 @@ export default function Home() {
   }
   return (
     <main className="mx-auto max-w-md px-6 py-14 space-y-8">
+      <Link href="/" className="home-link">Locadit</Link>
       <div className="pill"><span className="dot" />Rooms are live · no sign‑up · 2 min per person</div>
       <div>
         <h1 className="text-5xl font-extrabold tracking-tight">Locadit</h1>

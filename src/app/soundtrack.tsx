@@ -41,7 +41,7 @@ export default function Soundtrack() {
       const energy = sum / (8 * 255);
       peak = Math.max(peak * 0.995, energy);
       const n = energy / Math.max(0.05, peak);          // 0..1 relative to recent loudest bass
-      const target = Math.max(0, (n - 0.55) / 0.45);    // only the top of each hit registers
+      const target = Math.max(0, (n - 0.78) / 0.22);    // only the top of each hit registers
       level = target > level ? target : level * 0.85;
       setBeat(level * Math.min(1, gain.gain.value / MAX_VOLUME));
       raf = requestAnimationFrame(tick);
