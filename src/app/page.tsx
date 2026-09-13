@@ -57,6 +57,11 @@ export default function Landing() {
     setStep(END);
     requestAnimationFrame(() => heroRef.current?.querySelector<HTMLElement>(".phone-link")?.focus({ preventScroll: true }));
   }, []);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") skip(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [skip]);
 
   // After the wordmark parks at the top it keeps cycling through the drawn styles.
   const [loop, setLoop] = useState(0);
@@ -111,7 +116,18 @@ export default function Landing() {
             </Link>
           ))}
         </div>
-        {step < END && <button type="button" className="skip" onClick={skip}>Skip intro</button>}
+        {/* Skip hint: a cursor tapping the label. Pops in after the first beat, fades once the intro has finished. */}
+        <button type="button" className={`skip ${step >= END ? "off" : step >= 1 ? "on" : ""}`} onClick={skip} disabled={step >= END} aria-hidden={step >= END} tabIndex={step >= END ? -1 : 0}>
+          <span className="skip-in">
+            <svg className="skip-cursor" viewBox="0 0 32 32" width="30" height="30" aria-hidden>
+              <g className="skip-burst" fill="none" stroke="#111" strokeWidth="2" strokeLinecap="round">
+                <path d="M6.5 4.5 3.5 1.5" /><path d="M11 3.2V-0.5" /><path d="M5.2 9H1.5" />
+              </g>
+              <path className="skip-arrow" d="M11 9v18l4.8-4.4 3.6 7.4 3-1.4-3.5-7.3h6.3z" />
+            </svg>
+            <span className="skip-label">Click here to skip</span>
+          </span>
+        </button>
         <div className={`exit-wipe ${exiting ? "on" : ""}`} aria-hidden />
       </section>
 

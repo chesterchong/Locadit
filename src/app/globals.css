@@ -115,9 +115,21 @@ input[type=range]{accent-color:#111}
 .info small{display:block;font-size:12px;line-height:1.15;opacity:.6;margin-top:2px}
 .info-text{flex:1;min-width:0}
 .info-cta{flex:none;background:#111;color:#fff;border-radius:999px;padding:9px 14px;font-size:13px;font-weight:600;white-space:nowrap}
-/* Skip hotspot: an invisible clickable area in the bottom-right corner of the intro (keyboard users get a visible ring). */
-.skip{position:absolute;right:0;bottom:0;z-index:80;width:min(24vw,240px);height:min(22vh,200px);border:0;padding:0;margin:0;background:transparent;color:transparent;font:inherit;font-size:0;cursor:default;-webkit-tap-highlight-color:transparent}
-.skip:focus-visible{outline:2px solid #111;outline-offset:-14px;border-radius:12px;color:#111;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+/* Skip hint: a mouse cursor tapping "Click here to skip" in the bottom-right corner, clear of the washi frame. Pops in like a collage piece; fades when the intro ends. */
+.skip{position:absolute;right:max(40px,calc(env(safe-area-inset-right) + 26px));bottom:max(38px,calc(env(safe-area-inset-bottom) + 24px));z-index:80;border:0;margin:0;padding:8px 12px;background:transparent;color:#111;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;opacity:0;transform:rotate(-5deg) scale(.3);transition:transform .8s cubic-bezier(.2,1.5,.35,1),opacity .3s}
+.skip.on{opacity:1;transform:rotate(-5deg) scale(1)}
+.skip.off{opacity:0;transform:rotate(-5deg) scale(.6);pointer-events:none;transition:transform .35s ease,opacity .25s}
+.skip-in{display:inline-flex;align-items:center;gap:10px;transition:scale .32s cubic-bezier(.2,1.4,.3,1)}
+.skip:hover .skip-in{scale:1.08}
+.skip:active .skip-in{scale:.96}
+.skip:focus-visible{outline:2px solid #111;outline-offset:4px;border-radius:14px}
+.skip-label{font-family:var(--font-marker),"Comic Sans MS",cursive;font-size:26px;line-height:1;white-space:nowrap}
+.skip-cursor{flex:none;overflow:visible;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
+.skip-arrow{fill:#111;stroke:#fff;stroke-width:1.6;stroke-linejoin:round;paint-order:stroke fill;animation:skip-tap 2.6s ease-in-out infinite}
+.skip-burst{opacity:0;transform-origin:11px 9px;animation:skip-burst 2.6s ease-out infinite}
+@keyframes skip-tap{0%,14%,100%{translate:0 0}7%{translate:2px 2px}}
+@keyframes skip-burst{0%,7%{opacity:0;scale:.5}12%{opacity:1;scale:1}40%,100%{opacity:0;scale:1.2}}
+@media (max-width:640px){.skip{right:max(28px,calc(env(safe-area-inset-right) + 14px));bottom:max(28px,calc(env(safe-area-inset-bottom) + 14px))}.skip-label{font-size:21px}.skip-cursor{width:24px;height:24px}}
 /* Not-yet-revealed controls must not take taps or focus during the intro. */
 .phone-wrap:not(.on),.info:not(.on){visibility:hidden}
 @media (prefers-reduced-motion:reduce){.hero *,.hero *::before,.hero *::after{transition:none!important;animation:none!important}}
