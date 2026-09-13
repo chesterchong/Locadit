@@ -25,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${inter.variable} ${mono.variable} ${caveat.variable} ${playfair.variable} ${fredoka.variable} ${pixel.variable} ${righteous.variable} ${marker.variable} ${caption.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}<Soundtrack /></body>
+      <body className="min-h-full flex flex-col">{children}<Soundtrack /><div className="page-frame" aria-hidden /></body>
     </html>
   );
 }

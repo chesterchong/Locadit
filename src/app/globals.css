@@ -111,7 +111,7 @@ input[type=range]{accent-color:#111}
 @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
 
 /* Small home link on app pages */
-.home-link{position:fixed;left:20px;top:16px;z-index:50;font-family:var(--font-caveat),cursive;font-size:28px;font-weight:700;color:#111;text-decoration:none;opacity:.85}
+.home-link{position:fixed;left:28px;top:22px;z-index:50;font-family:var(--font-caveat),cursive;font-size:28px;font-weight:700;color:#111;text-decoration:none;opacity:.85}
 .home-link:hover{opacity:1}
 .chat-list{scrollbar-width:none}
 .chat-list::-webkit-scrollbar{display:none}
@@ -149,3 +149,6 @@ input[type=range]{accent-color:#111}
 @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -8px}}
 .promo:has(.promo-card){animation-play-state:paused}
 @media (prefers-reduced-motion:reduce){.promo{animation:none;left:auto;right:24px}.promo-pin{animation:none}}
+
+/* Static white frame around the whole site */
+.page-frame{position:fixed;inset:0;z-index:1000;pointer-events:none;border:14px solid #fff;border-radius:28px;box-shadow:0 0 0 80px #fff}
