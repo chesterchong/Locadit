@@ -260,3 +260,9 @@ input[type=range]{accent-color:#111}
 .share-qr-room{display:block;text-align:center;font-size:12px;font-weight:700}
 @media (max-width:640px){.share-qr{right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom))}}
 
+
+/* Destination picker */
+.dest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+.dest-grid .dest{display:flex;align-items:center;gap:.5rem;font-size:14px;font-weight:600}
+.dest-grid .dest:nth-child(4),.dest-grid .dest:nth-child(5){grid-column:span 1}
+@media (max-width:420px){.dest-grid{grid-template-columns:repeat(2,1fr)}}

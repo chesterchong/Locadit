@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 export default function Home() {
   const r = useRouter();
-  const [name, setName] = useState("Bali with the crew");
-  const [dest, setDest] = useState("Bali");
+  const [name, setName] = useState("Trip with the crew");
+  const [dest, setDest] = useState("Japan");
+  const DESTS = [["Japan", "🇯🇵"], ["Korea", "🇰🇷"], ["Malaysia", "🇲🇾"], ["Indonesia", "🇮🇩"], ["Singapore", "🇸🇬"]];
   const [dates, setDates] = useState("Oct 10–14, Oct 17–21, Nov 7–11");
   const [code, setCode] = useState("");
   async function create() {
@@ -24,7 +25,9 @@ export default function Home() {
       <section className="glass p-5 space-y-3 pop">
         <p className="text-xs uppercase tracking-widest muted">Start a trip</p>
         <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Trip name" />
-        <input className="input" value={dest} onChange={(e) => setDest(e.target.value)} placeholder="Destination" />
+        <div className="dest-grid" role="radiogroup" aria-label="Destination">
+          {DESTS.map(([d, flag]) => <button key={d} type="button" role="radio" aria-checked={dest === d} className={`chip dest ${dest === d ? "on" : ""}`} onClick={() => setDest(d)}><span aria-hidden>{flag}</span>{d}</button>)}
+        </div>
         <input className="input" value={dates} onChange={(e) => setDates(e.target.value)} placeholder="Date options, comma separated" />
         <button onClick={create} className="btn btn-primary w-full">Create room</button>
       </section>
