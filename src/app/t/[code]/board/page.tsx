@@ -42,7 +42,7 @@ export default function Board() {
         <div className="people mt-4">
           <div className="flex items-center gap-3">
             <div className="avatars">
-              {trip.answers.map((a) => <span key={a.name} className="avatar" style={{ background: tone(a.name) }} title={a.name}>{initials(a.name)}</span>)}
+              {trip.answers.map((a) => <span key={a.name} className="avatar" style={{ background: tone(a.name) }} data-name={a.name}>{initials(a.name)}</span>)}
               <button type="button" className="avatar add" title={copied ? "Copied" : "Copy invite link"} onClick={() => { navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); }); }}>{copied ? "✓" : "+"}</button>
             </div>
             <p className="text-sm muted">{trip.answers.length === 0 ? "No answers yet" : `${trip.answers.length} answered`}</p>

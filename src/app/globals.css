@@ -300,3 +300,7 @@ input[type=range]{accent-color:#111}
 .win-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem;justify-content:center}
 .win-chip{display:inline-flex;align-items:center;gap:.45rem;border-radius:999px;background:#111;color:#fff;padding:.3rem .5rem .3rem .8rem;font-size:13px;font-weight:600}
 .win-chip button{background:rgba(255,255,255,.18);border:0;color:#fff;cursor:pointer;width:20px;height:20px;border-radius:999px;line-height:1}
+/* Instant name tooltip on avatars */
+.avatar[data-name]{position:relative}
+.avatar[data-name]::after{content:attr(data-name);position:absolute;left:50%;bottom:calc(100% + 8px);translate:-50% 4px;background:#111;color:#fff;font-size:12px;font-weight:600;letter-spacing:0;padding:.3rem .6rem;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s,translate .15s}
+.avatar[data-name]:hover::after,.avatar[data-name]:focus-visible::after{opacity:1;translate:-50% 0}
