@@ -70,14 +70,15 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
     try {
       const j = await json(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code&timezone=auto&forecast_days=7`, 1800, deadline);
       const d = j.daily;
-      const hi = Math.round(Math.max(...d.temperature_2m_max));
-      const lo = Math.round(Math.min(...d.temperature_2m_min));
+      const avg = (a: number[]) => Math.round(a.reduce((x, y) => x + y, 0) / a.length);
+      const hi = avg(d.temperature_2m_max); // typical daytime high
+      const lo = avg(d.temperature_2m_min); // typical night low
       const rain = Math.round(d.precipitation_sum.reduce((a: number, b: number) => a + (b ?? 0), 0));
       const chance = Math.round(Math.max(...d.precipitation_probability_max));
       const severe = d.weather_code.some((code: number) => code >= 95);
       const level: Level = severe || hi >= 36 || rain >= 70 ? "caution" : hi >= 33 || rain >= 25 || chance >= 75 ? "heads-up" : "calm";
       const advice = severe ? "Keep plans flexible during storms." : hi >= 33 ? "Plan outdoor time before noon." : rain >= 25 ? "Keep one indoor backup." : undefined;
-      signals.push({ id: "weather", title: "Next 7 days", level, message: `${lo}–${hi}°C · ${chance}% rain · ${rain} mm`, advice, source: "Open-Meteo", asOf: d.time[0], live: true });
+      signals.push({ id: "weather", title: "Next 7 days", level, message: `Day ${hi}°C · Night ${lo}°C · ${chance}% rain · ${rain} mm`, advice, source: "Open-Meteo", asOf: d.time[0], live: true });
     } catch { /* shown as partial */ }
   })());
 

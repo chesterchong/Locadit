@@ -73,10 +73,10 @@ export default function Board() {
           <div className="radar-grid">
             {radar.signals.map((s) => (
               <article key={s.id} className={`signal ${s.level}`}>
-                <div className="signal-head"><b>{s.title}{s.live && <span className="live-dot" title="Live source" />}</b><span className="lvl">{LEVEL[s.level]}</span></div>
+                <div className="signal-head"><b title={`Source: ${s.source}${s.asOf ? ` · ${s.asOf}` : ""}`} className="cursor-help">{s.title}{s.live && <span className="live-dot" title="Live source" />}</b><span className="lvl">{LEVEL[s.level]}</span></div>
                 <p className="signal-value">{s.message}</p>
                 {s.advice && <p className="signal-action">{s.advice}</p>}
-                <footer>{s.source}{s.asOf ? ` · ${s.asOf}` : ""}{s.links?.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noreferrer">{l.label} ↗</a>)}</footer>
+                {s.links && <footer>{s.links.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noreferrer">{l.label} ↗</a>)}</footer>}
               </article>
             ))}
           </div>
