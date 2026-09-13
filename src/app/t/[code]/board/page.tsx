@@ -103,7 +103,7 @@ export default function Board() {
           <section className="glass p-5 space-y-4 pop">
             <div className="flex items-baseline justify-between"><p className="text-xs uppercase tracking-widest muted">Split costs</p>{trip.expenses.length > 0 && <p className="text-xs muted">Total <span className="mono text-black/80">${trip.expenses.reduce((s, e) => s + e.amount, 0).toLocaleString()}</span> · {result.members.length} people</p>}</div>
             <form className="money-form" onSubmit={(e) => { e.preventDefault(); if (title.trim() && +amount > 0 && paidBy) addExpense(); }}>
-              <input className="input" placeholder="What was it? Villa deposit, flights…" value={title} onChange={(e) => setTitle(e.target.value)} />
+              <input className="input" placeholder="Villa deposit, flights…" value={title} onChange={(e) => setTitle(e.target.value)} />
               <label className="amount"><span>$</span><input className="input mono" inputMode="decimal" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))} /></label>
               <select className="input" value={paidBy} onChange={(e) => setPaidBy(e.target.value)}><option value="">Who paid?</option>{result.members.map((m) => <option key={m}>{m}</option>)}</select>
               <button type="submit" disabled={!title.trim() || !(+amount > 0) || !paidBy} className="btn btn-primary disabled:opacity-30">Add</button>

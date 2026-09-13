@@ -239,12 +239,13 @@ main{position:relative;z-index:1}
 @media (prefers-reduced-motion:reduce){.enter > *{animation:none}.exit-wipe{transition:none}}
 
 /* Split costs form */
-.money-form{display:grid;grid-template-columns:1fr 128px 150px auto;gap:.5rem;align-items:stretch}
+.money-form{display:grid;grid-template-columns:minmax(0,1fr) 110px 140px auto;gap:.5rem;align-items:stretch}
+.money-form .input::placeholder{text-overflow:ellipsis}
 .money-form .input{width:100%;min-width:0}
 .amount{position:relative;display:block}
 .amount>span{position:absolute;left:.9rem;top:50%;translate:0 -50%;color:var(--muted);font-family:var(--mono);pointer-events:none}
 .amount .input{padding-left:1.7rem}
-@media (max-width:640px){.money-form{grid-template-columns:1fr 1fr}.money-form .input:first-child{grid-column:1 / -1}}
+@media (max-width:640px){.money-form{grid-template-columns:1fr 1fr}.money-form .input:first-child{grid-column:1 / -1}.money-form button{grid-column:1 / -1}}
 
 /* Participants */
 .people{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
