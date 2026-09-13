@@ -26,6 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${inter.variable} ${mono.variable} ${caveat.variable} ${playfair.variable} ${fredoka.variable} ${pixel.variable} ${righteous.variable} ${marker.variable} ${caption.variable} h-full antialiased`}
     >
+      <head><link rel="preconnect" href="https://thumb.wikimedia.org" /><link rel="preconnect" href="https://upload.wikimedia.org" /></head>
       <body className="min-h-full flex flex-col"><div className="top-blur" aria-hidden /><Promos />{children}<div className="page-frame" aria-hidden /></body>
     </html>
   );

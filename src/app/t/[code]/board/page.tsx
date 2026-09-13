@@ -95,7 +95,7 @@ export default function Board() {
           )}
           <section className="space-y-3">
             <p className="text-xs uppercase tracking-widest muted">Itinerary · {result.pace === "chill" ? "slow pace" : result.pace === "packed" ? "packed days" : "balanced pace"}</p>
-            <DayScene destination={trip.destination} theme={result.itinerary.find((d) => d.day === openDay)?.theme ?? null} open={openDay !== null} />
+            <DayScene destination={trip.destination} themes={result.itinerary.map((d) => d.theme)} theme={result.itinerary.find((d) => d.day === openDay)?.theme ?? null} open={openDay !== null} />
             {result.itinerary.map((day) => (
               <div key={day.day} role="button" tabIndex={0} aria-expanded={openDay === day.day} onClick={() => setOpenDay(day.day)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpenDay(day.day); } }} className={`glass p-5 pop day-card ${openDay === day.day ? "is-open" : ""}`}>
                 <div className="flex items-baseline justify-between gap-3"><p className="font-semibold text-lg"><span className="mono muted mr-2">D{day.day}</span>{day.headline ?? day.theme}</p><p className="mono text-sm muted shrink-0">~${day.budget}/pp</p></div>

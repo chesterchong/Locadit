@@ -8,15 +8,28 @@ const NIGHT_TERMS: Record<string, string> = { "Food & markets": "night market", 
 // x is the offset from the inner edge (next to the itinerary column), in % of the panel width.
 const SLOTS = [{ x: 6, y: 14, r: -8, w: 160 }, { x: 26, y: 40, r: 6, w: 175 }, { x: 8, y: 64, r: -4, w: 150 }];
 
-export default function DayScene({ destination, theme, open }: { destination: string; theme: string | null; open: boolean }) {
+const cache = new Map<string, Promise<string[]>>();
+function fetchPhotos(destination: string, term: string) {
+  const key = `${destination}|${term}`;
+  if (!cache.has(key)) {
+    cache.set(key, fetch(`/api/photos?q=${encodeURIComponent(`${destination} ${term}`)}&w=520`).then((r) => r.json())
+      .then((j) => { const urls: string[] = (j.photos ?? []).map((p: { url: string }) => p.url).slice(0, 3); urls.forEach((u) => { const im = new Image(); im.src = u; }); return urls; })
+      .catch(() => { cache.delete(key); return []; }));
+  }
+  return cache.get(key)!;
+}
+
+export default function DayScene({ destination, theme, themes = [], open }: { destination: string; theme: string | null; themes?: string[]; open: boolean }) {
   const [day, setDay] = useState<string[]>([]);
   const [night, setNight] = useState<string[]>([]);
+  // Warm every day's photos as soon as the board is up, so the first click is instant.
+  useEffect(() => { themes.forEach((th) => { fetchPhotos(destination, DAY_TERMS[th] ?? th); fetchPhotos(destination, NIGHT_TERMS[th] ?? `${th} night`); }); }, [destination, themes.join("|")]); // eslint-disable-line
   useEffect(() => {
     if (!open || !theme) return;
-    const get = (q: string) => fetch(`/api/photos?q=${encodeURIComponent(`${destination} ${q}`)}`).then((r) => r.json()).then((j) => (j.photos ?? []).map((p: { url: string }) => p.url).slice(0, 3)).catch(() => []);
-    setDay([]); setNight([]);
-    get(DAY_TERMS[theme] ?? theme).then(setDay);
-    get(NIGHT_TERMS[theme] ?? `${theme} night`).then(setNight);
+    let live = true;
+    fetchPhotos(destination, DAY_TERMS[theme] ?? theme).then((u) => live && setDay(u));
+    fetchPhotos(destination, NIGHT_TERMS[theme] ?? `${theme} night`).then((u) => live && setNight(u));
+    return () => { live = false; };
   }, [open, theme, destination]);
   return (
     <div className={`scene ${open ? "on" : ""}`} aria-hidden>
