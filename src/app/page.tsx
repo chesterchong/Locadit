@@ -128,7 +128,6 @@ export default function Landing() {
             <span className="skip-label">Click here to skip</span>
           </span>
         </button>
-        <p className={`credit ${step >= 9 ? "on" : ""}`}>Made by Team Odyssey for Codenection 2026 <span aria-hidden>❤️</span></p>
         <div className={`exit-wipe ${exiting ? "on" : ""}`} aria-hidden />
       </section>
 

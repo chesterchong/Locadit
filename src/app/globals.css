@@ -318,10 +318,6 @@ main{position:relative;z-index:1}
 .glass-chip{display:inline-block;background:rgba(255,255,255,.22);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:.35rem .75rem;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.3)}
 .glass-pill-dark{background:rgba(17,17,17,.06);border-color:rgba(0,0,0,.08);color:#222;text-shadow:none;box-shadow:none}
 
-/* Intro footer credit */
-.credit{position:absolute;left:0;right:0;bottom:30px;text-align:center;font-style:italic;font-size:15px;color:rgba(39,39,39,.55);opacity:0;transform:translateY(8px);transition:opacity .8s ease .4s,transform .8s ease .4s;pointer-events:none;z-index:70}
-.credit.on{opacity:1;transform:none}
-@media (max-width:640px){.credit{bottom:22px;font-size:13px}}
 
 /* Progressive blur along the top edge of app pages (hidden on the intro) */
 .top-blur{position:fixed;top:0;left:0;right:0;height:96px;z-index:45;pointer-events:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
@@ -329,3 +325,6 @@ main{position:relative;z-index:1}
   background:linear-gradient(rgba(247,243,240,.85),rgba(247,243,240,0))}
 body:has(.landing) .top-blur{display:none}
 .home-link{z-index:60}
+
+/* Board footer credit */
+.credit-static{text-align:center;font-style:italic;font-size:14px;color:rgba(39,39,39,.5);padding:2rem 0 1rem}
