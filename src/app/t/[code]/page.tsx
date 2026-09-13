@@ -104,6 +104,8 @@ export default function Quiz() {
   const x = fly === null ? dx : fly * 600;
   const rot = x / 18;
   const love = Math.min(1, Math.max(0, x / 110)), pass = Math.min(1, Math.max(0, -x / 110));
+  // Fade the card as it travels: gradually while dragging, fully once it flies off.
+  const fade = fly !== null ? 0 : 1 - Math.min(0.75, Math.abs(dx) / 320);
 
   return (
     <main className={`mx-auto max-w-md px-6 py-10 flex flex-col gap-6 ${q < FLOW.length ? "h-[100svh] overflow-hidden" : ""}`}>
@@ -172,7 +174,7 @@ export default function Quiz() {
             {ACTIVITIES[i + 1] && <div className="glass absolute inset-0 scale-[.95] translate-y-3 opacity-60" />}
             <div onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
               className="glass absolute inset-0 cursor-grab active:cursor-grabbing overflow-hidden touch-none"
-              style={{ transform: `translateX(${x}px) rotate(${rot}deg)`, transition: drag ? "none" : "transform .26s ease-out", background: `radial-gradient(80% 60% at 50% 0%, ${HUE[act]}33, #fff 70%)` }}>
+              style={{ transform: `translateX(${x}px) rotate(${rot}deg)`, opacity: fade, transition: drag ? "none" : "transform .26s ease-out, opacity .26s ease-out", background: `radial-gradient(80% 60% at 50% 0%, ${HUE[act]}33, #fff 70%)` }}>
               <div className="absolute left-5 top-5 rounded-lg border-2 border-green-600 px-3 py-1 text-lg font-extrabold text-green-600 -rotate-12" style={{ opacity: love }}>LOVE</div>
               <div className="absolute right-5 top-5 rounded-lg border-2 border-rose-500 px-3 py-1 text-lg font-extrabold text-rose-500 rotate-12" style={{ opacity: pass }}>PASS</div>
               <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
