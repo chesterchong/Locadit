@@ -150,6 +150,17 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
     signals.push({ id: "fx", title: "Exchange rate", level: "info", message: `1 ${home} = ${rate} ${dest} · ${direction}`, source: "ECB via Frankfurter", asOf: fx.date, live: true, advice: Math.abs(fx.change) >= 5 ? `${NAMES[home] ?? home} moved quickly; keep a small buffer.` : undefined });
   })());
 
+  // Cash vs card: curated notes for the supported destinations.
+  const PAY: Record<string, { level: Level; message: string; advice: string }> = {
+    JP: { level: "heads-up", message: "Cards work in cities and chains; small restaurants, shrines, markets and rural spots still want cash.", advice: "Carry ¥10,000–20,000 per person. 7-Eleven ATMs take foreign cards. Get a Suica or Pasmo for transit and convenience stores." },
+    KR: { level: "calm", message: "Cards are accepted almost everywhere, including street stalls and taxis.", advice: "Keep ₩50,000 for markets where foreign cards fail. Load a T-money card for transit." },
+    MY: { level: "heads-up", message: "Cards in malls, hotels and chains; hawker stalls, markets and many taxis are cash or local QR (DuitNow, Touch 'n Go).", advice: "Carry RM100–200 in small notes. Grab covers most rides by card." },
+    ID: { level: "heads-up", message: "Cash-heavy: warungs, markets, temple entries and local drivers expect rupiah. Cards work at hotels and bigger restaurants.", advice: "Withdraw from ATMs attached to banks to avoid skimmers; keep Rp500,000–1,000,000 per person in small notes. Locals pay by QRIS, which foreign apps rarely support." },
+    SG: { level: "calm", message: "Cards, contactless and PayNow are accepted nearly everywhere; a few hawker stalls are still cash-only.", advice: "S$50 in cash covers the rare exception. Tap your card on buses and MRT." },
+  };
+  const pay = PAY[place.countryCode];
+  if (pay) signals.push({ id: "payments", title: "Cash or card", level: pay.level, message: pay.message, advice: pay.advice, source: "Locadit field notes" });
+
   await Promise.all(tasks);
   const partial = deadline.aborted;
   const order: Record<Level, number> = { caution: 0, "heads-up": 1, calm: 2, info: 3 };
