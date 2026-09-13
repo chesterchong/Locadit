@@ -4,5 +4,5 @@ import { geocode } from "@/lib/geo";
 export async function POST(req: Request) {
   const b = await req.json();
   const place = (await geocode(b.destination)) ?? undefined;
-  return NextResponse.json(createTrip(b.name, b.destination, b.dateOptions, place));
+  return NextResponse.json(await createTrip(b.name, b.destination, b.dateOptions, place));
 }
