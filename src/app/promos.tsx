@@ -33,7 +33,6 @@ export default function Promos() {
               <div className="flex items-center gap-2">
                 <span className="mono text-xs">{p.code}</span>
                 <button type="button" className="btn btn-primary !py-1 !px-3 text-xs" onClick={() => { navigator.clipboard?.writeText(p.code); setCopied(p.id); setTimeout(() => setCopied(null), 1500); }}>{copied === p.id ? "Copied" : "Copy code"}</button>
-                <button type="button" className="ml-auto text-xs muted" onClick={() => setOpen(null)}>Close</button>
               </div>
             </div>
           )}
