@@ -4,7 +4,7 @@ import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { PIECES, Piece } from "@/lib/collage";
 
 // Intro timeline in ms. Step N+1 reveals collage layer N; the wordmark draws in at step 1, changes style at
-// steps 2–6, leaves at step 7, the phone rises at step 8 and its info card + button land at step 9.
+// steps 2–6, leaves at step 7, the phone rises at step 8 and its info card lands at step 9.
 const STEPS = [0, 500, 1500, 2200, 2900, 3600, 4300, 5400, 6000, 6600];
 const END = STEPS.length - 1;
 const WM = ["wm-hand", "wm-serif", "wm-black", "wm-round", "wm-pixel", "wm-geo"];
@@ -24,7 +24,6 @@ export default function Landing() {
   const reduced = useRef(false);
   const heroRef = useRef<HTMLElement>(null);
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
-  const everythingRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const el = heroRef.current!;
@@ -52,7 +51,7 @@ export default function Landing() {
   const skip = useCallback(() => {
     timers.current.forEach(clearTimeout);
     setStep(END);
-    requestAnimationFrame(() => everythingRef.current?.focus({ preventScroll: true }));
+    requestAnimationFrame(() => heroRef.current?.querySelector<HTMLElement>(".phone-wrap")?.focus({ preventScroll: true }));
   }, []);
 
   // Keyboard skip while the intro runs: Escape, Enter or Space.
@@ -99,7 +98,6 @@ export default function Landing() {
             </Link>
           ))}
         </div>
-        <button ref={everythingRef} type="button" className={`everything ${step >= 9 ? "on" : ""}`} onClick={(e) => { stop(e); document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }); }}>Everything Locadit</button>
         {step < END && <button type="button" className="skip" onClick={(e) => { stop(e); skip(); }}>Skip intro</button>}
       </section>
 

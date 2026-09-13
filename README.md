@@ -13,7 +13,7 @@ Open http://localhost:3000, create a room, share the `/t/CODE` link, open `/t/CO
 
 ## Landing intro
 
-The home page opens with a staged intro: a faint dot grid, a handwritten wordmark that draws itself in, six typographic styles cycling while a collage builds up layer by layer, a blue sky dropping in, the wordmark tucking into the top edge, then a phone card rising into the cleared centre with its info card and a bottom-right pill button.
+The home page opens with a staged intro: a faint dot grid, a handwritten wordmark that draws itself in, six typographic styles cycling while a collage builds up layer by layer, a blue sky dropping in, the wordmark tucking into the top edge, then a phone card rising into the cleared centre with its info card.
 
 - Timeline and stage: `src/app/page.tsx` (`STEPS` holds the beat timings in ms; the 1600×900 stage is scaled to cover the viewport without cropping the cards).
 - Collage slots: `src/lib/collage.ts`. Every piece is one entry with a centre position, size, rotation, the layer it appears with, and where it settles at the end. Swap a placeholder for real artwork by setting `kind: "img"` and `src: "/collage/your-file.png"`.
