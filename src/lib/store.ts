@@ -12,9 +12,10 @@ export const ACTIVITIES = ["Food & markets", "Nightlife", "Nature & hikes", "Mus
 const g = globalThis as unknown as { __trips?: Map<string, Trip>; __sb?: SupabaseClient | null };
 const memory = (g.__trips ??= new Map<string, Trip>());
 function db(): SupabaseClient | null {
-  if (g.__sb !== undefined) return g.__sb;
+  if (g.__sb) return g.__sb;
   const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_ANON_KEY;
-  g.__sb = url && key ? createClient(url, key, { auth: { persistSession: false } }) : null;
+  if (!url || !key) return null; // not cached, so env added later (dev) is picked up
+  g.__sb = createClient(url, key, { auth: { persistSession: false } });
   return g.__sb;
 }
 
