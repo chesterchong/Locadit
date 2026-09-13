@@ -178,9 +178,18 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
           if (r.ok) { j = await r.json(); break; }
         } catch { /* try next mirror */ }
       }
-      if (!j) throw new Error("overpass");
       type E = { tags: { name: string }; lat?: number; lon?: number; center?: { lat: number; lon: number } };
-      const hs = ((j.elements ?? []) as E[]).map((e) => { const la = e.lat ?? e.center?.lat ?? lat, lo = e.lon ?? e.center?.lon ?? lon; return { name: e.tags.name, d: km(lat, lon, la, lo) }; }).sort((a, b) => a.d - b.d);
+      let hs: { name: string; d: number }[] = [];
+      if (j) hs = ((j.elements ?? []) as E[]).map((e) => { const la = e.lat ?? e.center?.lat ?? lat, lo = e.lon ?? e.center?.lon ?? lon; return { name: e.tags.name, d: km(lat, lon, la, lo) }; });
+      else {
+        // Nominatim fallback: hospitals inside a ~40 km box.
+        const dd = 0.36;
+        const r = await fetch(`https://nominatim.openstreetmap.org/search?q=hospital&format=jsonv2&limit=8&bounded=1&viewbox=${lon - dd},${lat + dd},${lon + dd},${lat - dd}`, { next: { revalidate: 86400 }, signal: AbortSignal.timeout(15000), headers: { "User-Agent": "Locadit/0.1 (hackathon prototype)" } });
+        if (!r.ok) throw new Error("nominatim");
+        type N = { name?: string; display_name: string; lat: string; lon: string };
+        hs = ((await r.json()) as N[]).map((n) => ({ name: n.name || n.display_name.split(",")[0], d: km(lat, lon, parseFloat(n.lat), parseFloat(n.lon)) }));
+      }
+      hs.sort((a, b) => a.d - b.d);
       signals.push({ id: "exit", title: "Getting out", level: hs.length && hs[0].d <= 15 ? "calm" : "heads-up", message: hs.length ? `Nearest hospitals to ${point.name}: ${hs.slice(0, 3).map((h) => `${h.name} (${Math.round(h.d)} km)`).join(", ")}.` : `No hospital mapped within 40 km of ${point.name}.`, advice: "Save the embassy number from the advisory page, download offline maps, and agree a meeting point and a check-in time each evening. Helicopters can't fly in heavy weather; a car and a known road matter more.", source: "OpenStreetMap" });
     } catch { signals.push({ id: "exit", title: "Getting out", level: "info", message: "Hospital lookup unavailable right now.", advice: "Save the embassy number from the advisory page, download offline maps, and agree a meeting point and a check-in time each evening.", source: "OpenStreetMap" }); }
   })());
@@ -207,7 +216,7 @@ export async function assessRisk(trip: Trip, homeCountry?: string | null): Promi
     const level: Level = abs > 12 || fx.vol > 12 ? "caution" : abs > 5 || fx.vol > 7 ? "heads-up" : "calm";
     const rate = fx.rate >= 100 ? Math.round(fx.rate).toLocaleString() : fx.rate.toFixed(fx.rate >= 10 ? 2 : 3);
     const homeName = NAMES[home] ?? home, destName = NAMES[dest] ?? dest;
-    signals.push({ id: "fx", title: "Exchange rate", level, message: `1 ${home} ≈ ${rate} ${dest} today. Your ${homeName} buys ${abs.toFixed(1)}% ${fx.change >= 0 ? "more" : "less"} ${destName} than a year ago; the rate has been ${fx.vol > 12 ? "volatile" : fx.vol > 7 ? "moving" : "steady"} (${fx.vol.toFixed(0)}% annualised).`, advice: level === "calm" ? undefined : fx.change >= 0 ? `Your ${homeName} is stronger; budget in ${home} and exchange in a couple of batches rather than all at once.` : `Your ${homeName} is weaker; lock in the big costs early and keep a 10% buffer.`, source: "European Central Bank via Frankfurter", asOf: fx.date });
+    signals.push({ id: "fx", title: "Exchange rate", level, message: `1 ${home} ≈ ${rate} ${dest} today. Your ${home} buys ${abs.toFixed(1)}% ${fx.change >= 0 ? "more" : "less"} ${destName} than a year ago; the rate has been ${fx.vol > 12 ? "volatile" : fx.vol > 7 ? "moving" : "steady"} (${fx.vol.toFixed(0)}% annualised).`, advice: level === "calm" ? undefined : fx.change >= 0 ? `Your ${homeName} is stronger; budget in ${home} and exchange in a couple of batches rather than all at once.` : `Your ${homeName} is weaker; lock in the big costs early and keep a 10% buffer.`, source: "European Central Bank via Frankfurter", asOf: fx.date });
   })());
 
   await Promise.all(tasks);
