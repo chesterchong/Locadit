@@ -1,7 +1,7 @@
 import { Trip } from "./store";
 
 export type Level = "calm" | "heads-up" | "caution" | "info";
-export type Signal = { id: string; title: string; level: Level; message: string; advice?: string; source: string; asOf?: string; links?: { label: string; href: string }[] };
+export type Signal = { id: string; title: string; level: Level; message: string; advice?: string; source: string; asOf?: string; links?: { label: string; href: string }[]; data?: { hi: number; lo: number; rain: number } };
 export type Radar = { place: Trip["place"]; window?: { start: string; end: string; label: string }; signals: Signal[]; generatedAt: number };
 
 const cache = new Map<string, { at: number; radar: Radar }>();
@@ -69,7 +69,7 @@ export async function assessRisk(trip: Trip): Promise<Radar> {
       const level: Level = hi >= 36 || rain >= 60 || lo <= 0 ? "caution" : hi >= 33 || rain >= 30 || lo <= 5 ? "heads-up" : "calm";
       const feel = hi >= 36 ? "very hot" : hi >= 33 ? "hot" : lo <= 0 ? "freezing" : lo <= 5 ? "cold" : "comfortable";
       const wet = rain >= 60 ? "heavy rain" : rain >= 30 ? "regular showers" : rain >= 5 ? "light rain" : "mostly dry";
-      signals.push({ id: "weather", title: "Weather for your dates", level, message: `Typically ${feel}: ${Math.round(lo)}–${Math.round(hi)}°C with ${wet} (${Math.round(rain)} mm over 5 days) around ${win.label}.`, advice: level === "calm" ? undefined : hi >= 33 ? "Plan outdoor time for mornings; shade and water at midday." : rain >= 30 ? "Pack a light rain layer and keep indoor backups for one afternoon." : "Pack proper layers.", source: "Open-Meteo, same week last year", asOf: win.start.slice(0, 4) });
+      signals.push({ id: "weather", title: "Weather for your dates", level, message: `Typically ${feel}: ${Math.round(lo)}–${Math.round(hi)}°C with ${wet} (${Math.round(rain)} mm over 5 days) around ${win.label}.`, advice: level === "calm" ? undefined : hi >= 33 ? "Plan outdoor time for mornings; shade and water at midday." : rain >= 30 ? "Pack a light rain layer and keep indoor backups for one afternoon." : "Pack proper layers.", source: "Open-Meteo, same week last year", asOf: win.start.slice(0, 4), data: { hi: Math.round(hi), lo: Math.round(lo), rain: Math.round(rain) } });
     } catch { /* skip */ }
   })());
 

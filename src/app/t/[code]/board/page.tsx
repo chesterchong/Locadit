@@ -2,9 +2,21 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; links?: { label: string; href: string }[] };
+type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; links?: { label: string; href: string }[]; data?: { hi: number; lo: number; rain: number } };
 type Radar = { place?: { name: string; country: string }; window?: { label: string }; signals: Signal[] };
 const LEVEL: Record<Signal["level"], string> = { calm: "Calm", "heads-up": "Heads-up", caution: "Caution", info: "Info" };
+const OUTDOOR = new Set(["Nature & hikes", "Beach & rest", "Adventure sports", "Local neighbourhoods", "Food & markets"]);
+// Temperature risk for a day, stricter when the theme keeps people outside.
+function tempRisk(theme: string, d?: { hi: number; lo: number; rain: number }) {
+  if (!d) return null;
+  const out = OUTDOOR.has(theme);
+  if (d.hi >= 36) return { level: "caution", text: `${d.lo}–${d.hi}°C · extreme heat: keep midday indoors, hydrate` };
+  if (d.hi >= 32 && out) return { level: "heads-up", text: `${d.lo}–${d.hi}°C · hot for a day outside: start early, shade at noon` };
+  if (d.lo <= 0) return { level: "caution", text: `${d.lo}–${d.hi}°C · freezing: proper layers, check closures` };
+  if (d.lo <= 5 && out) return { level: "heads-up", text: `${d.lo}–${d.hi}°C · cold for a full day out: layers and warm stops` };
+  if (d.rain >= 30 && out) return { level: "heads-up", text: `${d.lo}–${d.hi}°C · showers likely: pack a rain layer` };
+  return { level: "calm", text: `${d.lo}–${d.hi}°C · comfortable` };
+}
 type Data = { trip: { code: string; name: string; destination: string; answers: { name: string }[]; expenses: { id: string; title: string; amount: number; paidBy: string }[] }; result: null | { budget: number; bestDate: { d: string; n: number }; dateVotes: { d: string; n: number }[]; scores: { act: string; score: number }[]; itinerary: { day: number; theme: string; why: string; budget: number; plan: string[] }[]; members: string[]; pace: string; notes: { name: string; mustHave?: string; avoid?: string }[] }; balances: Record<string, number> };
 export default function Board() {
   const { code } = useParams<{ code: string }>();
@@ -87,6 +99,7 @@ export default function Board() {
               <div key={day.day} className="glass p-5 pop">
                 <div className="flex items-baseline justify-between"><p className="font-semibold text-lg"><span className="mono muted mr-2">D{day.day}</span>{day.theme}</p><p className="mono text-sm muted">~${day.budget}/pp</p></div>
                 <p className="text-sm muted mt-1">Why: {day.why}</p>
+                {(() => { const tr = tempRisk(day.theme, radar?.signals.find((s) => s.id === "weather")?.data); return tr ? <p className={`temp ${tr.level} mt-2`}><span className="lvl">{tr.level === "calm" ? "Temp" : tr.level === "caution" ? "Heat/cold risk" : "Temp heads-up"}</span>{tr.text}</p> : null; })()}
                 <ul className="mt-3 space-y-1 text-sm">{day.plan.map((p, k) => <li key={p} className="flex gap-3"><span className="mono muted">{["AM", "PM", "EVE"][k]}</span>{p}</li>)}</ul>
               </div>
             ))}

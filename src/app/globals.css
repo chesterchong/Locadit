@@ -192,3 +192,10 @@ input[type=range]{accent-color:#111}
 
 /* Static white frame around the whole site */
 .page-frame{position:fixed;inset:0;z-index:1000;pointer-events:none;border:14px solid #fff;border-radius:28px;box-shadow:0 0 0 80px #fff}
+
+/* Per-day temperature risk */
+.temp{display:flex;align-items:center;gap:.5rem;font-size:12.5px;color:#333}
+.temp .lvl{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:.15rem .5rem;font-weight:600;white-space:nowrap}
+.temp.calm .lvl{background:#e6f6ec;color:#15803d}
+.temp.heads-up .lvl{background:#fff4d6;color:#a16207}
+.temp.caution .lvl{background:#fde8e8;color:#b91c1c}

@@ -27,7 +27,7 @@ export function merge(trip: Trip) {
   const itinerary = Array.from({ length: days }, (_, i) => {
     const s = ranked[i % ranked.length];
     const perDay = Math.round((budget * 0.6) / days);
-    const why = s.fans.length === a.length ? "everyone wanted this" : s.fans.length > a.length / 2 ? `${s.fans.length} of ${a.length} rated it highly` : `${s.fans.join(" & ")}'s pick, kept for fairness`;
+    const why = s.fans.length === a.length ? "everyone wanted this" : s.fans.length > a.length / 2 ? `${s.fans.length} of ${a.length} rated it highly` : s.fans.length ? `${s.fans.join(" & ")}'s pick, kept for fairness` : "rounds out the mix; nobody objected";
     const full = planFor(s.act, trip.destination);
     const plan = perDayItems >= 4 ? [...full, "Sunset spot, then a late bite"] : full.slice(0, perDayItems);
     return { day: i + 1, theme: s.act, why, budget: perDay, plan };
