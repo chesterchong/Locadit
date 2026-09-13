@@ -2,28 +2,23 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import RangePicker, { label, type Win } from "@/components/range-picker";
 
 const DESTS: [string, string][] = [["Japan", "🇯🇵"], ["Korea", "🇰🇷"], ["Malaysia", "🇲🇾"], ["Indonesia", "🇮🇩"], ["Singapore", "🇸🇬"]];
-type Win = { from: string; to: string };
-const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-// "2026-10-10","2026-10-14" -> "Oct 10–14"; across months -> "Oct 30 – Nov 2"
-function label(w: Win) {
-  const a = new Date(w.from + "T00:00:00"), b = new Date(w.to + "T00:00:00");
-  return a.getMonth() === b.getMonth() ? `${MON[a.getMonth()]} ${a.getDate()}–${b.getDate()}` : `${MON[a.getMonth()]} ${a.getDate()} – ${MON[b.getMonth()]} ${b.getDate()}`;
-}
-const today = new Date().toISOString().slice(0, 10);
 
 export default function Home() {
   const r = useRouter();
-  const [name, setName] = useState("");
   const [dest, setDest] = useState("Japan");
-  const [wins, setWins] = useState<Win[]>([{ from: "", to: "" }]);
+  const [name, setName] = useState("Japan with the crew");
+  const [nameTouched, setNameTouched] = useState(false);
+  const choose = (d: string) => { setDest(d); if (!nameTouched) setName(`${d} with the crew`); };
+  const [wins, setWins] = useState<Win[]>([]);
   const [creating, setCreating] = useState(false);
   const [code, setCode] = useState("");
   const [joining, setJoining] = useState(false);
   const [joinErr, setJoinErr] = useState("");
 
-  const valid = wins.filter((w) => w.from && w.to && w.to >= w.from);
+  const valid = wins;
   const canCreate = name.trim().length > 0 && valid.length > 0 && !creating;
 
   async function create() {
@@ -41,7 +36,6 @@ export default function Home() {
     setJoining(false);
     if (res.ok) r.push(`/t/${c}`); else setJoinErr(res.status === 404 ? "No room with that code. Check it with whoever invited you." : "Couldn't reach the room. Try again.");
   }
-  const setWin = (i: number, patch: Partial<Win>) => setWins((ws) => ws.map((w, k) => (k === i ? { ...w, ...patch, ...(patch.from && w.to && w.to < patch.from ? { to: patch.from } : {}) } : w)));
 
   return (
     <main className="mx-auto max-w-md px-6 pt-16 pb-14 space-y-8 enter">
@@ -54,24 +48,13 @@ export default function Home() {
 
       <section className="glass p-5 space-y-4 pop">
         <p className="text-xs uppercase tracking-widest muted">Start a trip</p>
-        <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Trip name" aria-label="Trip name" autoFocus />
-        <div className="dest-grid" role="radiogroup" aria-label="Destination">
-          {DESTS.map(([d, flag]) => <button key={d} type="button" role="radio" aria-checked={dest === d} className={`chip dest ${dest === d ? "on" : ""}`} onClick={() => setDest(d)}><span aria-hidden>{flag}</span>{d}</button>)}
+        <input className="input" value={name} onChange={(e) => { setName(e.target.value); setNameTouched(true); }} placeholder="Trip name" aria-label="Trip name" />
+        <div className="dest-tiles" role="radiogroup" aria-label="Destination">
+          {DESTS.map(([d, flag]) => <button key={d} type="button" role="radio" aria-checked={dest === d} className={`dest-tile ${dest === d ? "on" : ""}`} onClick={() => choose(d)}><span className="flag" aria-hidden>{flag}</span><span>{d}</span></button>)}
         </div>
-        <div className="space-y-2">
-          <p className="text-xs muted">Date windows the group can vote on</p>
-          {wins.map((w, i) => (
-            <div key={i} className="date-row">
-              <input type="date" className="input" min={today} value={w.from} onChange={(e) => setWin(i, { from: e.target.value })} aria-label={`Option ${i + 1} start`} />
-              <span className="muted">to</span>
-              <input type="date" className="input" min={w.from || today} value={w.to} onChange={(e) => setWin(i, { to: e.target.value })} aria-label={`Option ${i + 1} end`} />
-              {wins.length > 1 && <button type="button" className="date-x" aria-label="Remove option" onClick={() => setWins((ws) => ws.filter((_, k) => k !== i))}>×</button>}
-            </div>
-          ))}
-          {wins.length < 4 && <button type="button" className="text-sm underline muted" onClick={() => setWins((ws) => [...ws, { from: "", to: "" }])}>+ another window</button>}
-        </div>
+        <RangePicker value={wins} onChange={setWins} max={4} />
         <button onClick={create} disabled={!canCreate} className="btn btn-primary w-full disabled:opacity-30">{creating ? "Creating…" : "Create room"}</button>
-        {!canCreate && !creating && <p className="text-xs muted text-center">{!name.trim() ? "Give the trip a name to continue." : "Pick at least one date window."}</p>}
+        {!canCreate && !creating && <p className="text-xs muted text-center">{!name.trim() ? "Give the trip a name to continue." : "Add at least one date window on the calendar."}</p>}
       </section>
 
       <section className="glass p-5 space-y-3 pop">
