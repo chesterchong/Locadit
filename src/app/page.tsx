@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { PIECES, Piece } from "@/lib/collage";
+import IntroMusic from "@/app/intro-music";
 
 // Intro timeline in ms. Step N+1 reveals collage layer N; the wordmark draws in at step 1, changes style at
 // steps 2–6, leaves at step 7, the phone rises at step 8 and its info card lands at step 9.
@@ -89,6 +90,7 @@ export default function Landing() {
 
   return (
     <div className="landing">
+      <IntroMusic />
       <section ref={heroRef} className="hero" aria-label="Locadit intro">
         <div className={`stage ${step >= 6 ? "night" : ""} ${exiting ? "exit" : ""}`} style={{ "--s": fit?.s ?? 1, "--wm": fit?.wm ?? 1, visibility: fit ? "visible" : "hidden" } as CSSProperties}>
           <div className="dots on" />

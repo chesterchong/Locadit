@@ -3,9 +3,8 @@ import { useEffect, useRef, useState } from "react";
 
 const MAX_VOLUME = 0.55;
 const FADE_SECONDS = 4;
-// The disc's playlist. The landing intro plays its own track once first, then hands over to this list, which loops.
+// The disc's playlist (board page only). Loops.
 const PLAYLIST = ["/audio/melodic-minor.mp3", "/audio/nightcall.mp3", "/audio/broken-heart.mp3"];
-const INTRO = "/audio/intro.mp3";
 const NOTES = ["🎵", "🎶", "♪", "♫"];
 
 // Site-wide soundtrack via Web Audio, controlled by the spinning disc in the top-right corner.
@@ -69,8 +68,7 @@ export default function Soundtrack() {
     const tryStart = () => { if (startedRef.current) { unbind(); return; } play().then(() => { if (startedRef.current) unbind(); }); };
     const unbind = () => events.forEach((e) => window.removeEventListener(e, tryStart));
     events.forEach((e) => window.addEventListener(e, tryStart));
-    // Landing plays the intro track once before the playlist; other pages go straight to the playlist.
-    queueRef.current = window.location.pathname === "/" ? [INTRO, ...PLAYLIST] : [...PLAYLIST];
+    queueRef.current = [...PLAYLIST];
     load(queueRef.current[0]).then(() => { if (cancelled) return; readyRef.current = true; tryStart(); }).catch(() => {});
     return () => { cancelled = true; unbind(); try { srcRef.current?.stop(); } catch {} ctx.close().catch(() => {}); };
   }, []); // eslint-disable-line

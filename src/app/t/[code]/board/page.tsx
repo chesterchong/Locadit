@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import LoadingView from "@/app/loading-view";
+import Soundtrack from "@/app/soundtrack";
 import { useParams } from "next/navigation";
 import ShareQr from "@/components/share-qr";
 type Signal = { id: string; title: string; level: "calm" | "heads-up" | "caution" | "info"; message: string; advice?: string; source: string; asOf?: string; live?: boolean; links?: { label: string; href: string }[] };
@@ -35,6 +36,7 @@ export default function Board() {
     <main className="mx-auto max-w-2xl px-6 pt-16 pb-10 space-y-6">
       <ShareQr code={trip.code} />
       <Link href="/" className="home-link">Locadit</Link>
+      <Soundtrack />
       <div className="pill"><span className="dot" />Live · <span className="mono">{trip.code}</span></div>
       <header>
         <p className="text-xs uppercase tracking-widest muted">{trip.destination}</p>
