@@ -293,8 +293,8 @@ input[type=range]{accent-color:#111}
 .cal-day.past{color:#c9c4bd;cursor:default}
 .cal-day.today::after{content:"";position:absolute;left:50%;bottom:4px;width:4px;height:4px;margin-left:-2px;border-radius:999px;background:#111}
 .cal-day.win{background:#f2eee9}
-.cal-day.range{background:#e9e3da;border-radius:0}
-.cal-day.start,.cal-day.end{background:#111;color:#fff;border-radius:999px}
+.cal-day.range{background:#e9e3da}
+.cal-day.start,.cal-day.end,.cal-day.start:hover,.cal-day.end:hover{background:#111;color:#fff}
 .cal-day.start.today::after,.cal-day.end.today::after{background:#fff}
 .cal-hint{font-size:12px;color:var(--muted);margin-top:.6rem;text-align:center}
 .win-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem;justify-content:center}
