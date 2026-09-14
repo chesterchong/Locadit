@@ -1,56 +1,39 @@
-# Locadit
+# Locadit by Odyssey
 
-**Plan the trip together. Come home together.**
+**Team:** Chong Min Kit, Cheh Shu Hong
 
-Locadit is for groups who travel with the people they love and refuse to gamble on safety. The idea is borrowed from how Luma and Eventbrite make gathering people effortless, a link, a room, everyone in. But this is not an event. It is a trip, and the first priority is not the itinerary. It is knowing, before anyone books, whether the place and the dates carry a natural-disaster risk, and having somewhere the warning can reach the whole group if the world changes mid-trip.
+**Problem Statement:** Travel Planner
 
-The 2026 Nepal flash floods, where hundreds of tourists on organised trips went missing after a glacier collapse, are the case Locadit is designed around. A weather average would not have flagged it. A live flood feed, rain extremes for the dates and a rescue-reality check might have changed a decision.
+**Video Presentation:** https://www.youtube.com/watch?v=5ZHclSxWhoU
 
-## What it does
+<!-- Slides: add the link here -->
 
-1. **One link, no sign-up.** The organiser creates a room and shares a link or a tree-shaped QR code. Rooms persist in Supabase.
-2. **Private intake.** Locadit asks each traveller six short questions in a chat: name, budget ceiling, dates, pace, one must-have, one thing to avoid. Then a swipe deck of activities with real photos of the destination. Nobody sees anyone else's answers.
-3. **Merged plan.** The board turns everyone's answers into one budget ceiling, one date window and a day-by-day itinerary that explains why each day is there. Quiet voices get a day too. Costs split themselves with a settle-up list.
-4. **Trip radar.** Before and during the trip, every card is real data with its source and date, graded Calm, Heads-up or Caution:
-   - Rain extremes for your dates: ten years of daily totals, heaviest day, share of days over 50 mm, wet season flag (Open-Meteo archive).
-   - Flood outlook: river discharge forecast against five years of history at that point (Copernicus GloFAS via Open-Meteo). Live.
-   - Live alerts: GDACS disaster events within 300 km in the last 30 days. Live.
-   - Volcanoes within 100 km and which erupted in the last decade (Smithsonian Global Volcanism Program).
-   - Seismic activity: magnitude 4.5+ quakes within 300 km in the past year (USGS).
-   - Tropical storm season by basin and month.
-   - Government advice: UK FCDO status and US State Department level, fetched, not just linked. Live.
-   - Getting out: nearest hospitals to where you are staying (OpenStreetMap), plus the boring things that decide outcomes: embassy number saved, offline maps, a meeting point.
-   - Money: exchange rate and twelve-month volatility between the visitor's currency, inferred from location, and the destination's (ECB); inflation and homicide rate (World Bank).
-   - Per-day temperature risk on the itinerary, stricter for outdoor days.
-   Tell the radar where you are actually staying and it re-scores around that point: an Ubud villa and a Kuta beachfront are different trips.
+## 1. Project Overview
 
-Nothing here predicts a disaster. The point is to put the warnings people usually find afterwards in front of the group before they book, in language they can act on.
+**The Problem.** Group trips are planned in a group chat, and the chat is where they fall apart. Dates, budget and pace go to whoever answers first and loudest. The person with the smallest budget stays quiet rather than say so in front of everyone. Costs are tracked after the money is spent, if at all. And nobody checks whether the place is safe for those dates until the news does it for them.
 
-## Run
+Stakeholders: the organiser who ends up doing all the work, the quiet member who overspends to keep the peace, the group that wants one plan it actually agreed to, and the families at home who want to know the group saw the warnings.
 
-```bash
-npm install
-npm run dev
-```
+The case we design around is the August 2026 Nepal floods. A glacier collapse sent a debris flow through the Rasuwa valley, and hundreds of tourists on organised trips lost contact within days ([Al Jazeera](https://www.aljazeera.com/news/2026/8/27/nepal-tibet-floods-what-happened-what-caused-them-and-who-is-missing)). A weather average would not have flagged it. A live flood feed and disaster alerts in front of the group might have changed a decision.
 
-Open http://localhost:3000. Create a room at `/start`; the organiser is taken straight into the intake with the room code and live-board link. Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `.env.local` for persistence (a `locadit_trips` table with `code`, `data jsonb`, `updated_at`); without them rooms live in memory.
+| Similar app | What it does | Where it falls short |
+|---|---|---|
+| [Wanderlog](https://wanderlog.com/) | Collaborative itinerary with a shared budget tracker | One shared ledger, so the cheapest traveller has to out themselves. No safety layer. |
+| [TripIt](https://www.tripit.com/) | Turns booking emails into one timeline, Pro adds travel alerts | Built for one traveller's bookings, not a group's decisions. Alerts reach the individual only. |
+| [Splitwise](https://www.splitwise.com/) | Shared expenses with settle-up | Only after the money is spent. Nothing about dates, budget or the trip itself. |
 
-## Landing intro
+**Our Solution.** Locadit is a room, not a chat. The organiser shares one link or QR code. Each traveller answers six short questions and swipes eight activity cards in private. The engine merges everyone's answers into one budget ceiling, one date window and a day-by-day itinerary that says why each day is there, while a live Trip radar grades the destination's safety from public data.
 
-The home page opens with a staged intro: a faint dot grid, a handwritten wordmark that draws itself in, six typographic styles cycling while a collage builds up layer by layer, a golden-hour sky that falls to night, the wordmark tucking into the top edge, then a phone card rising into the cleared centre with its card. The collage pieces are the team's own cut-outs, themed on Malaysia, Singapore, Japan and Korea.
+- **One link, no sign-up.** A 4-character room code, an invite link and a QR.
+- **Private intake.** A six-question chat, then a swipe deck with real destination photos.
+- **Consensus merge.** Lowest comfortable budget, the dates most people can make, majority pace, a "why" line per day.
+- **Trip radar.** Weather, flood outlook, live disaster alerts, earthquakes, official advice, exchange rate, cash or card. Graded and cited per card.
+- **Split costs.** Equal split with a settle-up list.
+- **Live board.** Updates as people finish, on desktop and phone.
 
-- Timeline and stage: `src/app/page.tsx`. Collage slots: `src/lib/collage.ts` and `docs/collage-slots.md`.
-- Radar engine: `src/lib/risk.ts`. Currency: `src/lib/fx.ts`. Merge engine: `src/lib/engine.ts`. Storage: `src/lib/store.ts`.
+## 2. Ideation & Process
 
-## Stack
-
-Next.js 16, React, Tailwind, Supabase, Web Audio for the soundtrack, no AI keys required. Every external source is keyless and cited on the card it feeds.
-
----
-
-# 2. Ideation & Process
-
-## 2.1 Ideas We Considered
+### 2.1 Ideas We Considered
 
 | # | Idea | Why it was dropped / kept |
 |---|------|---------------------------|
@@ -65,36 +48,137 @@ Next.js 16, React, Tailwind, Supabase, Web Audio for the soundtrack, no AI keys 
 
 **Final direction:** A + B merged into one product. Consensus handles the *before* (merge preferences, draft itinerary, split costs). Replan handles the *during* (detect breakage, repair, re-sync the group). Envelope's budget burn-down survives as a component.
 
----
 
-## 2.2 Ideation Boards
+### 2.2 Ideation Boards
 
-### Board 1 — Problem tree
+#### Board 1 — Problem tree
 
 ![Board 1](docs/boards/1-problem-tree.png)
 
 Root problem at the top, causes in the middle, concrete effects at the bottom. The two highlighted branches (group misalignment and mid-trip breakage) became ideas A and B; the left branch is what every existing app already half-solves.
 
-### Board 2 — Idea mind map (Crazy Eights dump)
+#### Board 2 — Idea mind map (Crazy Eights dump)
 
 ![Board 2](docs/boards/2-mind-map.png)
 
 Every idea from our eight-minute sketch round, grouped after the fact. The "Group" and "Change" clusters had the most sticky notes and the fewest existing competitors, so we kept digging there.
 
-### Board 3 — 5 Whys on the "plans break" branch
+#### Board 3 — 5 Whys on the "plans break" branch
 
 ![Board 3](docs/boards/3-five-whys.png)
 
 The chain that produced Replan's core technical insight: model the itinerary as a dependency graph so a single broken node can be traced to everything it affects.
 
-### Board 4 — Merged user flow (A + B)
+#### Board 4 — Merged user flow (A + B)
 
 ![Board 4](docs/boards/4-user-flow.png)
 
 The end-to-end flow after merging Consensus (top half) and Replan (bottom loop). The two highlighted nodes are where the AI does real work; everything else is plumbing.
 
-### Board 5 — Keep / drop decision matrix
+#### Board 5 — Keep / drop decision matrix
 
 ![Board 5](docs/boards/5-decision-matrix.png)
 
 How we made the final cut. Consensus and Replan sit top-right. Envelope was novel but pulled left by unreliable pricing APIs, so it survives only as a widget.
+
+*Where it went: the prototype implements A (Consensus) in full. B (Replan) became the Trip radar's live safety feeds, which watch the destination before and during the trip. The self-healing itinerary itself is scheduled for the building phase (section 5).*
+
+### 2.3 Mentor Consultation
+
+<!-- fill in each mentor session -->
+| Date | Mentor | Feedback Received | What Was Changed |
+|---|---|---|---|
+| | | | |
+
+## 3. Design & Prototype
+
+**UI Prototype:** https://locadit-teal.vercel.app
+
+Try it in two minutes: open `/start`, pick a destination and dates, create a room, then share the code or the QR.
+
+![Landing](docs/screens/01-landing.png)
+*Landing. A collage builds up while the wordmark draws itself in, then a single card rises: Start a room.*
+
+![Start a trip](docs/screens/02-start.png)
+*Start a trip. Pick one of five destinations, tap start and end days on the calendar for up to four date windows, or join with a code.*
+
+![Chat intake](docs/screens/03-intake.png)
+*Private intake. Locadit asks six short questions in a chat. The host pill shows the room code and the live board link.*
+
+![Swipe deck](docs/screens/04-swipe.png)
+*Swipe deck. Eight activity cards with real Wikimedia Commons photos of the destination. Pass, Maybe or Love.*
+
+![Live board](docs/screens/05-board.png)
+*Live board. Who has answered, one button to join, and the Trip radar with graded, cited cards for the chosen dates.*
+
+![Itinerary](docs/screens/06-itinerary.png)
+*Itinerary. Each day says why it is there. Tapping a day opens a day-to-night photo scene behind the board.*
+
+![Split costs](docs/screens/07-costs.png)
+*Split costs. Add an expense, it splits across the room, and Settle up reduces the balances to the fewest transfers.*
+
+![Share QR](docs/screens/08-share.png)
+*Share. A QR code with the Locadit badge in the centre, ready to copy or scan.*
+
+## 4. What Makes It Different
+
+- **Private by default.** Everyone answers alone. The room only ever sees the merged result, so the tightest budget never has to speak up in public.
+- **A "why" on every day.** Budget is the lowest comfortable maximum, the dates are the ones most people can make, pace is a majority vote. Each itinerary day explains itself.
+- **Safety-first Trip radar.** Live, keyless public feeds graded Clear, Check or Act, each card citing its source, the urgent card first.
+- **One link, no sign-up.** A room code, an invite link and a QR generated in the browser.
+- **Settle-up in the fewest transfers.** Expenses split equally, balances collapse into a short "A pays B" list.
+
+| | Locadit | Wanderlog | TripIt | Splitwise |
+|---|:---:|:---:|:---:|:---:|
+| Private preference intake | ✓ | – | – | – |
+| Group agreement on dates, budget, pace | ✓ | – | – | – |
+| Cost split with settle-up | ✓ | ✓ | – | ✓ |
+| Live safety feeds inside the plan | ✓ | – | Pro only | – |
+
+## 5. Technical Architecture & Feasibility
+
+**Tech stack**
+
+| Layer | Choice | Why | Constraint |
+|---|---|---|---|
+| Frontend | Next.js 16 App Router, React 19, TypeScript, Tailwind v4 | One codebase for pages and API, fast to ship | Board polls its API every 2.5 s, no realtime channel yet |
+| Backend | Next.js route handlers on Vercel | No separate server to run | No auth. Anyone with the room code can read the room |
+| Database | Supabase Postgres, one `locadit_trips` row per room (trip as jsonb) | Free tier, zero setup, upsert on every write | Row Level Security is off, so the anon key is used server-side only. In-memory fallback for local dev |
+| Data sources | Open-Meteo (weather, GloFAS flood, geocoding), GDACS, USGS, UK FCDO, US State Dept, Frankfurter (ECB rates) | All keyless and public, cited on the card they feed | Fair-use limits. Every call has a timeout under a shared 7 s deadline, results cached 30 min to 24 h |
+| Photos | Wikimedia Commons search | Real, free, credited photos | Relevance varies with the search term |
+| Sharing | qrcode-generator in the browser | No third-party QR service | Copy image needs clipboard support, otherwise it downloads |
+| Hosting | Vercel, manual CLI deploys, git auto-deploy disabled | Batched deploys stay under the Hobby plan cap | Serverless cold starts on the first radar load |
+
+**System architecture**
+
+```mermaid
+flowchart LR
+  B[Browser<br/>start · intake · board]
+  API[Next.js route handlers<br/>trips · answers · expenses · risk · photos]
+  ENG[engine.ts<br/>merge + balances]
+  DB[(Supabase<br/>locadit_trips)]
+  SRC[Keyless sources<br/>Open-Meteo · GDACS · USGS · FCDO · State Dept · ECB · Wikimedia]
+  B -->|fetch, poll| API
+  API --> ENG
+  API --> DB
+  API --> SRC
+```
+
+**Build plan & scope** (3-week building phase)
+
+1. **Replan.** Store the itinerary as a dependency graph. Weather, flood and GDACS triggers mark broken nodes, and one-tap repair proposals broadcast to the room.
+2. **Group alerts.** Opt-in email at intake. A scheduled check re-grades the radar and notifies the room when a card changes grade.
+3. **Hardening.** Row Level Security with a server-only key, raw answers hidden from the room API, room expiry, rate limits on the proxies.
+4. **Stay point.** Let the group pin where it is staying so the radar and hospitals re-score around that point.
+5. **Mobile polish and accessibility.** Focus order, contrast, reduced motion.
+
+Out of scope: bookings, payments, user accounts, destinations beyond the current five (Japan, Korea, Malaysia, Indonesia, Singapore).
+
+## Run it locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open http://localhost:3000. Create a room at `/start`; the organiser is taken straight into the intake with the room code and live-board link. Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `.env.local` for persistence (a `locadit_trips` table with `code`, `data jsonb`, `updated_at`); without them rooms live in memory.
