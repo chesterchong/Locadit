@@ -30,7 +30,7 @@ export const PIECES: Piece[] = [
   { id: "umb-l", wind: 4, layer: 1, kind: "img", src: "/collage/umb-l.webp", content: "⛱️", x: 330, y: 470, size: 230, rot: -10 },
   { id: "umb-r", wind: 4, layer: 1, kind: "img", src: "/collage/umb-r.webp", content: "⛱️", x: 1240, y: 430, size: 200, rot: 8 },
   { id: "beach", wind: 2, layer: 1, kind: "img", src: "/collage/beach.webp", content: "🏖️", x: 880, y: 810, size: 300, z: 8 },
-  { id: "rock-l", wind: 0.6, layer: 1, kind: "img", src: "/collage/rock-l.webp", content: "🪨", x: 180, y: 770, size: 200, rot: -6 },
+  { id: "rock-l", wind: 0.6, layer: 1, kind: "img", src: "/collage/rock-l.webp", content: "🪨", x: 400, y: 770, size: 200, rot: -6 },
   { id: "rock-r", wind: 0.6, layer: 1, kind: "img", src: "/collage/rock-r.webp", content: "🪨", x: 1380, y: 800, size: 170, rot: 12 },
   { id: "palm-a", wind: 7, layer: 1, kind: "img", src: "/collage/palm-a.webp", content: "🌴", x: 640, y: 360, size: 150, rot: -4, to: { x: 110, y: 230, size: 300 } },
   { id: "palm-b", wind: 7, layer: 1, kind: "img", src: "/collage/palm-b.webp", content: "🌴", x: 960, y: 360, size: 150, rot: 4, to: { x: 1480, y: 200, size: 300 } },
@@ -50,7 +50,7 @@ export const PIECES: Piece[] = [
   { id: "opera", wind: 0.8, hover: true, layer: 3, kind: "img", src: "/collage/opera.webp", content: "🏛️", x: 1510, y: 660, size: 270 },
   { id: "kitten", hover: true, wind: 2, layer: 5, kind: "img", src: "/collage/kitten.webp", x: 1250, y: 780, size: 180, rot: 4, z: 52 },
   { id: "fish", wind: 3, layer: 3, kind: "img", src: "/collage/fish.webp", content: "🐠", x: 520, y: 580, size: 90, rot: -10 },
-  { id: "cactus-l", wind: 2, layer: 3, kind: "img", src: "/collage/cactus-l.webp", content: "🌵", x: 340, y: 820, size: 180, rot: -6 },
+  { id: "cactus-l", wind: 2, layer: 3, kind: "img", src: "/collage/cactus-l.webp", content: "🌵", x: 560, y: 820, size: 180, rot: -6 },
   { id: "cactus-r", wind: 6, layer: 3, kind: "img", src: "/collage/cactus-r.webp", content: "🌵", x: 1190, y: 830, size: 170, rot: 8 },
   { id: "flower", wind: 5, layer: 3, kind: "img", src: "/collage/flower.webp", content: "🌸", x: 1020, y: 790, size: 100 },
 
