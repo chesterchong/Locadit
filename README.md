@@ -1,6 +1,6 @@
 # Locadit by Odyssey
 
-**Team:** Chong Min Kit, Cheh Shu Hong
+**Team:** Odyssey
 
 **Problem Statement:** Travel Planner
 
