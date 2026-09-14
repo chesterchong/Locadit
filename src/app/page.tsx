@@ -79,7 +79,7 @@ export default function Landing() {
   };
   useEffect(() => {
     if (step < 7 || reduced.current) return;
-    const id = window.setInterval(() => setLoop((l) => l + 1), 1100);
+    const id = window.setInterval(() => setLoop((l) => l + 1), 1800);
     return () => window.clearInterval(id);
   }, [step]);
 
