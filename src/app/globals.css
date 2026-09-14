@@ -387,7 +387,7 @@ body:has(.landing) .top-blur{display:none}
   .share-qr-trigger{padding:10px 14px;font-size:14px}
 }
 /* Flex children default to min-width:auto, which lets one wide child push the page past the viewport on phones. */
-body > main{min-width:0;width:100%;max-width:100%}
+body > main{min-width:0}
 @media (max-width:640px){
   .money-form{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .money-form .input,.money-form select{min-width:0}
