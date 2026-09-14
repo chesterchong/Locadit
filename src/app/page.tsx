@@ -77,6 +77,23 @@ export default function Landing() {
     router.prefetch(href);
     window.setTimeout(() => router.push(href), 760);
   };
+  // Pointer parallax for the landmarks: the root carries --px/--py in -1..1, throttled to one write per frame.
+  const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (reduced.current) return;
+    let raf = 0;
+    const onMove = (e: PointerEvent) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const el = rootRef.current; if (!el) return;
+        el.style.setProperty("--px", ((e.clientX / window.innerWidth) * 2 - 1).toFixed(3));
+        el.style.setProperty("--py", ((e.clientY / window.innerHeight) * 2 - 1).toFixed(3));
+      });
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => { window.removeEventListener("pointermove", onMove); if (raf) cancelAnimationFrame(raf); };
+  }, []);
   useEffect(() => {
     if (step < 7 || reduced.current) return;
     const id = window.setInterval(() => setLoop((l) => l + 1), 1800);
@@ -89,7 +106,7 @@ export default function Landing() {
   const changeStep = leaving ? `L${loop}` : String(step);
 
   return (
-    <div className="landing">
+    <div className="landing" ref={rootRef}>
       <IntroMusic />
       <section ref={heroRef} className="hero" aria-label="Locadit intro">
         <div className={`stage ${step >= 6 ? "night" : ""} ${exiting ? "exit" : ""}`} style={{ "--s": fit?.s ?? 1, "--wm": fit?.wm ?? 1, visibility: fit ? "visible" : "hidden" } as CSSProperties}>
@@ -161,7 +178,7 @@ function PieceEl({ p, step, delay, seed }: { p: Piece; step: number; delay: numb
     "--fx": `${Math.round((t.x - 800) * 1.7)}px`, "--fy": `${Math.round((t.y - 450) * 1.7)}px`, "--fd": `${Math.round(Math.min(220, Math.hypot(t.x - 800, t.y - 450) / 4))}ms`,
     "--wa": `${p.wind ?? 2.5}deg`, "--wd": `${(2.1 + (seed % 5) * 0.35).toFixed(2)}s`, "--wdel": `${(-(seed % 7) * 0.4).toFixed(1)}s`,
   } as CSSProperties;
-  const cls = `piece ${p.kind} ${p.font ? "f-" + p.font : ""} ${p.underline ? "underline-blue" : ""} ${p.hover ? "hoverable" : ""} ${gone ? "off" : shown ? "on" : ""}`;
+  const cls = `piece ${p.kind} ${p.font ? "f-" + p.font : ""} ${p.underline ? "underline-blue" : ""} ${p.hover ? "hoverable" : ""} ${p.landmark ? "landmark" : ""} ${gone ? "off" : shown ? "on" : ""}`;
   if (p.kind === "img") return <div className={cls} style={style}><span className="in"><img src={p.src} alt="" draggable={false} decoding="async" /></span></div>;
   if (p.kind === "polaroid") return <div className={cls} style={style}><span className="in"><i style={{ background: p.color }} /></span></div>;
   if (p.kind === "checker" || p.kind === "cloud") return <div className={cls} style={style} />;

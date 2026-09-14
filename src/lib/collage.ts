@@ -23,6 +23,7 @@ export type Piece = {
   hover?: boolean; // grows slightly on hover
   wind?: number;   // sway amplitude in degrees (default 2.5); light or tall things get more
   cycle?: string[]; // text pieces only: lines to rotate through
+  landmark?: boolean; // big background cut-out: behind every piece, rises in from the ground, no sway, pointer parallax
 };
 
 export const PIECES: Piece[] = [
@@ -32,6 +33,10 @@ export const PIECES: Piece[] = [
   { id: "beach", wind: 2, layer: 1, kind: "img", src: "/collage/beach.webp", content: "🏖️", x: 880, y: 810, size: 300, z: 8 },
   { id: "rock-l", wind: 0.6, layer: 1, kind: "img", src: "/collage/rock-l.webp", content: "🪨", x: 400, y: 770, size: 200, rot: -6 },
   { id: "rock-r", wind: 0.6, layer: 1, kind: "img", src: "/collage/rock-r.webp", content: "🪨", x: 1380, y: 800, size: 170, rot: 12 },
+  // Landmarks: large cut-outs spread along the bottom edge, behind everything else (z 1).
+  { id: "fuji", landmark: true, layer: 1, kind: "img", src: "/collage/fuji.webp", x: 470, y: 700, size: 480, z: 1 },
+  { id: "temple", landmark: true, layer: 1, kind: "img", src: "/collage/temple.webp", x: 650, y: 770, size: 220, z: 1 },
+  { id: "artsci", landmark: true, layer: 1, kind: "img", src: "/collage/artsci.webp", x: 1300, y: 610, size: 300, z: 1 },
   { id: "palm-a", wind: 7, layer: 1, kind: "img", src: "/collage/palm-a.webp", content: "🌴", x: 640, y: 360, size: 150, rot: -4, to: { x: 110, y: 230, size: 300 } },
   { id: "palm-b", wind: 7, layer: 1, kind: "img", src: "/collage/palm-b.webp", content: "🌴", x: 960, y: 360, size: 150, rot: 4, to: { x: 1480, y: 200, size: 300 } },
 

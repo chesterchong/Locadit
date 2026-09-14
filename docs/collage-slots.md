@@ -44,6 +44,16 @@ Send transparent PNG cut-outs (background removed), roughly twice the listed siz
 | 5 | alien | 👾 | Merlion, Singapore | 120 |
 | 5 | wheel | 🎡 | Tokyo Tower or the Singapore Flyer | 200 |
 
+## Landmarks
+
+Three large cut-outs sit along the bottom edge behind every other piece (`landmark: true`, z 1). They rise out of the ground with a soft focus pull instead of popping in, never sway, breathe very slowly and drift a few pixels against the pointer for depth.
+
+| Slot id | Subject | Position | Width on stage |
+|---|---|---|---|
+| fuji | Mount Fuji with a sunburst behind the peak (Japan) | bottom left, behind the Jeju rocks and Supertrees | 480 |
+| temple | Temple of Heaven, Beijing, at the foot of Fuji | left of the info card, behind the Supertrees | 220 |
+| artsci | ArtScience Museum, Singapore | bottom right, between the red umbrella and the book | 300 |
+
 Spare landmark ideas if a cut-out doesn't work: Batu Caves staircase (KL), Fushimi Inari torii gates (Kyoto), Mount Fuji, N Seoul Tower, Gamcheon Culture Village (Busan), Sultan Abdul Samad Building (KL), Kampong Glam shophouses (Singapore).
 
 Phone card: `video` (portrait mp4) in `CARDS` in `src/app/page.tsx`.
